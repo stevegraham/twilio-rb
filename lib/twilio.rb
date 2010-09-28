@@ -1,4 +1,4 @@
-%w<rubygems active_support CGI yajl yajl/json_gem httparty>.each  { |lib| require lib }
+%w<rubygems active_support CGI yajl yajl/json_gem httparty builder>.each  { |lib| require lib }
 require File.join(File.dirname(__FILE__), 'twilio', 'resource.rb')
 
 module Twilio

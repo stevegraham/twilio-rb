@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.platform                = Gem::Platform::RUBY
   s.name                    = 'twilio-rb'
-  s.version                 = '0.1.1'
+  s.version                 = '0.2.0'
   s.summary                 = 'Interact with the Twilio API in a nice Ruby way.'
   s.description             = 'A nice Ruby wrapper for the Twilio REST API'
 
@@ -15,9 +15,10 @@ Gem::Specification.new do |s|
   s.add_dependency          'yajl-ruby',     '>= 0.7.7'
   s.add_dependency          'httparty',      '>= 0.6.1'
   s.add_dependency          'webmock',       '>= 1.3.5'
+  s.add_dependency          'builder',       '>= 2.1.2'
   
 
-  s.files                   = Dir['README.textile', 'lib/**/*']
+  s.files                   = Dir['README.md', 'lib/**/*']
   s.require_path            = 'lib'
 
   s.has_rdoc                = false
