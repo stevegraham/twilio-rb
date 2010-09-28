@@ -5,7 +5,7 @@ describe Twilio::SMS do
   let(:sms_resource_uri)   { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/AC000000000000/SMS/Messages.json" }
   let(:minimum_sms_params) { 'To=%2B14158141829&From=%2B14159352345&Body=Jenny%20please%3F!%20I%20love%20you%20%3C3' }
   let(:sms)                { Twilio::SMS.new(:to => '+14158141829', :from => '+14159352345', :body => 'Jenny please?! I love you <3') }
-  
+
   def stub_new_sms
     stub_request(:post, sms_resource_uri).with(:body => minimum_sms_params).to_return :body => canned_response('sms_created'), :status => 201
   end

@@ -5,7 +5,7 @@ describe Twilio::Call do
   let(:call_resource_uri)   { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/AC000000000000/Calls" }
   let(:minimum_call_params) { 'To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback' }
   let(:call)                { Twilio::Call.new(:to => '+14155551212', :from => '+14158675309', :url => 'http://localhost:3000/hollaback') }
-  
+
   def stub_new_call
     stub_request(:post, call_resource_uri + '.json').with(:body => minimum_call_params).to_return :body => canned_response('call_created'), :status => 201
   end
@@ -71,7 +71,10 @@ describe Twilio::Call do
 
   describe 'modifying a call' do
     let(:resource) { call_resource_uri + '/CAa346467ca321c71dbd5e12f627deb854.json' }
-    before { stub_new_call }
+    before do
+      Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
+      stub_new_call
+    end
 
     describe '#url=' do
       context 'after the call has been requested via the API' do
