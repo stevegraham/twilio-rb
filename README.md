@@ -35,6 +35,8 @@ The only account property that can be modified via the REST API is the friendly 
 
 This will update the API immediately with a PUT request.
 
+Please refer to the Twilio REST API documentation for an up to date list of properties.
+
 ## Making a telephone call
 
 The API used to make a telephone call is similar to interacting with an ActiveRecord model object.

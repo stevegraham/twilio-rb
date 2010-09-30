@@ -24,17 +24,17 @@ describe 'Twilio::Account' do
       Twilio::Account.should be_active
     end
     it 'returns false when the account is inactive' do
-      Twilio::Account.status = 'Dead'
+      Twilio::Account.status = 'dead'
       Twilio::Account.should_not be_active
     end
   end
   describe "#suspended?" do
     it 'returns true when the account is suspended' do
-      Twilio::Account.status = 'Suspended'
+      Twilio::Account.status = 'suspended'
       Twilio::Account.should be_suspended
     end
     it 'returns false when the account not suspended' do
-      Twilio::Account.status = 'Active'
+      Twilio::Account.status = 'active'
       Twilio::Account.should_not be_suspended
     end
   end

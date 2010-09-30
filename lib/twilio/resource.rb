@@ -27,14 +27,14 @@ module Twilio
     end
 
     def method_missing(id, *args, &blk) #:nodoc
-      meth = id.to_s.camelize
+      meth = id.to_s
       if meth =~ /\=$/
         add_attr_writer meth
         send meth, args.first
       elsif meth =~ /^#{meth}\?/i
         add_predicate meth
         send meth
-      elsif attributes.include? meth = meth.gsub('=', '')
+      elsif self[id]
         add_attr_reader meth
         send meth
       else
@@ -44,20 +44,19 @@ module Twilio
 
     def add_predicate(attribute)
       metaclass.class_eval do
-        define_method(attribute) { self[:status] =~ /^#{attribute.downcase.gsub '?', ''}/i ? true : false }
+        define_method(attribute) { self[:status] =~ /^#{attribute.gsub '?', ''}/i ? true : false }
       end
     end
 
     def add_attr_writer(attribute) #:nodoc
       metaclass.class_eval do
-        attribute = attribute.to_s.gsub(/\=$/, '')
-        define_method("#{attribute}=") { |value| self[attribute] = value } unless respond_to? "#{attribute}="
+        define_method(attribute) { |value| self[attribute.to_s.gsub(/\=$/, '').to_sym] = value } unless respond_to? attribute
       end
     end
 
     def add_attr_reader(attribute) #:nodoc
       metaclass.class_eval do
-        define_method(attribute) { self[attribute] } unless respond_to? attribute
+        define_method(attribute) { self[attribute.to_sym] } unless respond_to? attribute
       end
     end
 
