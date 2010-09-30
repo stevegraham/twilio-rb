@@ -144,12 +144,25 @@ describe Twilio::Call do
 
   describe "#[]" do
     let(:call) { Twilio::Call.new(:if_machine => :continue) }
-    it 'is a convenience for accessing attributes' do
+    it 'is a convenience for reading attributes' do
       call['IfMachine'].should == 'Continue'
     end
 
     it 'is agnostic as to whether the attributes are accessed using the symbol style, e.g. :if_machine or the Twilio string style, e.g. "IfMachine"' do
       call[:if_machine].should == 'Continue'
+    end
+  end
+
+  describe "#[]=" do
+    let(:call) { Twilio::Call.new(:if_machine => :continue) }
+    it 'is a convenience for writing attributes' do
+      call['IfMachine'] = 'hangup'
+      call['IfMachine'].should == 'hangup'
+    end
+
+    it 'is agnostic as to whether the attributes are accessed using the symbol style, e.g. :if_machine or the Twilio string style, e.g. "IfMachine"' do
+      call[:if_machine] = 'hangup'
+      call['IfMachine'].should == 'hangup'
     end
   end
 

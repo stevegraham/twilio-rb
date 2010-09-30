@@ -15,6 +15,26 @@ end</pre>
 
 Any method that calls the Twilio API will raise `Twilio::ConfigurationError` if either Account SID or Auth Token are not configured.
 
+## The Account object
+
+The Twilio API in its current incarnation supports one Twilio account per Account SID, and so the Twilio::Account object correspondingly is a singleton object.
+
+To access properties of the account the property name should be called as a method on the object itself, e.g.
+
+<pre>Twilio::Account.friendly_name</pre>
+
+The first time a method is invoked on the object an API call is made to retrieve the data. The methods themselves are not defined until they are called, i.e. lazy evaluation. This strategy means that addtional properties added to subsequent versions of the API should not break the library.
+
+To reload the data when needed `Twilio::Account.reload!` will make another API call and update its own internal state.
+
+Predicate methods i.e. those ending in `?` map directly to the status of the account, e.g. `Twilio::Account.suspended?` returns true if Twilio have suspended your account. Again, all of these methods are defined on the fly.
+
+The only account property that can be modified via the REST API is the friendly name, e.g.
+
+<pre>Twilio::Account.friendly_name = "I'm so vain, I had to change my name!"</pre>
+
+This will update the API immediately with a PUT request.
+
 ## Making a telephone call
 
 The API used to make a telephone call is similar to interacting with an ActiveRecord model object.

@@ -65,13 +65,14 @@ describe Twilio::SMS do
   end
 
   describe "#[]" do
-    let(:sms) { Twilio::SMS.new(:if_machine => :continue) }
+    let(:sms) { Twilio::SMS.new(:to => '+19175550000') }
     it 'is a convenience for accessing attributes' do
-      sms['IfMachine'].should == 'Continue'
+      sms['To'].should == '+19175550000'
     end
 
     it 'is agnostic as to whether the attributes are accessed using the symbol style, e.g. :if_machine or the Twilio string style, e.g. "IfMachine"' do
-      sms[:if_machine].should == 'Continue'
+      sms['To'] = '+19175559999'
+      sms[:to].should == '+19175559999'
     end
   end
 
