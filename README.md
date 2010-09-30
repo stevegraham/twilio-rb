@@ -3,6 +3,18 @@
 
 Interact with the Twilio API in a nice Ruby way
 
+## Installation
+
+The library has been packaged as a gem and is available from rubygems.org
+
+<pre>gem install twilio-rb</pre>
+
+## Usage
+
+Require the library in your script as
+
+<pre>require 'twilio'</pre>
+
 ## Configuration
 
 Configuration for this library is encapsulated within `Twilio::Config`. One needs to setup with an Account SID and an Auth Token, e.g.
