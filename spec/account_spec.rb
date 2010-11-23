@@ -5,7 +5,7 @@ def canned_response(resp)
 end
 
 describe 'Twilio::Account' do
-  let(:resource) { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{Twilio::ACCOUNT_SID}" }
+  let(:resource) { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{Twilio::ACCOUNT_SID}.json" }
   before(:each) do
     Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
     stub_request(:get, resource).to_return :body => canned_response('account'), :status => 200
