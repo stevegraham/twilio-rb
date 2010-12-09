@@ -1,4 +1,4 @@
-require 'active_support/core_ext/string/inflections' # Chill! we only use the bits of AS we need!
+require 'active_support/core_ext/string' # Chill! we only use the bits of AS we need!
 
 module Twilio
   module Resource
@@ -73,10 +73,20 @@ module Twilio
       end
 
       class << base
-        def create(attrs={})
-          new(attrs).tap { |c| c.save }
-        end if instance_of? Class # Don't want this mixed into singleton objects e.g. Twilio::Account 
-        
+        if instance_of? Class # Don't want this mixed into singleton objects e.g. Twilio::Account
+          def find(id)
+            # All Twilio resources follow a convention, except SMS :(
+            klass_name = name.demodulize
+            resource = klass_name == 'SMS' ? "#{klass_name}/Messages" : klass_name.pluralize
+            res = get "/Accounts/#{Twilio::ACCOUNT_SID}/#{resource}/#{id}.json"
+            new Hash[res.parsed_response.map { |k,v| [k.camelize, v] }] if (200..299).include? res.code
+          end
+
+          def create(attrs={})
+            new(attrs).tap { |c| c.save }
+          end 
+        end
+
         # decorate http methods with authentication
         %w<post get put delete>.each do |meth| 
           define_method(meth) do |*args| # splatted args necessary hack since <= 1.8.7 does not support optional block args 

@@ -7,7 +7,8 @@ describe Twilio::Call do
   let(:call)                { Twilio::Call.new(:to => '+14155551212', :from => '+14158675309', :url => 'http://localhost:3000/hollaback') }
 
   def stub_new_call
-    stub_request(:post, call_resource_uri + '.json').with(:body => minimum_call_params).to_return :body => canned_response('call_created'), :status => 201
+    stub_request(:post, call_resource_uri + '.json').with(:body => minimum_call_params).
+      to_return :body => canned_response('call_created'), :status => 201
   end
 
   def new_call_should_have_been_made
@@ -16,6 +17,33 @@ describe Twilio::Call do
 
   def canned_response(resp)
     File.new File.join(File.expand_path(File.dirname __FILE__), 'support', 'responses', "#{resp}.json")
+  end
+
+  describe '.find' do
+    context 'for a valid call sid' do
+      before do
+        Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
+        stub_request(:get, call_resource_uri + '/CAa346467ca321c71dbd5e12f627deb854' + '.json').
+          to_return :body => canned_response('call_created'), :status => 200
+      end
+
+      it 'finds a call with the given call sid' do
+        call = Twilio::Call.find 'CAa346467ca321c71dbd5e12f627deb854'
+        call.should be_a Twilio::Call
+        call.sid.should == 'CAa346467ca321c71dbd5e12f627deb854'
+      end
+    end
+
+    context 'for a string that does not correspond to a real call' do
+      before do
+        Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
+        stub_request(:get, call_resource_uri + '/phony' + '.json').to_return :status => 404
+      end
+      it 'returns nil' do
+        call = Twilio::Call.find 'phony'
+        call.should be_nil
+      end
+    end
   end
 
   describe '.new' do

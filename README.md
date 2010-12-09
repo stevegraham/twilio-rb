@@ -64,6 +64,14 @@ The parameter keys should be given as underscored symbols. They will be converte
 
 Please see the Twilio REST API documentation for an up to date list of supported parameters. 
 
+## Finding an existing telephone call
+
+To retrieve an earlier created call, there is the `Twilio::Call.find` method, which accepts a call SID, e.g.
+
+<pre>call = Twilio::Call.find 'CAa346467ca321c71dbd5e12f627deb854'</pre>
+
+This returns an instance of `Twilio::Call` if a call with the given SID was found, otherwise nil is returned 
+
 ### Modifying a live telephone call
 
 Once a call has been been created it can be modified with the following methods:
@@ -89,6 +97,14 @@ sms.save</pre>
 The parameter keys should be given as underscored symbols. They will be converted internally to camelized strings prior to an API call being made.
 
 Please see the Twilio REST API documentation for an up to date list of supported parameters.
+
+## Finding an existing telephone SMS message
+
+To retrieve an earlier created SMS message, there is the `Twilio::SMS.find` method, which accepts a SMS message SID, e.g.
+
+<pre>call = Twilio::SMS.find 'SM90c6fc909d8504d45ecdb3a3d5b3556e'</pre>
+
+This returns an instance of `Twilio::SMS` if a SMS message with the given SID was found, otherwise nil is returned
 
 ## Building TwiML documents
 
