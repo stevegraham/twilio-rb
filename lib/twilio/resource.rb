@@ -2,6 +2,10 @@ require 'active_support/core_ext/string' # Chill! we only use the bits of AS we 
 
 module Twilio
   module Resource
+    def initialize(attrs ={})  #:nodoc:
+      @attributes = Hash[attrs.map { |k,v| [k.to_s.camelize, v.to_s] }]
+    end
+
     # Convenience for accessing attributes. Attributes can be accessed either using the
     # preferred symbol style, e.g. :if_machine or using the Twilio stringified attribute
     # style, e.g. 'IfMachine'
@@ -19,7 +23,7 @@ module Twilio
     private
 
     def handle_response(res) # :nodoc:
-      if res.code.to_s =~ /^(4|5)\d\d/
+      if (400..599).include? res.code
         raise Twilio::APIError.new "Error ##{res.parsed_response['code']}: #{res.parsed_response['message']}"
       else
         @attributes.update Hash[res.parsed_response.map { |k,v| [k.camelize, v] }] # params are camelized in requests, yet underscored in the repsonse. inconsistency FTW!

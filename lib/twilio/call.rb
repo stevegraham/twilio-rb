@@ -3,7 +3,7 @@ module Twilio
     include Twilio::Resource
 
     def initialize(attrs ={})  #:nodoc:
-      @attributes = Hash[attrs.map { |k,v| [k.to_s.camelize, v.to_s] }]
+      super
       normalize_http_verbs!
       escape_send_digits! if attributes.include? 'SendDigits'
       normalize_if_machine_parameter!
