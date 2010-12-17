@@ -1,5 +1,5 @@
 %w<rubygems active_support cgi yajl yajl/json_gem httparty builder>.each  { |lib| require lib }
-require File.join(File.dirname(__FILE__), 'twilio', 'resource.rb')
+%w<resource finder persistable>.each { |lib| require File.join(File.dirname(__FILE__), 'twilio', "#{lib}.rb") }
 
 module Twilio
   API_ENDPOINT        = 'https://api.twilio.com/2010-04-01'

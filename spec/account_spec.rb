@@ -42,13 +42,13 @@ describe 'Twilio::Account' do
     it 'updates the friendly name' do
       stub_request(:put, resource).with(:body => 'friendly_name=vanity%20name').to_return :body => canned_response('account'), :status => 201
       Twilio::Account.friendly_name = 'vanity name'
-      request(:put, resource).with(:body => 'friendly_name=vanity%20name').should have_been_made
+      a_request(:put, resource).with(:body => 'friendly_name=vanity%20name').should have_been_made
     end
   end
   describe '#reload!' do
     it "makes a request to the API and updates the object's attributes" do
       Twilio::Account.reload!
-      request(:get, resource).should have_been_made
+      a_request(:get, resource).should have_been_made
     end
   end
 end

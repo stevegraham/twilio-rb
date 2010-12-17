@@ -5,5 +5,9 @@ RSpec.configure do |config|
   config.after(:each) do
     [:ACCOUNT_SID, :AUTH_TOKEN].each { |c| Twilio.instance_eval { remove_const c if const_defined? c } }
   end
-  config.include WebMock
+  config.include WebMock::API
+end
+
+def canned_response(resp)
+  File.new File.join(File.expand_path(File.dirname __FILE__), 'support', 'responses', "#{resp}.json")
 end

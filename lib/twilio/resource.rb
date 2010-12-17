@@ -3,7 +3,11 @@ require 'active_support/core_ext/string' # Chill! we only use the bits of AS we 
 module Twilio
   module Resource
     def initialize(attrs ={})  #:nodoc:
-      @attributes = Hash[attrs.map { |k,v| [k.to_s.camelize, v.to_s] }]
+      attrs = attrs.map do |k,v| 
+        v = v.to_s if v.is_a? Symbol
+        [k.to_s.camelize, v]
+      end
+      @attributes = Hash[attrs]
     end
 
     # Convenience for accessing attributes. Attributes can be accessed either using the
@@ -38,7 +42,7 @@ module Twilio
       elsif meth =~ /^#{meth}\?/i
         add_predicate meth
         send meth
-      elsif self[id]
+      elsif attributes.keys.include? meth.camelize
         add_attr_reader meth
         send meth
       else
@@ -77,20 +81,6 @@ module Twilio
       end
 
       class << base
-        if instance_of? Class # Don't want this mixed into singleton objects e.g. Twilio::Account
-          def find(id)
-            # All Twilio resources follow a convention, except SMS :(
-            klass_name = name.demodulize
-            resource = klass_name == 'SMS' ? "#{klass_name}/Messages" : klass_name.pluralize
-            res = get "/Accounts/#{Twilio::ACCOUNT_SID}/#{resource}/#{id}.json"
-            new Hash[res.parsed_response.map { |k,v| [k.camelize, v] }] if (200..299).include? res.code
-          end
-
-          def create(attrs={})
-            new(attrs).tap { |c| c.save }
-          end 
-        end
-
         # decorate http methods with authentication
         %w<post get put delete>.each do |meth| 
           define_method(meth) do |*args| # splatted args necessary hack since <= 1.8.7 does not support optional block args 

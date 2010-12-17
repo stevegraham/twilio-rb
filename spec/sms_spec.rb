@@ -11,7 +11,7 @@ describe Twilio::SMS do
   end
 
   def new_sms_should_have_been_made
-    request(:post, sms_resource_uri + '.json').with(:body => minimum_sms_params).should have_been_made
+    a_request(:post, sms_resource_uri + '.json').with(:body => minimum_sms_params).should have_been_made
   end
 
   def canned_response(resp)

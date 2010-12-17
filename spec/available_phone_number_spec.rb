@@ -10,23 +10,12 @@ describe Twilio::AvailablePhoneNumber do
       to_return :body => canned_response(response_file), :status => 200
   end
 
-  def canned_response(resp)
-    File.new File.join(File.expand_path(File.dirname __FILE__), 'support', 'responses', "#{resp}.json")
-  end
-  
-  describe '.find' do
-    it 'is an alias of .all' do
-      Twilio::AvailablePhoneNumber.method(:all).should == Twilio::AvailablePhoneNumber.method(:find)
-    end
-  end
-
   describe '.new' do
     it 'is a private method because they cannot be created via theTwilio API' do
       # I think this will fail on 1.8.7 as querying an objects methods returns a collection of strings.
       Twilio::AvailablePhoneNumber.private_methods.should include :new
     end
   end
-
 
   describe '.all' do
     context 'for US local numbers' do
@@ -37,12 +26,12 @@ describe Twilio::AvailablePhoneNumber do
         resp.length.should == 2
       end
 
-      its 'collection contains instances of Twilio::AvailablePhoneNumber' do
+      it 'returns a collection containing instances of Twilio::AvailablePhoneNumber' do
         resp = Twilio::AvailablePhoneNumber.all :area_code => '510'
         resp.all? { |r| r.is_a? Twilio::AvailablePhoneNumber }.should be_true
       end
 
-      its 'collection contains objects whose attributes correspond to the response' do
+      it 'returns a collection containing objects with attributes corresponding to the response' do
         numbers = JSON.parse(canned_response('available_local_phone_numbers').read)['available_phone_numbers']
         resp    = Twilio::AvailablePhoneNumber.all :area_code => '510'
 
@@ -56,7 +45,7 @@ describe Twilio::AvailablePhoneNumber do
       before { stub_api_call '/CA/Local.json', 'available_local_phone_numbers' }
       it 'makes a request for a non-US number as per the country code' do
         Twilio::AvailablePhoneNumber.all :iso_country_code => 'CA'
-        request(:get, resource_uri + '/CA/Local.json').should have_been_made
+        a_request(:get, resource_uri + '/CA/Local.json').should have_been_made
       end
     end
     

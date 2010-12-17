@@ -2,17 +2,17 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Twilio::Call do
 
-  let(:call_resource_uri)   { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/AC000000000000/Calls" }
-  let(:minimum_call_params) { 'To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback' }
+  let(:resource_uri)   { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/AC000000000000/Calls" }
+  let(:minimum_params) { 'To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback' }
   let(:call)                { Twilio::Call.new(:to => '+14155551212', :from => '+14158675309', :url => 'http://localhost:3000/hollaback') }
 
-  def stub_new_call
-    stub_request(:post, call_resource_uri + '.json').with(:body => minimum_call_params).
+  def stub_api_call
+    stub_request(:post, resource_uri + '.json').with(:body => minimum_params).
       to_return :body => canned_response('call_created'), :status => 201
   end
 
   def new_call_should_have_been_made
-    request(:post, call_resource_uri + '.json').with(:body => minimum_call_params).should have_been_made
+    a_request(:post, resource_uri + '.json').with(:body => minimum_params).should have_been_made
   end
 
   def canned_response(resp)
@@ -23,7 +23,7 @@ describe Twilio::Call do
     context 'for a valid call sid' do
       before do
         Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
-        stub_request(:get, call_resource_uri + '/CAa346467ca321c71dbd5e12f627deb854' + '.json').
+        stub_request(:get, resource_uri + '/CAa346467ca321c71dbd5e12f627deb854' + '.json').
           to_return :body => canned_response('call_created'), :status => 200
       end
 
@@ -37,7 +37,7 @@ describe Twilio::Call do
     context 'for a string that does not correspond to a real call' do
       before do
         Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
-        stub_request(:get, call_resource_uri + '/phony' + '.json').to_return :status => 404
+        stub_request(:get, resource_uri + '/phony' + '.json').to_return :status => 404
       end
       it 'returns nil' do
         call = Twilio::Call.find 'phony'
@@ -84,7 +84,7 @@ describe Twilio::Call do
     context 'when authentication credentials are configured' do
       before(:each) do
         Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
-        stub_new_call
+        stub_api_call
       end
       it 'makes the API call to Twilio' do
         call.save
@@ -98,10 +98,10 @@ describe Twilio::Call do
   end
 
   describe 'modifying a call' do
-    let(:resource) { call_resource_uri + '/CAa346467ca321c71dbd5e12f627deb854.json' }
+    let(:resource) { resource_uri + '/CAa346467ca321c71dbd5e12f627deb854.json' }
     before do
       Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
-      stub_new_call
+      stub_api_call
     end
 
     describe '#url=' do
@@ -111,14 +111,14 @@ describe Twilio::Call do
           call.save
           call.url = 'http://foo.com'
           call[:url].should == 'http://foo.com'
-          request(:post, resource).with(:body => 'url=http%3A%2F%2Ffoo.com').should have_been_made
+          a_request(:post, resource).with(:body => 'url=http%3A%2F%2Ffoo.com').should have_been_made
         end
       end
       context 'before the call has been requested via the API' do
         it 'updates the callback URL in its internal state' do
           call.url = 'http://foo.com'
           call[:url].should == 'http://foo.com'
-          request(:post, resource).with(:body => 'url=http%3A%2F%2Ffoo.com').should_not have_been_made
+          a_request(:post, resource).with(:body => 'url=http%3A%2F%2Ffoo.com').should_not have_been_made
         end
       end
     end
@@ -130,7 +130,7 @@ describe Twilio::Call do
           call.save
           call.cancel!
           call[:status].should == 'cancelled'
-          request(:post, resource).with(:body => 'Status=cancelled').should have_been_made
+          a_request(:post, resource).with(:body => 'Status=cancelled').should have_been_made
         end
       end
       context 'before the call has been requested via the API' do
@@ -147,7 +147,7 @@ describe Twilio::Call do
           call.save
           call.complete!
           call[:status].should == 'completed'
-          request(:post, resource).with(:body => 'Status=completed').should have_been_made
+          a_request(:post, resource).with(:body => 'Status=completed').should have_been_made
         end
       end
       context 'before the call has been requested via the API' do
@@ -164,7 +164,7 @@ describe Twilio::Call do
         account_sid   'AC000000000000'
         auth_token    '79ad98413d911947f0ba369d295ae7a3'
       end
-      stub_new_call
+      stub_api_call
       Twilio::Call.create :to => '+14155551212', :from => '+14158675309', :url => 'http://localhost:3000/hollaback'
       new_call_should_have_been_made
     end
@@ -212,7 +212,7 @@ describe Twilio::Call do
         account_sid   'AC000000000000'
         auth_token    '79ad98413d911947f0ba369d295ae7a3'
       end
-      stub_request(:post, call_resource_uri + '.json').with(:body => minimum_call_params).to_return :body => canned_response('api_error'), :status => 404
+      stub_request(:post, resource_uri + '.json').with(:body => minimum_params).to_return :body => canned_response('api_error'), :status => 404
       lambda { call.save }.should raise_error Twilio::APIError
     end
   end

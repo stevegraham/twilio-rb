@@ -1,6 +1,7 @@
 module Twilio
   class AvailablePhoneNumber
     include Twilio::Resource 
+    extend  Twilio::Finder
 
     class << self
       def all(opts={})
@@ -12,17 +13,7 @@ module Twilio
         handle_response get "/Accounts/#{Twilio::ACCOUNT_SID}/AvailablePhoneNumbers/#{country_code}/#{number_type}.json", params 
       end
 
-      alias   find all
       private :new
-
-      private
-      def handle_response(res) # :nodoc:
-        if (400..599).include? res.code
-          raise Twilio::APIError.new "Error ##{res.parsed_response['code']}: #{res.parsed_response['message']}"
-        else
-          res.parsed_response[name.demodulize.underscore + 's'].map { |p| new p }
-        end
-      end
 
     end
   end

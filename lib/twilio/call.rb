@@ -1,17 +1,14 @@
 module Twilio
   class Call
     include Twilio::Resource
+    include Twilio::Persistable
+    extend Twilio::Finder
 
     def initialize(attrs ={})  #:nodoc:
       super
       normalize_http_verbs!
       escape_send_digits! if attributes.include? 'SendDigits'
       normalize_if_machine_parameter!
-    end
-
-    # Dials the call
-    def save
-      handle_response self.class.post "/Accounts/#{Twilio::ACCOUNT_SID}/Calls.json", :body => attributes
     end
 
     # Cancels a call if its state is 'queued' or 'ringing'    
