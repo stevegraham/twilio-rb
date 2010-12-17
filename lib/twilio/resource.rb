@@ -19,7 +19,7 @@ module Twilio
       attributes[accessor]
     end
 
-    def []=(key,value)
+    def []=(key,value) # :nodoc:
       accessor = key.is_a?(Symbol) ? key.to_s.camelize : key
       attributes[accessor] = value
     end

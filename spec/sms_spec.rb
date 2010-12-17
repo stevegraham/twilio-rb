@@ -4,7 +4,7 @@ describe Twilio::SMS do
 
   let(:sms_resource_uri)   { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/AC000000000000/SMS/Messages" }
   let(:minimum_sms_params) { 'To=%2B14158141829&From=%2B14159352345&Body=Jenny%20please%3F!%20I%20love%20you%20%3C3' }
-  let(:sms)                { Twilio::SMS.new(:to => '+14158141829', :from => '+14159352345', :body => 'Jenny please?! I love you <3') }
+  let(:sms)                { Twilio::SMS.create(:to => '+14158141829', :from => '+14159352345', :body => 'Jenny please?! I love you <3') }
 
   def stub_new_sms
     stub_request(:post, sms_resource_uri + '.json').with(:body => minimum_sms_params).to_return :body => canned_response('sms_created'), :status => 201
@@ -45,22 +45,10 @@ describe Twilio::SMS do
     end
   end
 
-  describe '.new' do
-    describe "processing attributes" do
-      it "camelizes the attributes because that's how Twilio rolls" do
-        attrs = { :to => '+14158141829', :from => '+14159352345', :body => 'Jenny please?! I love you <3' }
-        attrs.each do |k,v|
-          sms.attributes.should include k.to_s.camelize
-          sms.attributes.should_not include k
-        end
-      end
-    end
-  end
-
   describe '#save' do
     context 'when authentication credentials are not configured' do
       it 'raises Twilio::ConfigurationError' do
-        lambda { sms.save }.should raise_error(Twilio::ConfigurationError)
+        lambda { sms }.should raise_error(Twilio::ConfigurationError)
       end
     end
     context 'when authentication credentials are configured' do
@@ -69,18 +57,17 @@ describe Twilio::SMS do
         stub_new_sms
       end
       it 'makes the API sms to Twilio' do
-        sms.save
+        sms
         new_sms_should_have_been_made
       end
       it 'updates its attributes' do
-        sms.save
         sms.direction.should == "outbound-api"
       end
     end
   end
 
   describe ".create" do
-    it "instantiates object and makes API sms in one step" do
+    it "sends the message" do
       Twilio::Config.setup do
         account_sid   'AC000000000000'
         auth_token    '79ad98413d911947f0ba369d295ae7a3'
@@ -100,18 +87,6 @@ describe Twilio::SMS do
     it 'is agnostic as to whether the attributes are accessed using the symbol style, e.g. :if_machine or the Twilio string style, e.g. "IfMachine"' do
       sms['To'] = '+19175559999'
       sms[:to].should == '+19175559999'
-    end
-  end
-
-  describe 'virtual attributes' do
-    it 'does not respond to unknown attributes, i.e. will super via method_missing' do
-      sms = Twilio::SMS.new
-      sms.should_not respond_to :foo
-    end
-    it 'does respond to known attributes' do
-      sms = Twilio::SMS.new
-      sms.foo = 'bar'
-      sms.foo.should == 'bar'
     end
   end
 

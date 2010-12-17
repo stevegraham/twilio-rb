@@ -4,7 +4,7 @@ describe Twilio::Call do
 
   let(:resource_uri)   { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/AC000000000000/Calls" }
   let(:minimum_params) { 'To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback' }
-  let(:call)                { Twilio::Call.new(:to => '+14155551212', :from => '+14158675309', :url => 'http://localhost:3000/hollaback') }
+  let(:call)           { Twilio::Call.create(:to => '+14155551212', :from => '+14158675309', :url => 'http://localhost:3000/hollaback') }
 
   def stub_api_call
     stub_request(:post, resource_uri + '.json').with(:body => minimum_params).
@@ -46,52 +46,39 @@ describe Twilio::Call do
     end
   end
 
-  describe '.new' do
+  describe '.create' do
+    before do 
+      Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
+      stub_api_call
+    end
+
     describe "processing attributes" do
-      it "camelizes the attributes because that's how Twilio rolls" do
-        attrs = { :to => '+19175551234', :from => '+19175550000', :url => 'http://localhost:3000/hollaback' }
-        attrs.each do |k,v|
-          call.attributes.should include k.to_s.camelize
-          call.attributes.should_not include k
-        end
-      end
-
-      it 'upcases attributes that correspond to HTTP verbs' do
-        attrs = { :fallback_method => :post, :status_callback_method => :get, :method => :put }
-        call  = Twilio::Call.new attrs
-        attrs.each do |k,v|
-          call.attributes[k.to_s.camelize].should == v.to_s.upcase
-          call.attributes[k.to_s.camelize].should_not == v
-        end
-      end
-
+      
       it 'escapes send digits because pound, i.e. "#" has special meaning in a url' do
-        Twilio::Call.new(:send_digits => '1234#00').attributes['SendDigits'].should == '1234%2300'
+        Twilio::Call.new(:send_digits => '1234#00').send_digits.should == '1234%2300'
       end
 
       it 'capitalises the value of "IfMachine" parameter' do
-        Twilio::Call.new(:if_machine => :continue).attributes['IfMachine'].should == 'Continue'
+        Twilio::Call.new(:if_machine => :continue).if_machine.should == 'Continue'
       end
     end
-  end
 
-  describe '#save' do
     context 'when authentication credentials are not configured' do
       it 'raises Twilio::ConfigurationError' do
-        lambda { call.save }.should raise_error(Twilio::ConfigurationError)
+        Twilio.send :remove_const, :ACCOUNT_SID
+        lambda { call }.should raise_error(Twilio::ConfigurationError)
       end
     end
     context 'when authentication credentials are configured' do
       before(:each) do
         Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
-        stub_api_call
       end
       it 'makes the API call to Twilio' do
-        call.save
+        call
         new_call_should_have_been_made
       end
       it 'updates its attributes' do
-        call.save
+        call
         call.phone_number_sid.should == "PNd6b0e1e84f7b117332aed2fd2e5bbcab"
       end
     end
@@ -105,56 +92,32 @@ describe Twilio::Call do
     end
 
     describe '#url=' do
-      context 'after the call has been requested via the API' do
-        it 'updates the callback URL with the API' do
-          stub_request(:post, resource).with(:body => 'url=http%3A%2F%2Ffoo.com').to_return :body => canned_response('call_url_modified'), :status => 201
-          call.save
-          call.url = 'http://foo.com'
-          call[:url].should == 'http://foo.com'
-          a_request(:post, resource).with(:body => 'url=http%3A%2F%2Ffoo.com').should have_been_made
-        end
-      end
-      context 'before the call has been requested via the API' do
-        it 'updates the callback URL in its internal state' do
-          call.url = 'http://foo.com'
-          call[:url].should == 'http://foo.com'
-          a_request(:post, resource).with(:body => 'url=http%3A%2F%2Ffoo.com').should_not have_been_made
-        end
+      it 'updates the callback URL with the API' do
+        stub_request(:post, resource).with(:body => 'url=http%3A%2F%2Ffoo.com').to_return :body => canned_response('call_url_modified'), :status => 201
+        call
+        call.url = 'http://foo.com'
+        call[:url].should == 'http://foo.com'
+        a_request(:post, resource).with(:body => 'url=http%3A%2F%2Ffoo.com').should have_been_made
       end
     end
 
     describe "#cancel!" do
-      context 'after the call has been requested via the API' do
-        it "updates the call's status as 'cancelled'" do
-          stub_request(:post, resource).with(:body => 'Status=cancelled').to_return :body => canned_response('call_cancelled'), :status => 201
-          call.save
-          call.cancel!
-          call[:status].should == 'cancelled'
-          a_request(:post, resource).with(:body => 'Status=cancelled').should have_been_made
-        end
+      it "updates the call's status as 'cancelled'" do
+        stub_request(:post, resource).with(:body => 'Status=cancelled').to_return :body => canned_response('call_cancelled'), :status => 201
+        call.cancel!
+        call[:status].should == 'cancelled'
+        a_request(:post, resource).with(:body => 'Status=cancelled').should have_been_made
       end
-      context 'before the call has been requested via the API' do
-        it 'raises an error' do
-          lambda { call.cancel! }.should raise_error Twilio::InvalidStateError
-        end
-      end
+
     end
 
     describe "#complete!" do
-      context 'after the call has been requested via the API' do
-        it "updates the call's status as 'completed'" do
+    it "updates the call's status as 'completed'" do
           stub_request(:post, resource).with(:body => 'Status=completed').to_return :body => canned_response('call_completed'), :status => 201
-          call.save
           call.complete!
           call[:status].should == 'completed'
           a_request(:post, resource).with(:body => 'Status=completed').should have_been_made
-        end
-      end
-      context 'before the call has been requested via the API' do
-        it 'raises an error' do
-          lambda { call.cancel! }.should raise_error Twilio::InvalidStateError
-        end
-      end
+        end 
     end
   end
   
@@ -213,7 +176,7 @@ describe Twilio::Call do
         auth_token    '79ad98413d911947f0ba369d295ae7a3'
       end
       stub_request(:post, resource_uri + '.json').with(:body => minimum_params).to_return :body => canned_response('api_error'), :status => 404
-      lambda { call.save }.should raise_error Twilio::APIError
+      lambda { call }.should raise_error Twilio::APIError
     end
   end
 end
