@@ -37,7 +37,7 @@ describe Twilio::IncomingPhoneNumber do
       stub_request(:get, resource_uri + '.json?FriendlyName=example&PhoneNumber=2125550000').
         to_return :body => canned_response('list_incoming_phone_numbers'), :status => 200
       Twilio::IncomingPhoneNumber.all :phone_number => '2125550000', :friendly_name => 'example'
-      a_request(:get, resource_uri + '.json?PhoneNumber=2125550000&FriendlyName=example').should have_been_made
+      a_request(:get, resource_uri + '.json?FriendlyName=example&PhoneNumber=2125550000').should have_been_made
     end
   end
 

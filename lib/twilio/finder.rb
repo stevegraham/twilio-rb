@@ -14,10 +14,21 @@ module Twilio
     end 
 
     def all(opts={})
-      opts                = Hash[opts.map { |k,v| [k.to_s.camelize, v]}]
-      params              = { :query => opts } if opts.any?
+      opts = opts.map do |k,v|
+        if [:updated_before, :created_before, :updated_after, :created_after].include? k
+          k = k.to_s
+          # Fancy schmancy-ness to handle Twilio <= URI operator for dates
+          comparator = k =~ /before$/ ? '<=' : '>='
+          "Date" << k.gsub(/\_\w+/, '').capitalize << comparator << v.to_s
+        else
+          "#{k.to_s.camelize}=#{v}"
+        end
+      end
 
-      handle_response get "/Accounts/#{Twilio::ACCOUNT_SID}/#{name.demodulize + 's'}.json", params
+      params = "?#{URI.encode(opts.join '&')}" unless opts.empty?
+      # TODO: This won't work with SMS messages, see above. Perhaps handle SMS case by overriding in
+      # SMS class itself instead of polluting generic functionality
+      handle_response get "/Accounts/#{Twilio::ACCOUNT_SID}/#{name.demodulize + 's'}.json#{params}"
     end
 
     private
