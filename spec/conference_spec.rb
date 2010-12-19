@@ -72,4 +72,33 @@ describe Twilio::Conference do
     end
   end
 
+  describe '#participants' do
+    before do
+      stub_api_call 'list_conferences'
+      stub_request(:get, resource_uri + '/CFbbe46ff1274e283f7e3ac1df0072ab39/Participants.json').
+        to_return :body => canned_response('list_participants'), :status => 200
+    end
+
+    let(:resp) { Twilio::Conference.all.first.participants }
+
+    it 'returns a collection of participants' do
+      resp.should_not be_empty
+      resp.all? { |r| r.is_a? Twilio::Participant }.should be_true
+    end
+
+    it 'returns a collection containing objects with attributes corresponding to the response' do
+      participants = JSON.parse(canned_response('list_participants').read)['participants']
+
+      participants.each_with_index do |obj,i|
+        obj.each do |attr, value| 
+          resp[i].send(attr).should == value
+        end
+      end
+    end
+    
+    it 'returns a collection with a length corresponding to the API response' do
+      resp.length.should == 1
+    end
+  end
+
 end

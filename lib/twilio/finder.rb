@@ -19,7 +19,7 @@ module Twilio
           k = k.to_s
           # Fancy schmancy-ness to handle Twilio <= URI operator for dates
           comparator = k =~ /before$/ ? '<=' : '>='
-          "Date" << k.gsub(/\_\w+/, '').capitalize << comparator << v.to_s
+          "Date" << k.gsub(/\_\w+$/, '').capitalize << comparator << v.to_s
         else
           "#{k.to_s.camelize}=#{v}"
         end
