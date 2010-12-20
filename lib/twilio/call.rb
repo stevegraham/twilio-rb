@@ -4,20 +4,24 @@ module Twilio
     include Twilio::Persistable
     extend Twilio::Finder
 
-    def initialize(attrs ={})  #:nodoc:
-      super
-      normalize_http_verbs!
-      escape_send_digits! if attributes.include? 'SendDigits'
-      normalize_if_machine_parameter!
+    class << self
+      alias old_create create
+      def create(attrs={})
+        attrs = attrs.with_indifferent_access
+        attrs.each { |k,v| v.upcase! if k.to_s =~ /method$/ }
+        attrs[:send_digits] = CGI.escape(attrs[:send_digits]) if attrs[:send_digits]
+        attrs['if_machine'].try :capitalize
+        old_create attrs
+      end
     end
 
     # Cancels a call if its state is 'queued' or 'ringing'    
     def cancel!
-      state_guard { modify_call 'Status' => 'cancelled' }
+      modify_call 'Status' => 'cancelled'
     end
     
     def complete!
-      state_guard { modify_call 'Status' => 'completed' }
+      modify_call 'Status' => 'completed'
     end
     
     # Update Handler URL
@@ -28,29 +32,6 @@ module Twilio
     end
 
     private
-
-    def normalize_http_verbs! #:nodoc:
-      # Twilio accepts a HTTP method for use with various callbacks. The API documentation
-      # indicates that the HTTP verbs are to be passed as upcase.
-      attributes.each { |k,v| v.upcase! if k =~ /Method$/ }
-    end
-
-    def escape_send_digits! #:nodoc:
-      # A pound, i.e. "#" has special meaning in a URL so it must be escaped
-      attributes.update 'SendDigits' => CGI.escape(attributes['SendDigits'])
-    end
-
-    def normalize_if_machine_parameter! #:nodoc:
-      attributes['IfMachine'].capitalize! if attributes['IfMachine']
-    end
-
-    def state_guard(&blk)
-      if self[:status] # If this attribute exists it is assumed the API call to create a call has been made, and the object is in the correct state to make request.
-        blk.call
-      else
-        raise Twilio::InvalidStateError.new 'Call is in invalid state to perform this action.'
-      end
-    end
 
     def modify_call(params)
       handle_response self.class.post "/Accounts/#{Twilio::ACCOUNT_SID}/Calls/#{self[:sid]}.json", :body => params

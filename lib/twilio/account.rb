@@ -1,7 +1,7 @@
 module Twilio
   module Account
     include Twilio::Resource
-    @attributes = {}
+    @attributes = {}.with_indifferent_access
 
     def attributes
       @attributes.empty? ? reload! : @attributes

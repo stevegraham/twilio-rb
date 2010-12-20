@@ -53,13 +53,29 @@ describe Twilio::Call do
     end
 
     describe "processing attributes" do
-      
+      let :call do
+        Twilio::Call.create :to => '+14155551212', :from => '+14158675309', :url => 'http://localhost:3000/hollaback',
+          :send_digits => '1234#00', :if_machine => 'Continue'
+      end
+
+      before do
+        stub_request(:post, resource_uri + '.json').
+          with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%252300&IfMachine=Continue").
+          to_return(:status => 200, :body => canned_response('call_created'))
+      end
+
       it 'escapes send digits because pound, i.e. "#" has special meaning in a url' do
-        Twilio::Call.new(:send_digits => '1234#00').send_digits.should == '1234%2300'
+        call
+        a_request(:post, resource_uri + '.json').
+          with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%252300&IfMachine=Continue").
+          should have_been_made
       end
 
       it 'capitalises the value of "IfMachine" parameter' do
-        Twilio::Call.new(:if_machine => :continue).if_machine.should == 'Continue'
+        call
+        a_request(:post, resource_uri + '.json').
+          with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%252300&IfMachine=Continue").
+          should have_been_made
       end
     end
 
@@ -134,38 +150,13 @@ describe Twilio::Call do
   end
 
   describe "#[]" do
-    let(:call) { Twilio::Call.new(:if_machine => :continue) }
+    let(:call) { Twilio::Call.new(:if_machine => 'Continue') }
     it 'is a convenience for reading attributes' do
-      call['IfMachine'].should == 'Continue'
-    end
-
-    it 'is agnostic as to whether the attributes are accessed using the symbol style, e.g. :if_machine or the Twilio string style, e.g. "IfMachine"' do
       call[:if_machine].should == 'Continue'
     end
-  end
 
-  describe "#[]=" do
-    let(:call) { Twilio::Call.new(:if_machine => :continue) }
-    it 'is a convenience for writing attributes' do
-      call['IfMachine'] = 'hangup'
-      call['IfMachine'].should == 'hangup'
-    end
-
-    it 'is agnostic as to whether the attributes are accessed using the symbol style, e.g. :if_machine or the Twilio string style, e.g. "IfMachine"' do
-      call[:if_machine] = 'hangup'
-      call['IfMachine'].should == 'hangup'
-    end
-  end
-
-  describe 'virtual attributes' do
-    it 'does not respond to unknown attributes, i.e. will super via method_missing' do
-      call = Twilio::Call.new
-      call.should_not respond_to :foo
-    end
-    it 'does respond to known attributes' do
-      call = Twilio::Call.new
-      call.foo = 'bar'
-      call.foo.should == 'bar'
+    it 'accepts a string or symbol' do
+      call['if_machine'].should == 'Continue'
     end
   end
   

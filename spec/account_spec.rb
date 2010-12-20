@@ -12,12 +12,8 @@ describe 'Twilio::Account' do
   end
 
   describe 'accessing account properties' do
-    let :response do
-      JSON.parse(File.read File.join File.dirname(__FILE__), '/support/responses/account.json')
-    end
-    it 'maps the API response to lazily defined accessor methods' do
-      response.each { |meth, value| Twilio::Account.send(meth).should == value }
-    end
+    JSON.parse(File.read File.join File.dirname(__FILE__), '/support/responses/account.json').
+      each { |meth, value| specify { Twilio::Account.send(meth).should == value } }
   end
   describe "#active?" do
     it 'returns true when the account is active' do

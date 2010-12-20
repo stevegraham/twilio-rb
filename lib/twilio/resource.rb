@@ -1,27 +1,18 @@
 require 'active_support/core_ext/string' # Chill! we only use the bits of AS we need!
+require 'active_support/core_ext/hash'
 
 module Twilio
   module Resource
     def initialize(attrs ={})  #:nodoc:
-      attrs = attrs.map do |k,v| 
-        v = v.to_s if v.is_a? Symbol
-        [k.to_s.camelize, v]
-      end
-      @attributes = Hash[attrs]
+      @attributes = attrs.with_indifferent_access
     end
 
-    # Convenience for accessing attributes. Attributes can be accessed either using the
-    # preferred symbol style, e.g. :if_machine or using the Twilio stringified attribute
-    # style, e.g. 'IfMachine'
-    # Kind of like ActiveSupport::HashWithIndifferentAccess on crack.
     def [](key)
-      accessor = key.is_a?(Symbol) ? key.to_s.camelize : key
-      attributes[accessor]
+      attributes[key]
     end
 
     def []=(key,value) # :nodoc:
-      accessor = key.is_a?(Symbol) ? key.to_s.camelize : key
-      attributes[accessor] = value
+      attributes[key] = value
     end
 
     private
@@ -30,7 +21,7 @@ module Twilio
       if (400..599).include? res.code
         raise Twilio::APIError.new "Error ##{res.parsed_response['code']}: #{res.parsed_response['message']}"
       else
-        @attributes.update Hash[res.parsed_response.map { |k,v| [k.camelize, v] }] # params are camelized in requests, yet underscored in the repsonse. inconsistency FTW!
+        @attributes.update(res.parsed_response)
       end
     end
 
@@ -39,10 +30,10 @@ module Twilio
       if meth =~ /\=$/
         add_attr_writer meth
         send meth, args.first
-      elsif meth =~ /^#{meth}\?/i
+      elsif meth =~ /^#{meth}\?$/i
         add_predicate meth
         send meth
-      elsif attributes.keys.include? meth.camelize
+      elsif attributes.keys.include? meth 
         add_attr_reader meth
         send meth
       else
@@ -52,7 +43,7 @@ module Twilio
 
     def add_predicate(attribute)
       metaclass.class_eval do
-        define_method(attribute) { self[:status] =~ /^#{attribute.gsub '?', ''}/i ? true : false }
+        define_method(attribute) { self['status'] =~ /^#{attribute.gsub '?', ''}/i ? true : false }
       end
     end
 
@@ -64,7 +55,7 @@ module Twilio
 
     def add_attr_reader(attribute) #:nodoc
       metaclass.class_eval do
-        define_method(attribute) { self[attribute.to_sym] } unless respond_to? attribute
+        define_method(attribute) { self[attribute] }  unless respond_to? attribute
       end
     end
 

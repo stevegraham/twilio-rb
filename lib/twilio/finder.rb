@@ -6,10 +6,9 @@ module Twilio
       resource            = klass_name == 'SMS' ? "#{klass_name}/Messages" : klass_name.pluralize
       res                 = get "/Accounts/#{Twilio::ACCOUNT_SID}/#{resource}/#{id}.json"
       hash                = res.parsed_response
-      
       if (200..299).include? res.code
         hash['api_version'] = hash['api_version'].to_s # api_version parsed as a date by http_party
-        new Hash[hash.map { |k,v| [k.camelize, v] }] 
+        new hash 
       end
     end 
 
