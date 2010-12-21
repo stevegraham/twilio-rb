@@ -12,6 +12,7 @@ module Twilio
             if (400..599).include? res.code
               raise Twilio::APIError.new "Error ##{res.parsed_response['code']}: #{res.parsed_response['message']}"
             else
+              res.parsed_response['api_version'] = res.parsed_response['api_version'].to_s
               new res.parsed_response
             end
           end

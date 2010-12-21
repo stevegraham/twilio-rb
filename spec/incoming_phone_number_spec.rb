@@ -71,4 +71,39 @@ describe Twilio::IncomingPhoneNumber do
     end
   end
 
+  describe '.create' do
+    let(:post_body) do
+      "PhoneNumber=%2B19175551234&FriendlyName=barrington&VoiceUrl=http%3A%2F%2Fwww.example.com%2Ftwiml.xml&VoiceMethod=post" +
+      "&VoiceFallbackUrl=http%3A%2F%2Fwww.example.com%2Ftwiml2.xml&VoiceFallbackMethod=get&StatusCallback=http%3A%2F%2Fwww.example.com%2Fgoodnite.xml" +
+      "&StatusCallbackMethod=get&SmsUrl=http%3A%2F%2Fwww.example.com%2Ftwiml.xml&SmsMethod=post&SmsFallbackUrl=http%3A%2F%2Fwww.example.com%2Ftwiml2.xml" +
+      "&SmsFallbackMethod=get&VoiceCallerIdLookup=false"
+    end
+
+    let(:params) do
+      { :phone_number => '+19175551234', :friendly_name => 'barrington',
+        :voice_url => 'http://www.example.com/twiml.xml', :voice_method => 'post', :voice_fallback_url => 'http://www.example.com/twiml2.xml',
+        :voice_fallback_method => 'get', :status_callback => 'http://www.example.com/goodnite.xml', :status_callback_method => 'get',
+        :sms_url => 'http://www.example.com/twiml.xml', :sms_method => 'post', :sms_fallback_url => 'http://www.example.com/twiml2.xml',
+        :sms_fallback_method => 'get', :voice_caller_id_lookup => false }
+    end
+
+    let(:number) do
+      Twilio::IncomingPhoneNumber.create params
+    end
+
+    before { stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('incoming_phone_number')}
+
+    it 'creates a new incoming number on the account' do
+      number
+      a_request(:post, resource_uri + '.json').with(:body => post_body).should have_been_made
+    end
+
+    it 'returns an instance of Twilio::IncomingPhoneNumber' do
+      number.should be_a Twilio::IncomingPhoneNumber
+    end
+    
+    JSON.parse(canned_response('incoming_phone_number')).map do |k,v|
+      specify { number.send(k).should == v }   
+    end
+  end
 end

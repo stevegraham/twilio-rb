@@ -1,5 +1,5 @@
 require './lib/twilio'
-%w<webmock rspec/expectations webmock/rspec>.each { |lib| require lib }
+%w<webmock rspec/expectations webmock/rspec mocha>.each { |lib| require lib }
 
 RSpec.configure do |config|
   config.after(:each) do
@@ -7,6 +7,7 @@ RSpec.configure do |config|
     WebMock.reset!
   end
   config.include WebMock::API
+  config.mock_with 'mocha'
 end
 
 def canned_response(resp)

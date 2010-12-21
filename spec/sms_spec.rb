@@ -45,7 +45,7 @@ describe Twilio::SMS do
     end
   end
 
-  describe '#save' do
+  describe '.create' do
     context 'when authentication credentials are not configured' do
       it 'raises Twilio::ConfigurationError' do
         lambda { sms }.should raise_error(Twilio::ConfigurationError)
@@ -63,18 +63,6 @@ describe Twilio::SMS do
       it 'updates its attributes' do
         sms.direction.should == "outbound-api"
       end
-    end
-  end
-
-  describe ".create" do
-    it "sends the message" do
-      Twilio::Config.setup do
-        account_sid   'AC000000000000'
-        auth_token    '79ad98413d911947f0ba369d295ae7a3'
-      end
-      stub_new_sms
-      Twilio::SMS.create :to => '+14158141829', :from => '+14159352345', :body => 'Jenny please?! I love you <3'
-      new_sms_should_have_been_made
     end
   end
 

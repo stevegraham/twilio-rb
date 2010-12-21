@@ -72,4 +72,13 @@ describe Twilio::AvailablePhoneNumber do
       end
     end
   end
+
+  describe '#purchase!' do
+    it "delegates to Twilio::IncomingPhoneNumber.create merging self.phone_number with any given args" do
+      Twilio::IncomingPhoneNumber.expects(:create).with :phone_number => '+12125550000',
+        :voice_url => 'http://www.example.com/twiml.xml', :voice_method => 'post'
+      available_number = Twilio::AvailablePhoneNumber.send :new, :phone_number => '+12125550000'
+      available_number.purchase! :voice_url => 'http://www.example.com/twiml.xml', :voice_method => 'post'
+    end
+  end
 end

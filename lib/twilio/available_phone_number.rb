@@ -16,5 +16,10 @@ module Twilio
       private :new
 
     end
+
+    # Shortcut for creating a new incoming phone number. Delegates to Twilio::IncomingPhoneNumber.create accepting the same options as that method does.
+    def purchase!(opts={})
+      Twilio::IncomingPhoneNumber.create opts.update :phone_number => phone_number
+    end
   end
 end
