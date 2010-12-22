@@ -71,6 +71,35 @@ describe Twilio::IncomingPhoneNumber do
     end
   end
 
+  describe '#destroy' do
+    before do
+      stub_request(:get, resource_uri + '/PN2a0747eba6abf96b7e3c3ff0b4530f6e' + '.json').
+        to_return :body => canned_response('incoming_phone_number'), :status => 200
+      stub_request(:delete, resource_uri + '/PN2a0747eba6abf96b7e3c3ff0b4530f6e' + '.json').
+        to_return :status => 204
+    end
+    
+    let(:call) { Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e' }
+
+    it 'deletes the resource' do
+      call.destroy
+      a_request(:delete, resource_uri + '/PN2a0747eba6abf96b7e3c3ff0b4530f6e' + '.json').
+      should have_been_made  
+    end
+
+    it 'freezes itself if successful' do
+      call.destroy
+      call.should be_frozen
+    end
+
+    context 'when the participant has already been kicked' do
+      it 'raises a RuntimeError' do
+        call.destroy
+        lambda { call.destroy }.should raise_error(RuntimeError, 'IncomingPhoneNumber has already been destroyed')
+      end
+    end
+  end
+
   describe '.create' do
     let(:post_body) do
       "PhoneNumber=%2B19175551234&FriendlyName=barrington&VoiceUrl=http%3A%2F%2Fwww.example.com%2Ftwiml.xml&VoiceMethod=post" +
@@ -87,9 +116,7 @@ describe Twilio::IncomingPhoneNumber do
         :sms_fallback_method => 'get', :voice_caller_id_lookup => false }
     end
 
-    let(:number) do
-      Twilio::IncomingPhoneNumber.create params
-    end
+    let(:number) { Twilio::IncomingPhoneNumber.create params }
 
     before { stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('incoming_phone_number')}
 

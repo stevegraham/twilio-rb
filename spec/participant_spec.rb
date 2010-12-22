@@ -18,7 +18,7 @@ describe Twilio::Participant do
       to_return :body => canned_response(response_file), :status => 200
   end
 
-  describe '#kick!' do
+  describe '#destroy' do
     before { stub_request(:delete, resource_uri).to_return :status => 204 }
     it 'sends a HTTP delete request' do
       participant.kick!
@@ -31,8 +31,14 @@ describe Twilio::Participant do
     context 'when the participant has already been kicked' do
       it 'raises a RuntimeError' do
         participant.freeze
-        lambda { participant.kick! }.should raise_error(RuntimeError, 'Participant has already been removed from conference')
+        lambda { participant.kick! }.should raise_error(RuntimeError, 'Participant has already been destroyed')
       end
+    end
+  end
+
+  describe '#kick!' do
+    it 'is an alias of destroy' do
+      participant.method(:kick!).should === participant.method(:destroy)
     end
   end
   
@@ -61,8 +67,12 @@ describe Twilio::Participant do
     context 'when the participant has been kicked' do
       it 'raises a RuntimeError' do
         participant.freeze
-        lambda { participant.mute! }.should raise_error(RuntimeError, 'Participant has already been removed from conference')
+        lambda { participant.mute! }.should raise_error(RuntimeError, 'Participant has already been destroyed')
       end
     end
   end
-end
+
+  describe 'subject' do
+    
+  end
+  end
