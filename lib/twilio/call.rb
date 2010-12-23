@@ -13,6 +13,21 @@ module Twilio
         attrs['if_machine'].try :capitalize
         old_create attrs
       end
+
+      private
+      def prepare_dates(opts)
+        opts.map do |k,v|
+          if [:started_before, :started_after, :ended_before, :ended_after].include? k
+            k = k.to_s
+            # Fancy schmancy-ness to handle Twilio <= URI operator for dates
+            comparator = k =~ /before$/ ? '<=' : '>='
+            delineator = k =~ /started/ ? 'Start' : 'End' 
+            delineator << "Time" << comparator << v.to_s
+          else
+            "#{k.to_s.camelize}=#{v}"
+          end
+        end
+      end
     end
 
     # Cancels a call if its state is 'queued' or 'ringing'

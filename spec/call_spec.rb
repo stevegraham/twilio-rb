@@ -20,6 +20,40 @@ describe Twilio::Call do
   def canned_response(resp)
     File.new File.join(File.expand_path(File.dirname __FILE__), 'support', 'responses', "#{resp}.json")
   end
+  
+  describe '.all' do
+    before do
+      stub_request(:get, resource_uri + '.json').
+        to_return :body => canned_response('list_calls'), :status => 200
+    end
+    it 'returns a collection of objects with a length corresponding to the response' do
+      resp = Twilio::Call.all
+      resp.length.should == 1
+    end
+
+    it 'returns a collection containing instances of Twilio::Call' do
+      resp = Twilio::Call.all
+      resp.all? { |r| r.is_a? Twilio::Call }.should be_true
+    end
+
+    it 'returns a collection containing objects with attributes corresponding to the response' do
+      calls = JSON.parse(canned_response('list_calls').read)['calls']
+      resp    = Twilio::Call.all
+
+      calls.each_with_index do |obj,i|
+        obj.each do |attr, value| 
+          resp[i].send(attr).should == value
+        end
+      end
+    end
+
+    it 'accepts options to refine the search' do
+      stub_request(:get, resource_uri + '.json?EndTime>=2010-11-12&Page=5&StartTime<=2010-12-12&Status=dialled').
+        to_return :body => canned_response('list_calls'), :status => 200
+      Twilio::Call.all :page => 5, :status => 'dialled', :started_before => Date.parse('2010-12-12'), :ended_after => Date.parse('2010-11-12')
+      a_request(:get, resource_uri + '.json?EndTime>=2010-11-12&Page=5&StartTime<=2010-12-12&Status=dialled').should have_been_made
+    end
+  end
 
   describe '.find' do
     context 'for a valid call sid' do
