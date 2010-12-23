@@ -11,7 +11,9 @@ describe Twilio::IncomingPhoneNumber do
   end
 
   let(:post_body) do
-    "PhoneNumber=%2B19175551234&FriendlyName=barrington&VoiceUrl=http%3A%2F%2Fwww.example.com%2Ftwiml.xml&VoiceMethod=post&VoiceFallbackUrl=http%3A%2F%2Fwww.example.com%2Ftwiml2.xml&VoiceFallbackMethod=get&StatusNumberback=http%3A%2F%2Fwww.example.com%2Fgoodnite.xml&StatusNumberbackMethod=get&SmsUrl=http%3A%2F%2Fwww.example.com%2Ftwiml.xml&SmsMethod=post&SmsFallbackUrl=http%3A%2F%2Fwww.example.com%2Ftwiml2.xml&SmsFallbackMethod=get&VoiceNumbererIdLookup=false"
+    "PhoneNumber=%2B19175551234&FriendlyName=barrington&VoiceUrl=http%3A%2F%2Fwww.example.com%2Ftwiml.xml&VoiceMethod=post&VoiceFallbackUrl=http%3A%2F%2Fwww.example.com%2Ftwiml2.xml&" +
+    "VoiceFallbackMethod=get&StatusNumberback=http%3A%2F%2Fwww.example.com%2Fgoodnite.xml&StatusNumberbackMethod=get&SmsUrl=http%3A%2F%2Fwww.example.com%2Ftwiml.xml&SmsMethod=post&" +
+    "SmsFallbackUrl=http%3A%2F%2Fwww.example.com%2Ftwiml2.xml&SmsFallbackMethod=get&VoiceNumbererIdLookup=false"
   end
 
   let(:params) do
