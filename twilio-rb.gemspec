@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.platform                  = Gem::Platform::RUBY
   s.name                      = 'twilio-rb'
-  s.version                   = '0.4'
+  s.version                   = '1.0pre'
   s.summary                   = 'Interact with the Twilio API in a nice Ruby way.'
   s.description               = 'A nice Ruby wrapper for the Twilio REST API'
 

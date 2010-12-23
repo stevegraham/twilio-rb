@@ -9,10 +9,15 @@ module Twilio
 
   class << self
     def const_missing(const_name)
-      raise Twilio::ConfigurationError.new "Cannot complete request. Please set #{const_name.to_s.downcase} with Twilio::Config.setup first!"
+      if [:ACCOUNT_SID, :AUTH_TOKEN].include? const_name
+        raise Twilio::ConfigurationError.new "Cannot complete request. Please set #{const_name.to_s.downcase} with Twilio::Config.setup first!"
+      else
+        super
+      end
     end
   end
 end
 
 Dir[File.join(File.dirname(__FILE__), 'twilio', '*.rb')].each { |lib| require lib }
 
+require File.join(File.dirname(__FILE__), 'railtie.rb') if Object.const_defined?(:Rails) && Rails.version =~ /^3/
