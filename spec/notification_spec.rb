@@ -21,15 +21,10 @@ describe Twilio::Notification do
       resp = Twilio::Notification.all
       resp.all? { |r| r.is_a? Twilio::Notification }.should be_true
     end
-
-    it 'returns a collection containing objects with attributes corresponding to the response' do
-      notifications = JSON.parse(canned_response('list_notifications').read)['notifications']
-      resp    = Twilio::Notification.all
-
-      notifications.each_with_index do |obj,i|
-        obj.each do |attr, value| 
-          resp[i].send(attr).should == value
-        end
+    
+    JSON.parse(canned_response('list_notifications').read)['notifications'].each_with_index do |obj,i|
+      obj.each do |attr, value| 
+        specify { Twilio::Notification.all[i].send(attr).should == value }
       end
     end
 
@@ -48,16 +43,14 @@ describe Twilio::Notification do
         stub_request(:get, resource_uri + '/NO5a7a84730f529f0a76b3e30c01315d1a' + '.json').
           to_return :body => canned_response('notification'), :status => 200
       end
-
+      let(:notification) { Twilio::Notification.find 'NO5a7a84730f529f0a76b3e30c01315d1a' }
+      
       it 'returns an instance of Twilio::Notification.all' do
-        notification = Twilio::Notification.find 'NO5a7a84730f529f0a76b3e30c01315d1a'
         notification.should be_a Twilio::Notification
       end
 
-      it 'returns an object with attributes that correspond to the API response' do
-        response = JSON.parse(canned_response('notification').read)
-        notification     = Twilio::Notification.find 'NO5a7a84730f529f0a76b3e30c01315d1a'
-        response.each { |k,v| notification.send(k).should == v }
+      JSON.parse(canned_response('notification').read).each do |k,v|
+        specify { notification.send(k).should == v }
       end
     end
 

@@ -12,24 +12,19 @@ describe Twilio::Recording do
 
   describe '.all' do
     before { stub_api_call 'list_recordings' }
+    let (:resp) { Twilio::Recording.all }
+
     it 'returns a collection of objects with a length corresponding to the response' do
-      resp = Twilio::Recording.all
       resp.length.should == 1
     end
 
     it 'returns a collection containing instances of Twilio::Recording' do
-      resp = Twilio::Recording.all
       resp.all? { |r| r.is_a? Twilio::Recording }.should be_true
     end
 
-    it 'returns a collection containing objects with attributes corresponding to the response' do
-      recordings = JSON.parse(canned_response('list_recordings').read)['recordings']
-      resp    = Twilio::Recording.all
-
-      recordings.each_with_index do |obj,i|
-        obj.each do |attr, value| 
-          resp[i].send(attr).should == value
-        end
+    JSON.parse(canned_response('list_recordings').read)['recordings'].each_with_index do |obj,i|
+      obj.each do |attr, value| 
+        specify { resp[i].send(attr).should == value }
       end
     end
 
@@ -49,15 +44,14 @@ describe Twilio::Recording do
           to_return :body => canned_response('recording'), :status => 200
       end
 
+      let(:recording) { Twilio::Recording.find 'RE557ce644e5ab84fa21cc21112e22c485' }
+
       it 'returns an instance of Twilio::Recording.all' do
-        recording = Twilio::Recording.find 'RE557ce644e5ab84fa21cc21112e22c485'
         recording.should be_a Twilio::Recording
       end
-
-      it 'returns an object with attributes that correspond to the API response' do
-        response = JSON.parse(canned_response('recording').read)
-        recording     = Twilio::Recording.find 'RE557ce644e5ab84fa21cc21112e22c485'
-        response.each { |k,v| recording.send(k).should == v }
+  
+      JSON.parse(canned_response('recording').read).each do |k,v|
+        specify { recording.send(k).should == v }
       end
     end
 

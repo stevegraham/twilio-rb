@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'active_support/core_ext/hash'
 
 describe Twilio::Call do
 
@@ -26,27 +27,22 @@ describe Twilio::Call do
       stub_request(:get, resource_uri + '.json').
         to_return :body => canned_response('list_calls'), :status => 200
     end
+
+    let(:resp) { Twilio::Call.all }
     it 'returns a collection of objects with a length corresponding to the response' do
-      resp = Twilio::Call.all
       resp.length.should == 1
     end
 
     it 'returns a collection containing instances of Twilio::Call' do
-      resp = Twilio::Call.all
       resp.all? { |r| r.is_a? Twilio::Call }.should be_true
     end
 
-    it 'returns a collection containing objects with attributes corresponding to the response' do
-      calls = JSON.parse(canned_response('list_calls').read)['calls']
-      resp    = Twilio::Call.all
-
-      calls.each_with_index do |obj,i|
-        obj.each do |attr, value| 
-          resp[i].send(attr).should == value
-        end
+    JSON.parse(canned_response('list_calls').read)['calls'].each_with_index do |obj,i|
+      obj.each do |attr, value| 
+        specify { resp[i].send(attr).should == value }
       end
     end
-
+ 
     it 'accepts options to refine the search' do
       stub_request(:get, resource_uri + '.json?EndTime>=2010-11-12&Page=5&StartTime<=2010-12-12&Status=dialled').
         to_return :body => canned_response('list_calls'), :status => 200
@@ -62,10 +58,15 @@ describe Twilio::Call do
           to_return :body => canned_response('call_created'), :status => 200
       end
 
-      it 'finds a call with the given call sid' do
-        call = Twilio::Call.find 'CAa346467ca321c71dbd5e12f627deb854'
+      let(:call) { Twilio::Call.find 'CAa346467ca321c71dbd5e12f627deb854' }
+
+      it 'returns an instance of Twilio::Call' do
         call.should be_a Twilio::Call
-        call.sid.should == 'CAa346467ca321c71dbd5e12f627deb854'
+      end
+
+      JSON.parse(canned_response('call_created').read).except('method').each do |k,v|
+        # OOPS! Collides with Object#method, access with obj[:method] syntax
+        specify { call.send(k).should == v }
       end
     end
 
@@ -92,6 +93,11 @@ describe Twilio::Call do
         stub_request(:post, resource_uri + '.json').
           with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%252300&IfMachine=Continue").
           to_return(:status => 200, :body => canned_response('call_created'))
+      end
+
+      JSON.parse(canned_response('call_created').read).except('method').each do |k,v|
+        # OOPS! Collides with Object#method, access with obj[:method] syntax
+        specify { call.send(k).should == v }
       end
 
       it 'escapes send digits because pound, i.e. "#" has special meaning in a url' do

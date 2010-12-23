@@ -27,24 +27,18 @@ describe Twilio::IncomingPhoneNumber do
 
   describe '.all' do
     before { stub_api_call 'list_incoming_phone_numbers' }
+    let(:resp) { resp = Twilio::IncomingPhoneNumber.all }
     it 'returns a collection of objects with a length corresponding to the response' do
-      resp = Twilio::IncomingPhoneNumber.all
       resp.length.should == 1
     end
 
     it 'returns a collection containing instances of Twilio::AvailablePhoneNumber' do
-      resp = Twilio::IncomingPhoneNumber.all
       resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be_true
     end
 
-    it 'returns a collection containing objects with attributes corresponding to the response' do
-      numbers = JSON.parse(canned_response('list_incoming_phone_numbers').read)['incoming_phone_numbers']
-      resp    = Twilio::IncomingPhoneNumber.all
-
-      numbers.each_with_index do |obj,i|
-        obj.each do |attr, value| 
-          resp[i].send(attr).should == value
-        end
+    JSON.parse(canned_response('list_incoming_phone_numbers').read)['incoming_phone_numbers'].each_with_index do |obj,i|
+      obj.each do |attr, value| 
+        specify { resp[i].send(attr).should == value }
       end
     end
 
@@ -64,15 +58,14 @@ describe Twilio::IncomingPhoneNumber do
           to_return :body => canned_response('incoming_phone_number'), :status => 200
       end
 
+      let(:number) { Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e' }
+
       it 'returns an instance of Twilio::IncomingPhoneNumber' do
-        number = Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e'
         number.should be_a Twilio::IncomingPhoneNumber 
       end
 
-      it 'returns an object with attributes that correspond to the API response' do
-        response = JSON.parse(canned_response('incoming_phone_number').read)
-        number     = Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e'
-        response.each { |k,v| number.send(k).should == v }
+      JSON.parse(canned_response('incoming_phone_number').read).each do |k,v|
+        specify { number.send(k).should == v }
       end
     end
 

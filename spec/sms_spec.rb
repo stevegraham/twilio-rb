@@ -25,24 +25,20 @@ describe Twilio::SMS do
       stub_request(:get, resource_uri + '.json').
         to_return :body => canned_response('list_messages'), :status => 200
     end
+
+    let(:resp) { Twilio::SMS.all }
+
     it 'returns a collection of objects with a length corresponding to the response' do
-      resp = Twilio::SMS.all
       resp.length.should == 1
     end
 
     it 'returns a collection containing instances of Twilio::SMS' do
-      resp = Twilio::SMS.all
       resp.all? { |r| r.is_a? Twilio::SMS }.should be_true
     end
 
-    it 'returns a collection containing objects with attributes corresponding to the response' do
-      messages = JSON.parse(canned_response('list_messages').read)['sms_messages']
-      resp    = Twilio::SMS.all
-
-      messages.each_with_index do |obj,i|
-        obj.each do |attr, value| 
-          resp[i].send(attr).should == value
-        end
+    JSON.parse(canned_response('list_messages').read)['sms_messages'].each_with_index do |obj,i|
+      obj.each do |attr, value| 
+        specify { resp[i].send(attr).should == value }
       end
     end
   end
@@ -53,10 +49,14 @@ describe Twilio::SMS do
           to_return :body => canned_response('sms_created'), :status => 200
       end
 
-      it 'finds a message with the given message sid' do
-        sms = Twilio::SMS.find 'SM90c6fc909d8504d45ecdb3a3d5b3556e'
+      let(:sms) { Twilio::SMS.find 'SM90c6fc909d8504d45ecdb3a3d5b3556e' }
+
+      JSON.parse(canned_response('sms_created').read).each do |k,v|
+        specify { sms.send(k).should == v }
+      end
+
+      it 'returns an instance of Twilio::SMS' do
         sms.should be_a Twilio::SMS
-        sms.sid.should == 'SM90c6fc909d8504d45ecdb3a3d5b3556e'
       end
     end
 
@@ -84,8 +84,9 @@ describe Twilio::SMS do
         sms
         new_sms_should_have_been_made
       end
-      it 'updates its attributes' do
-        sms.direction.should == "outbound-api"
+
+      JSON.parse(canned_response('sms_created').read).each do |k,v|
+        specify { sms.send(k).should == v }
       end
     end
   end
