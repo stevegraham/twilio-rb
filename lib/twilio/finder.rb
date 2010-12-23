@@ -7,12 +7,19 @@ module Twilio
         hash['api_version'] = hash['api_version'].to_s # api_version parsed as a date by http_party
         new hash 
       end
-    end 
+    end
+
+    def count(opts={})
+      opts   = prepare_dates opts
+      params = "?#{URI.encode(opts.join '&')}" unless opts.empty?
+
+      get("/Accounts/#{Twilio::ACCOUNT_SID}/#{resource_fragment}.json#{params}").parsed_response['total']
+    end
 
     def all(opts={})
-      opts = prepare_dates opts
-      
+      opts   = prepare_dates opts
       params = "?#{URI.encode(opts.join '&')}" unless opts.empty?
+      
       handle_response get "/Accounts/#{Twilio::ACCOUNT_SID}/#{resource_fragment}.json#{params}"
     end
 

@@ -40,6 +40,21 @@ describe Twilio::OutgoingCallerId do
     end
   end
 
+  describe '.count' do
+    before { stub_api_call 'list_caller_ids' }
+    it 'returns the number of resources' do
+      Twilio::OutgoingCallerId.count.should == 1
+    end
+
+    it 'accepts options to refine the search' do
+      query = '.json?FriendlyName=example&PhoneNumber=2125550000'
+      stub_request(:get, resource_uri + query).
+        to_return :body => canned_response('list_caller_ids'), :status => 200
+      Twilio::OutgoingCallerId.count :phone_number => '2125550000', :friendly_name => 'example'
+      a_request(:get, resource_uri + query).should have_been_made
+    end
+  end
+
   describe '.find' do
     context 'for a valid caller_id' do
       before do

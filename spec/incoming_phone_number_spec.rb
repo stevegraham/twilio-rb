@@ -26,6 +26,20 @@ describe Twilio::IncomingPhoneNumber do
 
   let(:number) { Twilio::IncomingPhoneNumber.create params }
 
+  describe '.count' do
+    before { stub_api_call 'list_incoming_phone_numbers' }
+    it 'returns the number of resources' do
+      Twilio::IncomingPhoneNumber.count.should == 6
+    end
+
+    it 'accepts options to refine the search' do
+      query = '.json?FriendlyName=example&PhoneNumber=2125550000'
+      stub_request(:get, resource_uri + query).
+        to_return :body => canned_response('list_incoming_phone_numbers'), :status => 200
+      Twilio::IncomingPhoneNumber.count :phone_number => '2125550000', :friendly_name => 'example'
+      a_request(:get, resource_uri + query).should have_been_made
+    end
+  end
 
   describe '.all' do
     before { stub_api_call 'list_incoming_phone_numbers' }

@@ -37,6 +37,21 @@ describe Twilio::Recording do
     end
   end
 
+  describe '.count' do
+    before { stub_api_call 'list_recordings' }
+    it 'returns the number of resources' do
+      Twilio::Recording.count.should == 527
+    end
+
+    it 'accepts options to refine the search' do
+      query = '.json?CallSid=CAa346467ca321c71dbd5e12f627deb854&DateCreated<=2010-12-12'
+      stub_request(:get, resource_uri + query).
+        to_return :body => canned_response('list_recordings'), :status => 200
+      Twilio::Recording.count :call_sid => 'CAa346467ca321c71dbd5e12f627deb854', :created_before => Date.parse('2010-12-12')
+      a_request(:get, resource_uri + query).should have_been_made
+    end
+  end
+
   describe '.find' do
     context 'for a valid recording' do
       before do

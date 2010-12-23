@@ -14,6 +14,7 @@ module Twilio
       end
 
       private :new
+      undef_method :count
 
     end
 

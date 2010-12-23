@@ -51,6 +51,22 @@ describe Twilio::Call do
     end
   end
 
+  describe '.count' do
+    it 'returns the number of resources' do
+      stub_request(:get, resource_uri + '.json').
+        to_return :body => canned_response('list_calls'), :status => 200
+      Twilio::Call.count.should == 147
+    end
+
+    it 'accepts options to refine the search' do
+      query = '.json?FriendlyName=example&Status=in-progress'
+      stub_request(:get, resource_uri + query).
+        to_return :body => canned_response('list_calls'), :status => 200
+      Twilio::Call.count :friendly_name => 'example', :status => 'in-progress'
+      a_request(:get, resource_uri + query).should have_been_made
+    end
+  end
+
   describe '.find' do
     context 'for a valid call sid' do
       before do

@@ -41,7 +41,32 @@ describe Twilio::SMS do
         specify { resp[i].send(attr).should == value }
       end
     end
+
+    it 'accepts options to refine the search' do
+      query = '.json?DateSent>=2010-11-12&Page=5&DateSent<=2010-12-12'
+      stub_request(:get, resource_uri + query).
+        to_return :body => canned_response('list_messages'), :status => 200
+      Twilio::SMS.all :page => 5, :created_before => Date.parse('2010-12-12'), :sent_after => Date.parse('2010-11-12')
+      a_request(:get, resource_uri + query).should have_been_made
+    end
   end
+
+  describe '.count' do
+    it 'returns the number of resources' do
+      stub_request(:get, resource_uri + '.json').
+        to_return :body => canned_response('list_messages'), :status => 200
+      Twilio::SMS.count.should == 261
+    end
+
+    it 'accepts options to refine the search' do
+      query = '.json?To=+19175551234&From=+19175550000'
+      stub_request(:get, resource_uri + query).
+        to_return :body => canned_response('list_messages'), :status => 200
+      Twilio::SMS.count :to => '+19175551234', :from => '+19175550000'
+      a_request(:get, resource_uri + query).should have_been_made
+    end
+  end
+
   describe '.find' do
     context 'for a valid sms sid' do
       before do

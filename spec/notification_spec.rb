@@ -37,6 +37,21 @@ describe Twilio::Notification do
     end
   end
 
+  describe '.count' do
+    before { stub_api_call 'list_notifications' }
+    it 'returns the number of resources' do
+      Twilio::Notification.count.should == 1224
+    end
+
+    it 'accepts options to refine the search' do
+      query = '.json?FriendlyName=example&PhoneNumber=2125550000'
+      stub_request(:get, resource_uri + query).
+        to_return :body => canned_response('list_notifications'), :status => 200
+      Twilio::Notification.count :phone_number => '2125550000', :friendly_name => 'example'
+      a_request(:get, resource_uri + query).should have_been_made
+    end
+  end
+
   describe '.find' do
     context 'for a valid notification' do
       before do

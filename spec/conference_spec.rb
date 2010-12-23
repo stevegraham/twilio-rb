@@ -42,6 +42,21 @@ describe Twilio::Conference do
     end
   end
 
+  describe '.count' do
+    before { stub_api_call 'list_conferences' }
+    it 'returns the number of resources' do
+      Twilio::Conference.count.should == 462
+    end
+
+    it 'accepts options to refine the search' do
+      query = '.json?FriendlyName=example&Status=in-progress'
+      stub_request(:get, resource_uri + query).
+        to_return :body => canned_response('list_conferences'), :status => 200
+      Twilio::Conference.count :friendly_name => 'example', :status => 'in-progress'
+      a_request(:get, resource_uri + query).should have_been_made
+    end
+  end
+
   describe '.find' do
     context 'for a valid conference' do
       before do
