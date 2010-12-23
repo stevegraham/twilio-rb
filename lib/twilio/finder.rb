@@ -13,7 +13,18 @@ module Twilio
     end 
 
     def all(opts={})
-      opts = opts.map do |k,v|
+      opts = prepare_dates opts
+
+      params = "?#{URI.encode(opts.join '&')}" unless opts.empty?
+      # TODO: This won't work with SMS messages, see above. Perhaps handle SMS case by overriding in
+      # SMS class itself instead of polluting generic functionality
+      handle_response get "/Accounts/#{Twilio::ACCOUNT_SID}/#{name.demodulize + 's'}.json#{params}"
+    end
+
+    private
+
+    def prepare_dates(opts)
+      opts.map do |k,v|
         if [:updated_before, :created_before, :updated_after, :created_after].include? k
           k = k.to_s
           # Fancy schmancy-ness to handle Twilio <= URI operator for dates
@@ -23,14 +34,8 @@ module Twilio
           "#{k.to_s.camelize}=#{v}"
         end
       end
-
-      params = "?#{URI.encode(opts.join '&')}" unless opts.empty?
-      # TODO: This won't work with SMS messages, see above. Perhaps handle SMS case by overriding in
-      # SMS class itself instead of polluting generic functionality
-      handle_response get "/Accounts/#{Twilio::ACCOUNT_SID}/#{name.demodulize + 's'}.json#{params}"
     end
 
-    private
     def handle_response(res) # :nodoc:
       if (400..599).include? res.code
         raise Twilio::APIError.new "Error ##{res.parsed_response['code']}: #{res.parsed_response['message']}"
