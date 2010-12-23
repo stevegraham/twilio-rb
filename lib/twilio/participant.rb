@@ -7,11 +7,7 @@ module Twilio
 
     def mute!
       state_guard do
-        if muted?
-          handle_response self.class.post path, :body => 'Muted=false'
-        else
-          handle_response self.class.post path, :body => 'Muted=true'
-        end
+        update_attributes muted? ? { :muted => false } : { :muted => true }
       end
     end
 

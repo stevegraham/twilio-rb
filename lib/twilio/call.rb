@@ -15,26 +15,20 @@ module Twilio
       end
     end
 
-    # Cancels a call if its state is 'queued' or 'ringing'    
+    # Cancels a call if its state is 'queued' or 'ringing'
     def cancel!
-      modify_call 'Status' => 'cancelled'
+      update_attributes :status => 'cancelled'
     end
-    
+
     def complete!
-      modify_call 'Status' => 'completed'
+      update_attributes :status => 'completed'
     end
-    
+
     # Update Handler URL
     def url=(url)
       # If this attribute exists it is assumed the API call to create a call has been made, so we need to tell Twilio.
-      modify_call "url" => url if self[:status]
+      update_attributes :url => url if self[:status]
       self[:url] = url
-    end
-
-    private
-
-    def modify_call(params)
-      handle_response self.class.post "/Accounts/#{Twilio::ACCOUNT_SID}/Calls/#{self[:sid]}.json", :body => params
     end
   end
 end

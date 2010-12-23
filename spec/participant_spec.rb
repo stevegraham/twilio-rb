@@ -6,7 +6,7 @@ describe Twilio::Participant do
     "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{Twilio::ACCOUNT_SID}" +
     "/Conferences/CFbbe46ff1274e283f7e3ac1df0072ab39/Participants/CA386025c9bf5d6052a1d1ea42b4d16662.json"
   end
-  
+
   let(:participant) do
     Twilio::Participant.new JSON.parse(canned_response('show_participant').read)
   end
@@ -41,7 +41,7 @@ describe Twilio::Participant do
       participant.method(:kick!).should === participant.method(:destroy)
     end
   end
-  
+
   describe '#mute!' do
     context 'when the participant is unmuted' do
       before { stub_request(:post, resource_uri).to_return :status => 201, :body => canned_response('muted_participant') }
@@ -71,8 +71,4 @@ describe Twilio::Participant do
       end
     end
   end
-
-  describe 'subject' do
-    
-  end
-  end
+end

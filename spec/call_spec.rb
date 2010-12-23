@@ -6,6 +6,8 @@ describe Twilio::Call do
   let(:minimum_params) { 'To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback' }
   let(:call)           { Twilio::Call.create(:to => '+14155551212', :from => '+14158675309', :url => 'http://localhost:3000/hollaback') }
 
+  before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
+     
   def stub_api_call
     stub_request(:post, resource_uri + '.json').with(:body => minimum_params).
       to_return :body => canned_response('call_created'), :status => 201
@@ -22,7 +24,6 @@ describe Twilio::Call do
   describe '.find' do
     context 'for a valid call sid' do
       before do
-        Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
         stub_request(:get, resource_uri + '/CAa346467ca321c71dbd5e12f627deb854' + '.json').
           to_return :body => canned_response('call_created'), :status => 200
       end
@@ -35,10 +36,8 @@ describe Twilio::Call do
     end
 
     context 'for a string that does not correspond to a real call' do
-      before do
-        Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
-        stub_request(:get, resource_uri + '/phony' + '.json').to_return :status => 404
-      end
+      before { stub_request(:get, resource_uri + '/phony' + '.json').to_return :status => 404 }
+
       it 'returns nil' do
         call = Twilio::Call.find 'phony'
         call.should be_nil
@@ -47,10 +46,7 @@ describe Twilio::Call do
   end
 
   describe '.create' do
-    before do 
-      Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
-      stub_api_call
-    end
+    before { stub_api_call }
 
     describe "processing attributes" do
       let :call do
@@ -102,18 +98,14 @@ describe Twilio::Call do
 
   describe 'modifying a call' do
     let(:resource) { resource_uri + '/CAa346467ca321c71dbd5e12f627deb854.json' }
-    before do
-      Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') }
-      stub_api_call
-    end
+    before { stub_api_call }
 
     describe '#url=' do
       it 'updates the callback URL with the API' do
-        stub_request(:post, resource).with(:body => 'url=http%3A%2F%2Ffoo.com').to_return :body => canned_response('call_url_modified'), :status => 201
-        call
+        stub_request(:post, resource).with(:body => 'Url=http%3A%2F%2Ffoo.com').to_return :body => canned_response('call_url_modified'), :status => 201
         call.url = 'http://foo.com'
         call[:url].should == 'http://foo.com'
-        a_request(:post, resource).with(:body => 'url=http%3A%2F%2Ffoo.com').should have_been_made
+        a_request(:post, resource).with(:body => 'Url=http%3A%2F%2Ffoo.com').should have_been_made
       end
     end
 
@@ -139,10 +131,6 @@ describe Twilio::Call do
   
   describe ".create" do
     it "instantiates object and makes API call in one step" do
-      Twilio::Config.setup do
-        account_sid   'AC000000000000'
-        auth_token    '79ad98413d911947f0ba369d295ae7a3'
-      end
       stub_api_call
       Twilio::Call.create :to => '+14155551212', :from => '+14158675309', :url => 'http://localhost:3000/hollaback'
       new_call_should_have_been_made
@@ -162,12 +150,23 @@ describe Twilio::Call do
   
   describe 'behaviour on API error' do
     it 'raises an exception' do
-      Twilio::Config.setup do
-        account_sid   'AC000000000000'
-        auth_token    '79ad98413d911947f0ba369d295ae7a3'
-      end
       stub_request(:post, resource_uri + '.json').with(:body => minimum_params).to_return :body => canned_response('api_error'), :status => 404
       lambda { call }.should raise_error Twilio::APIError
+    end
+  end
+
+  describe '#update_attributes' do
+    before do
+      stub_request(:post, resource_uri + '.json').with(:body => minimum_params).
+          to_return :body => canned_response('call_created')
+        stub_request(:post, resource_uri + '/' + call.sid + '.json').with(:body => 'Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback').
+          to_return :body => canned_response('call_created')
+      end
+    context 'when the resource has been persisted' do
+      it 'updates the API number the new parameters' do
+        call.update_attributes :url => 'http://localhost:3000/hollaback'
+        a_request(:post, resource_uri + '/' + call.sid + '.json').with(:body => 'Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback').should have_been_made
+      end
     end
   end
 end

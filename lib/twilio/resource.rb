@@ -15,7 +15,24 @@ module Twilio
       attributes[key] = value
     end
 
+    def update_attributes(attrs={})
+      state_guard do
+        handle_response self.class.post path, :body => Hash[attrs.map { |k,v| [k.to_s.camelize, v]}]
+      end
+    end
+
     private
+    def state_guard
+      if frozen?
+        raise RuntimeError, "#{self.class.name.demodulize} has already been destroyed"
+      else
+        yield
+      end
+    end
+
+    def path # :nodoc:
+      "/Accounts/#{Twilio::ACCOUNT_SID}/#{self.class.name.demodulize + 's'}/#{self[:sid]}.json"
+    end
 
     def handle_response(res) # :nodoc:
       if (400..599).include? res.code
