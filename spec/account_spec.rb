@@ -36,9 +36,9 @@ describe 'Twilio::Account' do
   end
   describe '#friendly_name=' do
     it 'updates the friendly name' do
-      stub_request(:put, resource).with(:body => 'friendly_name=vanity%20name').to_return :body => canned_response('account'), :status => 201
+      stub_request(:post, resource).with(:body => 'FriendlyName=vanity%20name').to_return :body => canned_response('account'), :status => 201
       Twilio::Account.friendly_name = 'vanity name'
-      a_request(:put, resource).with(:body => 'friendly_name=vanity%20name').should have_been_made
+      a_request(:post, resource).with(:body => 'FriendlyName=vanity%20name').should have_been_made
     end
   end
   describe '#reload!' do

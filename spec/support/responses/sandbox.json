@@ -1,0 +1,13 @@
+{
+    "pin": "63729915",
+    "account_sid": "ACda6f1e31047ebd6fe7a55f120be3a900",
+    "phone_number": "+14154132865",
+    "voice_url": "http:\/\/demo.twilio.com\/welcome",
+    "voice_method": "GET",
+    "sms_url": "http:\/\/demo.twilio.com\/welcome\/sms",
+    "sms_method": "POST",
+    "date_created": "Mon, 10 Nov 2008 20:52:56 +0000",
+    "date_updated": "Mon, 10 Nov 2008 20:52:56 +0000",
+    "api_version": "2010-04-01",
+    "uri": "\/2010-04-01\/Accounts\/ACda6f1e31047ebd6fe7a55f120be3a900\/Sandbox.json"
+}

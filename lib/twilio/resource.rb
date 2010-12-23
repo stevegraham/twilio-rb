@@ -17,11 +17,15 @@ module Twilio
 
     def update_attributes(attrs={})
       state_guard do
-        handle_response self.class.post path, :body => Hash[attrs.map { |k,v| [k.to_s.camelize, v]}]
+        handle_response klass.post path, :body => Hash[attrs.map { |k,v| [k.to_s.camelize, v]}]
       end
     end
 
     private
+    def klass
+      self.class == Module ? self : self.class
+    end
+
     def state_guard
       if frozen?
         raise RuntimeError, "#{self.class.name.demodulize} has already been destroyed"
@@ -31,13 +35,14 @@ module Twilio
     end
 
     def path # :nodoc:
-      "/Accounts/#{Twilio::ACCOUNT_SID}/#{self.class.name.demodulize + 's'}/#{self[:sid]}.json"
+      "/Accounts/#{Twilio::ACCOUNT_SID}/#{klass.name.demodulize.pluralize}/#{self[:sid]}.json"
     end
 
     def handle_response(res) # :nodoc:
       if (400..599).include? res.code
         raise Twilio::APIError.new "Error ##{res.parsed_response['code']}: #{res.parsed_response['message']}"
       else
+        res.parsed_response['api_version'] = res.parsed_response['api_version'].to_s
         @attributes.update(res.parsed_response)
       end
     end

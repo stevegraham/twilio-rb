@@ -1,5 +1,5 @@
 module Twilio
-  module Account
+  module Sandbox
     include Twilio::Resource
     @attributes = {}.with_indifferent_access
 
@@ -11,15 +11,16 @@ module Twilio
       handle_response get path
     end
 
-    def friendly_name=(name)
-      update_attributes :friendly_name => name
+    %w<voice_url voice_method sms_url sms_method>.each do |meth|
+      define_method "#{meth}=" do |arg|
+        update_attributes meth => arg 
+      end
     end
 
     private
     def path
-      "/Accounts/#{Twilio::ACCOUNT_SID}.json"
+      "/Accounts/#{Twilio::ACCOUNT_SID}/Sandbox.json"
     end
-
     extend self
   end
 end
