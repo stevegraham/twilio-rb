@@ -19,21 +19,21 @@ describe Twilio::AvailablePhoneNumber do
 
   describe '.all' do
     context 'for US local numbers' do
-      before { stub_api_call '/US/Local.json?AreaCode=510', 'available_local_phone_numbers' }
+      before { stub_api_call '/US/Local.json?AreaCode=510&Page=2', 'available_local_phone_numbers' }
 
       it 'returns a collection of objects with a length corresponding to the response' do
-        resp = Twilio::AvailablePhoneNumber.all :area_code => '510'
+        resp = Twilio::AvailablePhoneNumber.all :page => 2, :area_code => '510'
         resp.length.should == 2
       end
 
       it 'returns a collection containing instances of Twilio::AvailablePhoneNumber' do
-        resp = Twilio::AvailablePhoneNumber.all :area_code => '510'
+        resp = Twilio::AvailablePhoneNumber.all :page => 2, :area_code => '510'
         resp.all? { |r| r.is_a? Twilio::AvailablePhoneNumber }.should be_true
       end
 
       it 'returns a collection containing objects with attributes corresponding to the response' do
         numbers = JSON.parse(canned_response('available_local_phone_numbers').read)['available_phone_numbers']
-        resp    = Twilio::AvailablePhoneNumber.all :area_code => '510'
+        resp    = Twilio::AvailablePhoneNumber.all :page => 2, :area_code => '510'
 
         numbers.each_with_index do |obj,i|
           obj.each { |attr, value| resp[i].send(attr).should == value }

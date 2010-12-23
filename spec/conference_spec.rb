@@ -34,9 +34,9 @@ describe Twilio::Conference do
     end
 
     it 'accepts options to refine the search' do
-      query = '.json?FriendlyName=example&Status=in-progress&DateCreated>=1970-01-01&DateUpdated<=2038-01-19'
+      query = '.json?FriendlyName=example&Status=in-progress&Page=5&DateCreated>=1970-01-01&DateUpdated<=2038-01-19'
       stub_request(:get, resource_uri + query).to_return :body => canned_response('list_conferences'), :status => 200
-      Twilio::Conference.all :friendly_name => 'example', :status => 'in-progress',
+      Twilio::Conference.all :page => 5, :friendly_name => 'example', :status => 'in-progress',
         :created_after => Date.parse('1970-01-01'), :updated_before => Date.parse('2038-01-19')
       a_request(:get, resource_uri + query).should have_been_made
     end

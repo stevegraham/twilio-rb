@@ -34,10 +34,11 @@ describe Twilio::Notification do
     end
 
     it 'accepts options to refine the search' do
-      stub_request(:get, resource_uri + '.json?Log=0&MessageDate<=2010-12-12&MessageDate>=2010-11-12').
+      query = '.json?Log=0&MessageDate<=2010-12-12&MessageDate>=2010-11-12&Page=5'
+      stub_request(:get, resource_uri + query).
         to_return :body => canned_response('list_notifications'), :status => 200
-      Twilio::Notification.all :log => '0', :created_before => Date.parse('2010-12-12'), :created_after => Date.parse('2010-11-12')
-      a_request(:get, resource_uri + '.json?Log=0&MessageDate<=2010-12-12&MessageDate>=2010-11-12').should have_been_made
+      Twilio::Notification.all :page => 5, :log => '0', :created_before => Date.parse('2010-12-12'), :created_after => Date.parse('2010-11-12')
+      a_request(:get, resource_uri + query).should have_been_made
     end
   end
 
