@@ -9,9 +9,11 @@ It offers an ActiveRecord style API, i.e. one that most Ruby developers are fami
 
 ## Installation
 
-The library has been packaged as a gem and is available from rubygems.org
+The library has been packaged as a gem and is available from rubygems.org. The version that this readme pertains to is 1.0beta. To install use the `--pre` flag
 
-<pre>gem install twilio-rb</pre>
+<pre>gem install twilio-rb --pre</pre>
+
+Please use the Github issue tracker to report any issues or bugs you uncover.
 
 ## Usage
 
@@ -21,7 +23,7 @@ Require the library in your script as
 
 or using bundler:
 
-<pre>gem 'twilio-rb', '1.0pre', :require => 'twilio'</pre>
+<pre>gem 'twilio-rb', '1.0beta', :require => 'twilio'</pre>
 
 ## Configuration
 
