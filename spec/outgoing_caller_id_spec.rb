@@ -6,7 +6,7 @@ describe Twilio::OutgoingCallerId do
   before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
   let(:params) { { :phone_number => '+19175551234', :friendly_name => 'barry' } }
   let(:post_body) { 'PhoneNumber=%2B19175551234&FriendlyName=barry'}
-  
+
 
   def stub_api_call(response_file, uri_tail='')
     stub_request(:get, resource_uri + uri_tail + '.json').
@@ -24,7 +24,7 @@ describe Twilio::OutgoingCallerId do
       resp = Twilio::OutgoingCallerId.all
       resp.all? { |r| r.is_a? Twilio::OutgoingCallerId }.should be_true
     end
-    
+
     JSON.parse(canned_response('list_caller_ids').read)['outgoing_caller_ids'].each_with_index do |obj,i|
       obj.each do |attr, value| 
         specify { Twilio::OutgoingCallerId.all[i].send(attr).should == value }
@@ -62,7 +62,7 @@ describe Twilio::OutgoingCallerId do
           to_return :body => canned_response('caller_id'), :status => 200
       end
       let(:caller_id) { Twilio::OutgoingCallerId.find 'PNe905d7e6b410746a0fb08c57e5a186f3' }
-      
+
       it 'returns an instance of Twilio::OutgoingCallerId.all' do
         caller_id.should be_a Twilio::OutgoingCallerId
       end
@@ -84,7 +84,7 @@ describe Twilio::OutgoingCallerId do
   end
 
   describe '.create' do
-    
+
     before { stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('caller_id')}
     let(:caller_id) { Twilio::OutgoingCallerId.create params }
 
@@ -96,7 +96,7 @@ describe Twilio::OutgoingCallerId do
     it 'returns an instance of Twilio::OutgoingCallerId' do
       caller_id.should be_a Twilio::OutgoingCallerId
     end
-    
+
     JSON.parse(canned_response('caller_id')).map do |k,v|
       specify { caller_id.send(k).should == v }   
     end
@@ -109,13 +109,13 @@ describe Twilio::OutgoingCallerId do
       stub_request(:delete, resource_uri + '/PNe905d7e6b410746a0fb08c57e5a186f3' + '.json').
         to_return :status => 204
     end
-    
+
     let(:caller_id) { Twilio::OutgoingCallerId.find 'PNe905d7e6b410746a0fb08c57e5a186f3' }
 
     it 'deletes the resource' do
       caller_id.destroy
       a_request(:delete, resource_uri + '/PNe905d7e6b410746a0fb08c57e5a186f3' + '.json').
-      should have_been_made  
+        should have_been_made  
     end
 
     it 'freezes itself if successful' do
@@ -133,18 +133,34 @@ describe Twilio::OutgoingCallerId do
 
   describe '#update_attributes' do
     let(:caller_id) { Twilio::OutgoingCallerId.create params }
-    
+
     before do
       stub_request(:post, resource_uri + '.json').with(:body => post_body).
-          to_return :body => canned_response('call_created')
-        stub_request(:post, resource_uri + '/' + caller_id.sid + '.json').with(params).
-          to_return :body => canned_response('call_created')
-      end
+        to_return :body => canned_response('caller_id')
+      stub_request(:post, resource_uri + '/' + caller_id.sid + '.json').with(params).
+        to_return :body => canned_response('caller_id')
+    end
     context 'when the resource has been persisted' do
       it 'updates the API number the new parameters' do
         caller_id.update_attributes :url => 'http://localhost:3000/hollaback'
         a_request(:post, resource_uri + '/' + caller_id.sid + '.json').with(params).should have_been_made
       end
+    end
+  end
+
+  describe '#friendly_name=' do
+    let(:caller_id) { Twilio::OutgoingCallerId.create params }
+
+    before do
+      stub_request(:post, resource_uri + '.json').with(:body => post_body).
+        to_return :body => canned_response('caller_id')
+    end
+
+    it 'updates the friendly_name property with the API' do
+      stub_request(:post, resource_uri + '/' + caller_id.sid + '.json').
+        with(:body => "FriendlyName=foo").to_return :body => canned_response('caller_id'), :status => 201
+      caller_id.friendly_name = 'foo'
+      a_request(:post, resource_uri + '/' + caller_id.sid + '.json').with(:body => "FriendlyName=foo").should have_been_made
     end
   end
 end

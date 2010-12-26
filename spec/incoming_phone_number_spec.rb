@@ -163,4 +163,22 @@ describe Twilio::IncomingPhoneNumber do
       end
     end
   end
+
+  %w<friendly_name api_version voice_url voice_method voice_fallback_url voice_fallback_method status_callback status_callback_method sms_url sms_method sms_fallback_url sms_fallback_method voice_caller_id_lookup>.each do |meth|
+    describe "##{meth}=" do
+      let(:number) { Twilio::IncomingPhoneNumber.create params }
+      
+      before do
+        stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('incoming_phone_number')
+        stub_request(:post, resource_uri + '/' + number.sid + '.json').
+          with(:body => URI.encode("#{meth.camelize}=foo")).to_return :body => canned_response('incoming_phone_number'), :status => 201
+      end
+
+      it "updates the #{meth} property with the API" do
+        number.send "#{meth}=", 'foo'
+        a_request(:post, resource_uri + '/' + number.sid + '.json').
+          with(:body => URI.encode("#{meth.camelize}=foo")).should have_been_made
+      end
+    end
+  end
 end
