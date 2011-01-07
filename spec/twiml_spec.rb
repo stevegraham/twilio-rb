@@ -29,5 +29,11 @@ describe Twilio::TwiML do
       "<Gather action=\"/process_gather.php\" method=\"GET\">\n    <Say>Now hit some buttons!</Say>\n  " + 
       "</Gather>\n</Response>\n"
     end
+    it 'does not include doctype or Response if is_partial is true' do
+      xml = Twilio::TwiML.build(true) do |res|
+        res.say 'This code is re-used in a partial!'
+      end
+      xml.should == "<Say>This code is re-used in a partial!</Say>\n"
+    end
   end
 end

@@ -1,6 +1,6 @@
 module Twilio
   module TwiML
-    def build &blk
+    def build(is_partial=false, &blk)
       xm = Builder::XmlMarkup.new(:indent => 2)
       xm.instance_eval do
         def method_missing(meth, *args, &blk)
@@ -12,8 +12,12 @@ module Twilio
           super(meth.to_s.capitalize, *args, &blk)
         end
       end
-      xm.instruct!
-      xm.response &blk
+      if is_partial
+        blk.call(xm)
+      else
+        xm.instruct!
+        xm.response &blk
+      end
     end
     extend self
   end

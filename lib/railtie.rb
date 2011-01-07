@@ -8,7 +8,8 @@ module Twilio
               include ::ActionView::Template::Handlers::Compilable
 
               def compile(template)
-                %<Twilio::TwiML.build { |res| #{template.source} }>
+                partial = File.basename(template.identifier).starts_with?('_')
+                %<Twilio::TwiML.build(#{partial}) { |res| #{template.source} }>
               end
             end
           end
