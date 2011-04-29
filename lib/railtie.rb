@@ -9,7 +9,10 @@ module Twilio
               include ::ActionView::Template::Handlers::Compilable
 
               def compile(template)
-                %<Twilio::TwiML.build { |res| #{template.source} }>
+                <<-EOS
+                controller.content_type = 'text/xml'
+                Twilio::TwiML.build {|res| #{template.source} }
+                EOS
               end
             end
           end
