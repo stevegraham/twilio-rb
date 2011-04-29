@@ -5,6 +5,7 @@ module Twilio
         class Template
           module Handlers
             class TwiML < ::ActionView::Template::Handler
+              self.default_format = 'text/xml'
               include ::ActionView::Template::Handlers::Compilable
 
               def compile(template)
