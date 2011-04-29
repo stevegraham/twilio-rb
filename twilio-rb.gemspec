@@ -23,6 +23,4 @@ Gem::Specification.new do |s|
 
   s.files                     = Dir['README.md', 'lib/**/*']
   s.require_path              = 'lib'
-
-  s.has_rdoc                  = false
 end
