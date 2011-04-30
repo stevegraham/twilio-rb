@@ -5,21 +5,21 @@ module Twilio
       hash = res.parsed_response
       if (200..299).include? res.code
         hash['api_version'] = hash['api_version'].to_s # api_version parsed as a date by http_party
-        new hash 
+        new hash
       end
     end
 
     def count(opts={})
       opts   = prepare_dates opts
-      params = "?#{URI.encode(opts.join '&')}" unless opts.empty?
+      params = prepare_params opts
 
       get("/Accounts/#{Twilio::ACCOUNT_SID}/#{resource_fragment}.json#{params}").parsed_response['total']
     end
 
     def all(opts={})
       opts   = prepare_dates opts
-      params = "?#{URI.encode(opts.join '&')}" unless opts.empty?
-      
+      params = prepare_params opts
+
       handle_response get "/Accounts/#{Twilio::ACCOUNT_SID}/#{resource_fragment}.json#{params}"
     end
 
@@ -42,6 +42,12 @@ module Twilio
           "#{k.to_s.camelize}=#{v}"
         end
       end
+    end
+
+    def prepare_params(opts)
+      # call URI twice, once to handle colon - otherwise a colon in the query var forces request to xml
+      # see: http://getsatisfaction.com/twilio/topics/json_request_returning_xml_if_query_vars_contains_a_colon
+      "?#{URI.encode(URI.encode(opts.join('&')), ":")}" unless opts.empty?
     end
 
     def handle_response(res) # :nodoc:
