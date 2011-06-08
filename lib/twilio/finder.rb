@@ -10,16 +10,12 @@ module Twilio
     end
 
     def count(opts={})
-      opts   = prepare_dates opts
-      params = prepare_params opts
-
+      params = prepare_params opts if opts.any?
       get("/Accounts/#{Twilio::ACCOUNT_SID}/#{resource_fragment}.json#{params}").parsed_response['total']
     end
 
     def all(opts={})
-      opts   = prepare_dates opts
-      params = prepare_params opts
-
+      params = prepare_params opts if opts.any?
       handle_response get "/Accounts/#{Twilio::ACCOUNT_SID}/#{resource_fragment}.json#{params}"
     end
 
@@ -31,23 +27,18 @@ module Twilio
       resource   = klass_name == 'SMS' ? "#{klass_name}/Messages" : klass_name.pluralize
     end
 
-    def prepare_dates(opts) # :nodoc:
-      opts.map do |k,v|
+    def prepare_params(opts) # :nodoc:
+      pairs = opts.map do |k,v|
         if [:updated_before, :created_before, :updated_after, :created_after].include? k
           k = k.to_s
           # Fancy schmancy-ness to handle Twilio <= URI operator for dates
           comparator = k =~ /before$/ ? '<=' : '>='
-          "Date" << k.gsub(/\_\w+$/, '').capitalize << comparator << v.to_s
+          CGI.escape("Date" << k.gsub(/\_\w+$/, '').capitalize << comparator << v.to_s)
         else
-          "#{k.to_s.camelize}=#{v}"
+          "#{k.to_s.camelize}=#{CGI.escape v.to_s}"
         end
       end
-    end
-
-    def prepare_params(opts)
-      # call URI twice, once to handle colon - otherwise a colon in the query var forces request to xml
-      # see: http://getsatisfaction.com/twilio/topics/json_request_returning_xml_if_query_vars_contains_a_colon
-      "?#{URI.encode(URI.encode(opts.join('&')), ":")}" unless opts.empty?
+      "?#{pairs.join('&')}"
     end
 
     def handle_response(res) # :nodoc:

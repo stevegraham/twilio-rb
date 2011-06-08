@@ -32,7 +32,7 @@ describe Twilio::OutgoingCallerId do
     end
 
     it 'accepts options to refine the search' do
-      query = '.json?FriendlyName=barry&Page=5&PhoneNumber=+19175551234'
+      query = '.json?FriendlyName=barry&Page=5&PhoneNumber=%2B19175551234'
       stub_request(:get, resource_uri + query).
         to_return :body => canned_response('list_caller_ids'), :status => 200
       Twilio::OutgoingCallerId.all :page => 5, :phone_number => '+19175551234', :friendly_name => 'barry'

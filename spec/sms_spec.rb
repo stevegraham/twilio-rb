@@ -59,7 +59,7 @@ describe Twilio::SMS do
     end
 
     it 'accepts options to refine the search' do
-      query = '.json?To=+19175551234&From=+19175550000'
+      query = '.json?To=%2B19175551234&From=%2B19175550000'
       stub_request(:get, resource_uri + query).
         to_return :body => canned_response('list_messages'), :status => 200
       Twilio::SMS.count :to => '+19175551234', :from => '+19175550000'
