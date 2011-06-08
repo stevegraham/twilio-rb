@@ -1,4 +1,3 @@
-
 # Twilio.rb
 
 Interact with the Twilio API in a nice Ruby way. 
@@ -23,7 +22,7 @@ Require the library in your script as
 
 or using bundler:
 
-<pre>gem 'twilio-rb', '1.0beta', :require => 'twilio'</pre>
+<pre>gem 'twilio-rb', '1.0beta2', :require => 'twilio'</pre>
 
 ## Configuration
 
