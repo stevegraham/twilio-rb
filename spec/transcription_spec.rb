@@ -2,11 +2,15 @@ require 'spec_helper'
 
 describe Twilio::Transcription do
 
-  let(:resource_uri) { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{Twilio::ACCOUNT_SID}/Transcriptions" }
   before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
 
-  def stub_api_call(response_file, uri_tail='')
-    stub_request(:get, resource_uri + uri_tail + '.json').
+  def resource_uri(account_sid=nil)
+    account_sid ||= Twilio::ACCOUNT_SID
+    "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Transcriptions"
+  end
+
+  def stub_api_call(response_file, account_sid=nil)
+    stub_request(:get, resource_uri(account_sid) + '.json').
       to_return :body => canned_response(response_file), :status => 200
   end
 
@@ -25,6 +29,49 @@ describe Twilio::Transcription do
     JSON.parse(canned_response('list_transcriptions').read)['transcriptions'].each_with_index do |obj,i|
       obj.each do |attr, value| 
         specify { Twilio::Transcription.all[i].send(attr).should == value }
+      end
+    end
+
+    context 'on a subaccount' do
+      before { stub_api_call 'list_transcriptions', 'SUBACCOUNT_SID' }
+
+      context 'found by passing in an account_sid' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Transcription.all :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Transcription.all :account => mock(:sid => 'SUBACCOUNT_SID')
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
+    end
+  end
+
+  describe '.count' do
+    before { stub_api_call 'list_transcriptions' }
+    it 'returns the number of resources' do
+      Twilio::Transcription.count.should == 150
+    end
+
+    context 'on a subaccount' do
+      before { stub_api_call 'list_transcriptions', 'SUBACCOUNT_SID' }
+
+      context 'found by passing in an account_sid' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Transcription.count :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Transcription.count :account => mock(:sid => 'SUBACCOUNT_SID')
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
       end
     end
   end
@@ -53,6 +100,29 @@ describe Twilio::Transcription do
       it 'returns nil' do
         transcription = Twilio::Transcription.find 'phony'
         transcription.should be_nil
+      end
+    end
+
+    context 'on a subaccount' do
+      before do
+        stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/TR8c61027b709ffb038236612dc5af8723' + '.json').
+          to_return :body => canned_response('notification'), :status => 200
+      end
+
+      context 'found by passing in an account_sid' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Transcription.find 'TR8c61027b709ffb038236612dc5af8723', :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '/TR8c61027b709ffb038236612dc5af8723' + '.json').
+            should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Transcription.find 'TR8c61027b709ffb038236612dc5af8723', :account => mock(:sid => 'SUBACCOUNT_SID')
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '/TR8c61027b709ffb038236612dc5af8723' + '.json').
+            should have_been_made
+        end
       end
     end
   end

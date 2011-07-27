@@ -2,96 +2,261 @@ require 'spec_helper'
 
 describe Twilio::IncomingPhoneNumber do
 
-  let(:resource_uri) { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{Twilio::ACCOUNT_SID}/IncomingPhoneNumbers" }
   before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
 
-  def stub_api_call(response_file, uri_tail='')
-    stub_request(:get, resource_uri + uri_tail + '.json').
+  def resource_uri(account_sid=nil)
+    account_sid ||= Twilio::ACCOUNT_SID
+    "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/IncomingPhoneNumbers"
+  end
+
+  def stub_api_call(response_file, account_sid=nil)
+    stub_request(:get, resource_uri(account_sid) + '.json').
       to_return :body => canned_response(response_file), :status => 200
   end
 
   let(:post_body) do
     "PhoneNumber=%2B19175551234&FriendlyName=barrington&VoiceUrl=http%3A%2F%2Fwww.example.com%2Ftwiml.xml&VoiceMethod=post&VoiceFallbackUrl=http%3A%2F%2Fwww.example.com%2Ftwiml2.xml&" +
-    "VoiceFallbackMethod=get&StatusNumberback=http%3A%2F%2Fwww.example.com%2Fgoodnite.xml&StatusNumberbackMethod=get&SmsUrl=http%3A%2F%2Fwww.example.com%2Ftwiml.xml&SmsMethod=post&" +
-    "SmsFallbackUrl=http%3A%2F%2Fwww.example.com%2Ftwiml2.xml&SmsFallbackMethod=get&VoiceNumbererIdLookup=false"
+    "VoiceFallbackMethod=get&StatusCallback=http%3A%2F%2Fwww.example.com%2Fgoodnite.xml&StatusCallbackMethod=get&SmsUrl=http%3A%2F%2Fwww.example.com%2Ftwiml.xml&SmsMethod=post&" +
+    "SmsFallbackUrl=http%3A%2F%2Fwww.example.com%2Ftwiml2.xml&SmsFallbackMethod=get&VoiceCallerIdLookup=false"
   end
 
   let(:params) do
     { :phone_number => '+19175551234', :friendly_name => 'barrington',
       :voice_url => 'http://www.example.com/twiml.xml', :voice_method => 'post', :voice_fallback_url => 'http://www.example.com/twiml2.xml',
-      :voice_fallback_method => 'get', :status_numberback => 'http://www.example.com/goodnite.xml', :status_numberback_method => 'get',
+      :voice_fallback_method => 'get', :status_callback => 'http://www.example.com/goodnite.xml', :status_callback_method => 'get',
       :sms_url => 'http://www.example.com/twiml.xml', :sms_method => 'post', :sms_fallback_url => 'http://www.example.com/twiml2.xml',
-      :sms_fallback_method => 'get', :voice_numberer_id_lookup => false }
+      :sms_fallback_method => 'get', :voice_caller_id_lookup => false }
   end
 
   let(:number) { Twilio::IncomingPhoneNumber.create params }
 
   describe '.count' do
-    before { stub_api_call 'list_incoming_phone_numbers' }
-    it 'returns the number of resources' do
-      Twilio::IncomingPhoneNumber.count.should == 6
+    context 'on the master account' do
+      before { stub_api_call 'list_incoming_phone_numbers' }
+      it 'returns the number of resources' do
+        Twilio::IncomingPhoneNumber.count.should == 6
+      end
+
+      it 'accepts options to refine the search' do
+        query = '.json?FriendlyName=example&PhoneNumber=2125550000'
+        stub_request(:get, resource_uri + query).
+          to_return :body => canned_response('list_incoming_phone_numbers'), :status => 200
+        Twilio::IncomingPhoneNumber.count :phone_number => '2125550000', :friendly_name => 'example'
+        a_request(:get, resource_uri + query).should have_been_made
+      end
     end
 
-    it 'accepts options to refine the search' do
-      query = '.json?FriendlyName=example&PhoneNumber=2125550000'
-      stub_request(:get, resource_uri + query).
-        to_return :body => canned_response('list_incoming_phone_numbers'), :status => 200
-      Twilio::IncomingPhoneNumber.count :phone_number => '2125550000', :friendly_name => 'example'
-      a_request(:get, resource_uri + query).should have_been_made
+    context 'on a subaccount' do
+      context 'found by passing in an account sid' do
+        before { stub_api_call 'list_incoming_phone_numbers', 'SUBACCOUNT_SID' }
+        it 'returns the number of resources' do
+          Twilio::IncomingPhoneNumber.count(:account_sid => 'SUBACCOUNT_SID').should == 6
+        end
+
+        it 'accepts options to refine the search' do
+          query = '.json?FriendlyName=example&PhoneNumber=2125550000'
+          stub_request(:get, resource_uri('SUBACCOUNT_SID') + query).
+            to_return :body => canned_response('list_incoming_phone_numbers'), :status => 200
+          Twilio::IncomingPhoneNumber.count :phone_number => '2125550000',
+            :friendly_name => 'example', :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + query).should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        before { stub_api_call 'list_incoming_phone_numbers', 'SUBACCOUNT_SID' }
+        it 'returns the number of resources' do
+          Twilio::IncomingPhoneNumber.count(:account => mock(:sid => 'SUBACCOUNT_SID')).should == 6
+        end
+
+        it 'accepts options to refine the search' do
+          query = '.json?FriendlyName=example&PhoneNumber=2125550000'
+          stub_request(:get, resource_uri('SUBACCOUNT_SID') + query).
+            to_return :body => canned_response('list_incoming_phone_numbers'), :status => 200
+          Twilio::IncomingPhoneNumber.count :phone_number => '2125550000',
+            :friendly_name => 'example', :account => mock(:sid => 'SUBACCOUNT_SID')
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + query).should have_been_made
+        end
+      end
     end
   end
 
   describe '.all' do
-    before { stub_api_call 'list_incoming_phone_numbers' }
-    let(:resp) { resp = Twilio::IncomingPhoneNumber.all }
-    it 'returns a collection of objects with a length corresponding to the response' do
-      resp.length.should == 1
-    end
+    context 'on the master account' do
+      before { stub_api_call 'list_incoming_phone_numbers' }
+      let(:resp) { resp = Twilio::IncomingPhoneNumber.all }
+      it 'returns a collection of objects with a length corresponding to the response' do
+        resp.length.should == 1
+      end
 
-    it 'returns a collection containing instances of Twilio::AvailablePhoneNumber' do
-      resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be_true
-    end
+      it 'returns a collection containing instances of Twilio::AvailablePhoneNumber' do
+        resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be_true
+      end
 
-    JSON.parse(canned_response('list_incoming_phone_numbers').read)['incoming_phone_numbers'].each_with_index do |obj,i|
-      obj.each do |attr, value| 
-        specify { resp[i].send(attr).should == value }
+      JSON.parse(canned_response('list_incoming_phone_numbers').read)['incoming_phone_numbers'].each_with_index do |obj,i|
+        obj.each do |attr, value| 
+          specify { resp[i].send(attr).should == value }
+        end
+      end
+
+      it 'accepts options to refine the search' do
+        query = '.json?FriendlyName=example&Page=5&PhoneNumber=2125550000'
+        stub_request(:get, resource_uri + query).
+          to_return :body => canned_response('list_incoming_phone_numbers'), :status => 200
+        Twilio::IncomingPhoneNumber.all :page => 5, :phone_number => '2125550000', :friendly_name => 'example'
+        a_request(:get, resource_uri + query).should have_been_made
       end
     end
 
-    it 'accepts options to refine the search' do
-      query = '.json?FriendlyName=example&Page=5&PhoneNumber=2125550000'
-      stub_request(:get, resource_uri + query).
-        to_return :body => canned_response('list_incoming_phone_numbers'), :status => 200
-      Twilio::IncomingPhoneNumber.all :page => 5, :phone_number => '2125550000', :friendly_name => 'example'
-      a_request(:get, resource_uri + query).should have_been_made
+    context 'on a subaccount' do
+      context 'found by passing in an account sid' do
+        before { stub_api_call 'list_incoming_phone_numbers', 'SUBACCOUNT_SID' }
+        let(:resp) { resp = Twilio::IncomingPhoneNumber.all :account_sid => 'SUBACCOUNT_SID' }
+        it 'returns a collection of objects with a length corresponding to the response' do
+          resp.length.should == 1
+        end
+
+        it 'returns a collection containing instances of Twilio::AvailablePhoneNumber' do
+          resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be_true
+        end
+
+        JSON.parse(canned_response('list_incoming_phone_numbers').read)['incoming_phone_numbers'].each_with_index do |obj,i|
+          obj.each do |attr, value| 
+            specify { resp[i].send(attr).should == value }
+          end
+        end
+
+        it 'accepts options to refine the search' do
+          query = '.json?FriendlyName=example&Page=5&PhoneNumber=2125550000'
+          stub_request(:get, resource_uri('SUBACCOUNT_SID') + query).
+            to_return :body => canned_response('list_incoming_phone_numbers'), :status => 200
+          Twilio::IncomingPhoneNumber.all :page => 5, :phone_number => '2125550000',
+            :friendly_name => 'example', :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + query).should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        context 'found by passing in an account sid' do
+          before { stub_api_call 'list_incoming_phone_numbers', 'SUBACCOUNT_SID' }
+          let(:resp) { resp = Twilio::IncomingPhoneNumber.all :account => mock(:sid =>'SUBACCOUNT_SID') }
+          it 'returns a collection of objects with a length corresponding to the response' do
+            resp.length.should == 1
+          end
+
+          it 'returns a collection containing instances of Twilio::AvailablePhoneNumber' do
+            resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be_true
+          end
+
+          JSON.parse(canned_response('list_incoming_phone_numbers').read)['incoming_phone_numbers'].each_with_index do |obj,i|
+            obj.each do |attr, value| 
+              specify { resp[i].send(attr).should == value }
+            end
+          end
+
+          it 'accepts options to refine the search' do
+            query = '.json?FriendlyName=example&Page=5&PhoneNumber=2125550000'
+            stub_request(:get, resource_uri('SUBACCOUNT_SID') + query).
+              to_return :body => canned_response('list_incoming_phone_numbers'), :status => 200
+            Twilio::IncomingPhoneNumber.all :page => 5, :phone_number => '2125550000',
+              :friendly_name => 'example', :account => mock(:sid =>'SUBACCOUNT_SID')
+            a_request(:get, resource_uri('SUBACCOUNT_SID') + query).should have_been_made
+          end
+        end
+      end
     end
   end
 
   describe '.find' do
-    context 'for a valid number' do
-      before do
-        stub_request(:get, resource_uri + '/PN2a0747eba6abf96b7e3c3ff0b4530f6e' + '.json').
-          to_return :body => canned_response('incoming_phone_number'), :status => 200
+    context 'on the master account' do
+      context 'for a valid number' do
+        before do
+          stub_request(:get, resource_uri + '/PN2a0747eba6abf96b7e3c3ff0b4530f6e' + '.json').
+            to_return :body => canned_response('incoming_phone_number'), :status => 200
+        end
+
+        let(:number) { Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e' }
+
+        it 'returns an instance of Twilio::IncomingPhoneNumber' do
+          number.should be_a Twilio::IncomingPhoneNumber 
+        end
+
+        JSON.parse(canned_response('incoming_phone_number').read).each do |k,v|
+          specify { number.send(k).should == v }
+        end
       end
 
-      let(:number) { Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e' }
-
-      it 'returns an instance of Twilio::IncomingPhoneNumber' do
-        number.should be_a Twilio::IncomingPhoneNumber 
-      end
-
-      JSON.parse(canned_response('incoming_phone_number').read).each do |k,v|
-        specify { number.send(k).should == v }
+      context 'for a string that does not correspond to a real number' do
+        before do
+          stub_request(:get, resource_uri + '/phony' + '.json').to_return :status => 404
+        end
+        it 'returns nil' do
+          number = Twilio::IncomingPhoneNumber.find 'phony'
+          number.should be_nil
+        end
       end
     end
 
-    context 'for a string that does not correspond to a real number' do
-      before do
-        stub_request(:get, resource_uri + '/phony' + '.json').to_return :status => 404
+    context 'on a subaccount' do
+      context 'found by passing in an account sid' do
+        context 'for a valid number' do
+          before do
+            stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/PN2a0747eba6abf96b7e3c3ff0b4530f6e' + '.json').
+              to_return :body => canned_response('incoming_phone_number'), :status => 200
+          end
+
+          let(:number) { Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e', :account_sid => 'SUBACCOUNT_SID' }
+
+          it 'returns an instance of Twilio::IncomingPhoneNumber' do
+            number.should be_a Twilio::IncomingPhoneNumber 
+          end
+
+          JSON.parse(canned_response('incoming_phone_number').read).each do |k,v|
+            specify { number.send(k).should == v }
+          end
+        end
+
+        context 'for a string that does not correspond to a real number' do
+          before do
+            stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/phony' + '.json').to_return :status => 404
+          end
+          it 'returns nil' do
+            number = Twilio::IncomingPhoneNumber.find 'phony', :account_sid => 'SUBACCOUNT_SID'
+            number.should be_nil
+          end
+        end
       end
-      it 'returns nil' do
-        number = Twilio::IncomingPhoneNumber.find 'phony'
-        number.should be_nil
+
+      context 'found by passing in an instance of Twilio::Account' do
+        context 'for a valid number' do
+          before do
+            stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/PN2a0747eba6abf96b7e3c3ff0b4530f6e' + '.json').
+              to_return :body => canned_response('incoming_phone_number'), :status => 200
+          end
+
+          let(:number) do
+            Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e',
+              :account => mock(:sid => 'SUBACCOUNT_SID')
+          end
+
+          it 'returns an instance of Twilio::IncomingPhoneNumber' do
+            number.should be_a Twilio::IncomingPhoneNumber 
+          end
+
+          JSON.parse(canned_response('incoming_phone_number').read).each do |k,v|
+            specify { number.send(k).should == v }
+          end
+        end
+
+        context 'for a string that does not correspond to a real number' do
+          before do
+            stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/phony' + '.json').to_return :status => 404
+          end
+          it 'returns nil' do
+            number = Twilio::IncomingPhoneNumber.find 'phony', :account => mock(:sid => 'SUBACCOUNT_SID')
+            number.should be_nil
+          end
+        end
       end
     end
   end
@@ -126,20 +291,65 @@ describe Twilio::IncomingPhoneNumber do
   end
 
   describe '.create' do
-    
-    before { stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('incoming_phone_number')}
+    context 'on the main account' do
+      before { stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('incoming_phone_number')}
 
-    it 'creates a new incoming number on the account' do
-      number
-      a_request(:post, resource_uri + '.json').with(:body => post_body).should have_been_made
+      it 'creates a new incoming number on the account' do
+        number
+        a_request(:post, resource_uri + '.json').with(:body => post_body).should have_been_made
+      end
+
+      it 'returns an instance of Twilio::IncomingPhoneNumber' do
+        number.should be_a Twilio::IncomingPhoneNumber
+      end
+
+      JSON.parse(canned_response('incoming_phone_number')).map do |k,v|
+        specify { number.send(k).should == v }   
+      end
     end
 
-    it 'returns an instance of Twilio::IncomingPhoneNumber' do
-      number.should be_a Twilio::IncomingPhoneNumber
-    end
-    
-    JSON.parse(canned_response('incoming_phone_number')).map do |k,v|
-      specify { number.send(k).should == v }   
+    context 'on a subaccount' do
+      context 'found by passing in a account sid string' do
+        before do 
+          stub_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).to_return :body => canned_response('incoming_phone_number')
+        end
+
+        let(:number) { Twilio::IncomingPhoneNumber.create params.merge(:account_sid => 'SUBACCOUNT_SID') }
+
+        it 'creates a new incoming number on the account' do
+          number
+          a_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).should have_been_made
+        end
+
+        it 'returns an instance of Twilio::IncomingPhoneNumber' do
+          number.should be_a Twilio::IncomingPhoneNumber
+        end
+
+        JSON.parse(canned_response('incoming_phone_number')).map do |k,v|
+          specify { number.send(k).should == v }   
+        end
+      end
+
+      context 'found by passing in an actual instance of Twilio::Account' do
+        before do 
+          stub_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).to_return :body => canned_response('incoming_phone_number')
+        end
+
+        let(:number) { Twilio::IncomingPhoneNumber.create params.merge(:account => mock(:sid => 'SUBACCOUNT_SID')) }
+
+        it 'creates a new incoming number on the account' do
+          number
+          a_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).should have_been_made
+        end
+
+        it 'returns an instance of Twilio::IncomingPhoneNumber' do
+          number.should be_a Twilio::IncomingPhoneNumber
+        end
+
+        JSON.parse(canned_response('incoming_phone_number')).map do |k,v|
+          specify { number.send(k).should == v }   
+        end
+      end
     end
   end
 

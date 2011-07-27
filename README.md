@@ -89,6 +89,20 @@ To retrieve an earlier created SMS message, there is the `Twilio::SMS.find` meth
 
 This returns an instance of `Twilio::SMS` if a SMS message with the given SID was found, otherwise nil is returned
 
+# Subaccounts
+
+The Twilio REST API supports subaccounts that is discrete accounts owned by a master account. twilio-rb supports this too.
+
+To perform an operation on an account other than the master account you can pass in the subaccount sid
+
+<pre>Twilio::SMS.create :to => '+19175551234' :from => '+16465550000',
+  :body => 'This will be billed to a subaccount, sucka!' :account => 'ACXXXXXXXXXXXXXXXXXXXXXXXX'</pre>
+  
+You can also pass in an object that responds to sid, i.e. an instance of Twilio::Account
+
+<pre>Twilio::SMS.create :to => '+19175551234' :from => '+16465550000',
+  :body => 'This TOO will be billed to a subaccount, sucka!' :account => my_subaccount_object</pre>
+
 # Building TwiML documents
 
 A TwiML document is an XML document. The best way to build XML in Ruby is with Builder, and so it follows that we should use builder for TwiML. `Twilio::TwiML.build` behaves like builder except element names are capitalised for you and attributes are camelized for you as well. This is so you may continue to write beautiful code.

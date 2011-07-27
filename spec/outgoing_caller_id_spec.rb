@@ -2,14 +2,17 @@ require 'spec_helper'
 
 describe Twilio::OutgoingCallerId do
 
-  let(:resource_uri) { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{Twilio::ACCOUNT_SID}/OutgoingCallerIds" }
   before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
   let(:params) { { :phone_number => '+19175551234', :friendly_name => 'barry' } }
   let(:post_body) { 'PhoneNumber=%2B19175551234&FriendlyName=barry'}
 
+  def resource_uri(account_sid=nil)
+    account_sid ||= Twilio::ACCOUNT_SID
+    "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/OutgoingCallerIds"
+  end
 
-  def stub_api_call(response_file, uri_tail='')
-    stub_request(:get, resource_uri + uri_tail + '.json').
+  def stub_api_call(response_file, account_sid=nil)
+    stub_request(:get, resource_uri(account_sid) + '.json').
       to_return :body => canned_response(response_file), :status => 200
   end
 
@@ -38,6 +41,24 @@ describe Twilio::OutgoingCallerId do
       Twilio::OutgoingCallerId.all :page => 5, :phone_number => '+19175551234', :friendly_name => 'barry'
       a_request(:get, resource_uri + query).should have_been_made
     end
+
+    context 'on a subaccount' do
+      before { stub_api_call 'list_caller_ids', 'SUBACCOUNT_SID' }
+
+      context 'found by passing in an account_sid' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::OutgoingCallerId.all :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::OutgoingCallerId.all :account => mock(:sid => 'SUBACCOUNT_SID')
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
+    end
   end
 
   describe '.count' do
@@ -52,6 +73,24 @@ describe Twilio::OutgoingCallerId do
         to_return :body => canned_response('list_caller_ids'), :status => 200
       Twilio::OutgoingCallerId.count :phone_number => '2125550000', :friendly_name => 'example'
       a_request(:get, resource_uri + query).should have_been_made
+    end
+
+    context 'on a subaccount' do
+      before { stub_api_call 'list_caller_ids', 'SUBACCOUNT_SID' }
+
+      context 'found by passing in an account_sid' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::OutgoingCallerId.count :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::OutgoingCallerId.count :account => mock(:sid => 'SUBACCOUNT_SID')
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
     end
   end
 
@@ -81,24 +120,92 @@ describe Twilio::OutgoingCallerId do
         caller_id.should be_nil
       end
     end
+
+    context 'on a subaccount' do
+      before do
+        stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/PNe905d7e6b410746a0fb08c57e5a186f3' + '.json').
+          to_return :body => canned_response('caller_id'), :status => 200
+      end
+
+      context 'found by passing in an account_sid' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::OutgoingCallerId.find 'PNe905d7e6b410746a0fb08c57e5a186f3', :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '/PNe905d7e6b410746a0fb08c57e5a186f3' + '.json').
+            should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::OutgoingCallerId.find 'PNe905d7e6b410746a0fb08c57e5a186f3', :account => mock(:sid => 'SUBACCOUNT_SID')
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '/PNe905d7e6b410746a0fb08c57e5a186f3' + '.json').
+            should have_been_made
+        end
+      end
+    end
   end
 
   describe '.create' do
+    context 'on the main account' do
+      before { stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('caller_id')}
+      let(:caller_id) { Twilio::OutgoingCallerId.create params }
 
-    before { stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('caller_id')}
-    let(:caller_id) { Twilio::OutgoingCallerId.create params }
+      it 'creates a new incoming caller_id on the account' do
+        caller_id
+        a_request(:post, resource_uri + '.json').with(:body => post_body).should have_been_made
+      end
 
-    it 'creates a new incoming caller_id on the account' do
-      caller_id
-      a_request(:post, resource_uri + '.json').with(:body => post_body).should have_been_made
+      it 'returns an instance of Twilio::OutgoingCallerId' do
+        caller_id.should be_a Twilio::OutgoingCallerId
+      end
+
+      JSON.parse(canned_response('caller_id')).map do |k,v|
+        specify { caller_id.send(k).should == v }   
+      end
     end
 
-    it 'returns an instance of Twilio::OutgoingCallerId' do
-      caller_id.should be_a Twilio::OutgoingCallerId
-    end
+    context 'on a subaccount' do
+      context 'found by passing in a account sid string' do
+        before do 
+          stub_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).to_return :body => canned_response('caller_id')
+        end
 
-    JSON.parse(canned_response('caller_id')).map do |k,v|
-      specify { caller_id.send(k).should == v }   
+        let(:caller_id) { Twilio::OutgoingCallerId.create params.merge(:account_sid => 'SUBACCOUNT_SID') }
+
+        it 'creates a new incoming caller_id on the account' do
+          caller_id
+          a_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).should have_been_made
+        end
+
+        it 'returns an instance of Twilio::OutgoingCallerId' do
+          caller_id.should be_a Twilio::OutgoingCallerId
+        end
+
+        JSON.parse(canned_response('caller_id')).map do |k,v|
+          specify { caller_id.send(k).should == v }   
+        end
+      end
+
+      context 'found by passing in an actual instance of Twilio::Account' do
+        before do 
+          stub_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).to_return :body => canned_response('caller_id')
+        end
+
+        let(:caller_id) { Twilio::OutgoingCallerId.create params.merge(:account => mock(:sid => 'SUBACCOUNT_SID')) }
+
+        it 'creates a new incoming caller_id on the account' do
+          caller_id
+          a_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).should have_been_made
+        end
+
+        it 'returns an instance of Twilio::OutgoingCallerId' do
+          caller_id.should be_a Twilio::OutgoingCallerId
+        end
+
+        JSON.parse(canned_response('caller_id')).map do |k,v|
+          specify { caller_id.send(k).should == v }   
+        end
+      end
     end
   end
 

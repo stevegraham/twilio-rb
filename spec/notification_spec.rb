@@ -2,11 +2,15 @@ require 'spec_helper'
 
 describe Twilio::Notification do
 
-  let(:resource_uri) { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{Twilio::ACCOUNT_SID}/Notifications" }
   before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
 
-  def stub_api_call(response_file, uri_tail='')
-    stub_request(:get, resource_uri + uri_tail + '.json').
+  def resource_uri(account_sid=nil)
+    account_sid ||= Twilio::ACCOUNT_SID
+    "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Notifications"
+  end
+
+  def stub_api_call(response_file, account_sid=nil)
+    stub_request(:get, resource_uri(account_sid) + '.json').
       to_return :body => canned_response(response_file), :status => 200
   end
 
@@ -35,6 +39,24 @@ describe Twilio::Notification do
       Twilio::Notification.all :page => 5, :log => '0', :created_before => Date.parse('2010-12-12'), :created_after => Date.parse('2010-11-12')
       a_request(:get, resource_uri + query).should have_been_made
     end
+
+    context 'on a subaccount' do
+      before { stub_api_call 'list_notifications', 'SUBACCOUNT_SID' }
+
+      context 'found by passing in an account_sid' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Notification.all :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Notification.all :account => mock(:sid => 'SUBACCOUNT_SID')
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
+    end
   end
 
   describe '.count' do
@@ -50,9 +72,50 @@ describe Twilio::Notification do
       Twilio::Notification.count :phone_number => '2125550000', :friendly_name => 'example'
       a_request(:get, resource_uri + query).should have_been_made
     end
+
+    context 'on a subaccount' do
+      before { stub_api_call 'list_notifications', 'SUBACCOUNT_SID' }
+
+      context 'found by passing in an account_sid' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Notification.count :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Notification.count :account => mock(:sid => 'SUBACCOUNT_SID')
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
+    end
   end
 
   describe '.find' do
+    context 'on a subaccount' do
+      before do
+        stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/NO5a7a84730f529f0a76b3e30c01315d1a' + '.json').
+          to_return :body => canned_response('notification'), :status => 200
+      end
+
+      context 'found by passing in an account_sid' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Notification.find 'NO5a7a84730f529f0a76b3e30c01315d1a', :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '/NO5a7a84730f529f0a76b3e30c01315d1a' + '.json').
+            should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Notification.find 'NO5a7a84730f529f0a76b3e30c01315d1a', :account => mock(:sid => 'SUBACCOUNT_SID')
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '/NO5a7a84730f529f0a76b3e30c01315d1a' + '.json').
+            should have_been_made
+        end
+      end
+    end
+
     context 'for a valid notification' do
       before do
         stub_request(:get, resource_uri + '/NO5a7a84730f529f0a76b3e30c01315d1a' + '.json').

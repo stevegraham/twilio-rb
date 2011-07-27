@@ -17,8 +17,7 @@ module Twilio
       private
       def prepare_params(opts) # :nodoc:
         pairs = opts.map do |k,v|
-          if [:started_before, :started_after, :ended_before, :ended_after].include? k
-            k = k.to_s
+          if %w(started_before started_after ended_before ended_after).include? k
             # Fancy schmancy-ness to handle Twilio <= URI operator for dates
             comparator = k =~ /before$/ ? '<=' : '>='
             delineator = k =~ /started/ ? 'Start' : 'End' 

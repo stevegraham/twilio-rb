@@ -8,8 +8,7 @@ module Twilio
       private
       def prepare_params(opts) # :nodoc:
         pairs = opts.map do |k,v|
-          if [:created_before, :created_after].include? k
-            k = k.to_s
+          if %w(created_before created_after).include? k
             # Fancy schmancy-ness to handle Twilio <= URI operator for dates
             comparator = k =~ /before$/ ? '<=' : '>='
             CGI.escape("MessageDate" << comparator << v.to_s)

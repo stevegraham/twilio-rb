@@ -1,7 +1,10 @@
 module Twilio
   module Finder
-    def find(id)
-      res  = get "/Accounts/#{Twilio::ACCOUNT_SID}/#{resource_fragment}/#{id}.json"
+    def find(id, opts={})
+      opts        = opts.with_indifferent_access
+      # Support subaccounts by optionally passing in an account_sid or account object
+      account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::ACCOUNT_SID
+      res  = get "/Accounts/#{account_sid}/#{resource_fragment}/#{id}.json"
       hash = res.parsed_response
       if (200..299).include? res.code
         hash['api_version'] = hash['api_version'].to_s # api_version parsed as a date by http_party
@@ -10,13 +13,19 @@ module Twilio
     end
 
     def count(opts={})
-      params = prepare_params opts if opts.any?
-      get("/Accounts/#{Twilio::ACCOUNT_SID}/#{resource_fragment}.json#{params}").parsed_response['total']
+      opts        = opts.with_indifferent_access
+      # Support subaccounts by optionally passing in an account_sid or account object
+      account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::ACCOUNT_SID
+      params      = prepare_params opts if opts.any?
+      get("/Accounts/#{account_sid}/#{resource_fragment}.json#{params}").parsed_response['total']
     end
 
     def all(opts={})
-      params = prepare_params opts if opts.any?
-      handle_response get "/Accounts/#{Twilio::ACCOUNT_SID}/#{resource_fragment}.json#{params}"
+      opts        = opts.with_indifferent_access
+      # Support subaccounts by optionally passing in an account_sid or account object
+      account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::ACCOUNT_SID
+      params      = prepare_params opts if opts.any?
+      handle_response get "/Accounts/#{account_sid}/#{resource_fragment}.json#{params}"
     end
 
     private
@@ -29,8 +38,7 @@ module Twilio
 
     def prepare_params(opts) # :nodoc:
       pairs = opts.map do |k,v|
-        if [:updated_before, :created_before, :updated_after, :created_after].include? k
-          k = k.to_s
+        if %w(updated_before created_before updated_after created_after).include? k
           # Fancy schmancy-ness to handle Twilio <= URI operator for dates
           comparator = k =~ /before$/ ? '<=' : '>='
           CGI.escape("Date" << k.gsub(/\_\w+$/, '').capitalize << comparator << v.to_s)

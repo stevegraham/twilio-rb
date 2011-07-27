@@ -2,11 +2,15 @@ require 'spec_helper'
 
 describe Twilio::Recording do
 
-  let(:resource_uri) { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{Twilio::ACCOUNT_SID}/Recordings" }
   before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
 
-  def stub_api_call(response_file, uri_tail='')
-    stub_request(:get, resource_uri + uri_tail + '.json').
+  def resource_uri(account_sid=nil)
+    account_sid ||= Twilio::ACCOUNT_SID
+    "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Recordings"
+  end
+
+  def stub_api_call(response_file, account_sid=nil)
+    stub_request(:get, resource_uri(account_sid) + '.json').
       to_return :body => canned_response(response_file), :status => 200
   end
 
@@ -35,6 +39,24 @@ describe Twilio::Recording do
       Twilio::Recording.all :page => 5, :call_sid => 'CAa346467ca321c71dbd5e12f627deb854', :created_before => Date.parse('2010-12-12'), :created_after => Date.parse('2010-11-12')
       a_request(:get, resource_uri + query).should have_been_made
     end
+
+    context 'on a subaccount' do
+      before { stub_api_call 'list_recordings', 'SUBACCOUNT_SID' }
+
+      context 'found by passing in an account_sid' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Recording.all :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Recording.all :account => mock(:sid => 'SUBACCOUNT_SID')
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
+    end
   end
 
   describe '.count' do
@@ -49,6 +71,24 @@ describe Twilio::Recording do
         to_return :body => canned_response('list_recordings'), :status => 200
       Twilio::Recording.count :call_sid => 'CAa346467ca321c71dbd5e12f627deb854', :created_before => Date.parse('2010-12-12')
       a_request(:get, resource_uri + query).should have_been_made
+    end
+
+    context 'on a subaccount' do
+      before { stub_api_call 'list_recordings', 'SUBACCOUNT_SID' }
+
+      context 'found by passing in an account_sid' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Recording.count :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Recording.count :account => mock(:sid => 'SUBACCOUNT_SID')
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
+        end
+      end
     end
   end
 
@@ -77,6 +117,29 @@ describe Twilio::Recording do
       it 'returns nil' do
         recording = Twilio::Recording.find 'phony'
         recording.should be_nil
+      end
+    end
+
+    context 'on a subaccount' do
+      before do
+        stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/RE557ce644e5ab84fa21cc21112e22c485' + '.json').
+          to_return :body => canned_response('notification'), :status => 200
+      end
+
+      context 'found by passing in an account_sid' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Recording.find 'RE557ce644e5ab84fa21cc21112e22c485', :account_sid => 'SUBACCOUNT_SID'
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '/RE557ce644e5ab84fa21cc21112e22c485' + '.json').
+            should have_been_made
+        end
+      end
+
+      context 'found by passing in an instance of Twilio::Account' do
+        it 'uses the subaccount sid in the request' do
+          Twilio::Recording.find 'RE557ce644e5ab84fa21cc21112e22c485', :account => mock(:sid => 'SUBACCOUNT_SID')
+          a_request(:get, resource_uri('SUBACCOUNT_SID') + '/RE557ce644e5ab84fa21cc21112e22c485' + '.json').
+            should have_been_made
+        end
       end
     end
   end
