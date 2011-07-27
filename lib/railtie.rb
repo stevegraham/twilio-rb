@@ -11,13 +11,15 @@ module Twilio
               def compile(template)
                 <<-EOS
                 controller.content_type = 'text/xml'
-                Twilio::TwiML.build {|res| #{template.source} }
+                Twilio::TwiML.build { |res| #{template.source} }
                 EOS
               end
             end
           end
         end
       end
+
+      ActionController::Base.class_eval { before_filter Twilio::RequestFilter }
 
       ::ActionView::Template.register_template_handler(:voice, ActionView::Template::Handlers::TwiML)
       ::Mime::Type.register_alias 'text/xml', :voice
