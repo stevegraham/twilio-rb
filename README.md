@@ -326,4 +326,9 @@ Twilio::IncomingPhoneNumber.create :phone_number => numbers.first.phone_number, 
 
 A recording resource instance has an extra instance method: `#mp3` this returns a publicly accessible URL for the MP3 representation of the resource instance. 
 
+# Contributors
 
+Stevie Graham
+TJ Singleton
+Christopher Durtschi
+Dan Imrie-Situnayake
