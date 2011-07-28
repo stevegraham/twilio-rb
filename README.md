@@ -328,7 +328,7 @@ A recording resource instance has an extra instance method: `#mp3` this returns 
 
 # Contributors
 
-Stevie Graham
-TJ Singleton
-Christopher Durtschi
-Dan Imrie-Situnayake
+* Stevie Graham
+* TJ Singleton
+* Christopher Durtschi
+* Dan Imrie-Situnayake
