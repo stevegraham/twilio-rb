@@ -1,0 +1,43 @@
+PATH
+  remote: .
+  specs:
+    twilio-rb (1.0beta3)
+      activesupport (>= 3.0.0)
+      builder (>= 2.1.2)
+      httparty (>= 0.6.1)
+      i18n (~> 0.5.0)
+      yajl-ruby (>= 0.7.7)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    activesupport (3.0.10)
+    addressable (2.2.6)
+    builder (3.0.0)
+    crack (0.1.8)
+    diff-lcs (1.1.3)
+    httparty (0.7.8)
+      crack (= 0.1.8)
+    i18n (0.5.0)
+    mocha (0.9.12)
+    rspec (2.6.0)
+      rspec-core (~> 2.6.0)
+      rspec-expectations (~> 2.6.0)
+      rspec-mocks (~> 2.6.0)
+    rspec-core (2.6.4)
+    rspec-expectations (2.6.0)
+      diff-lcs (~> 1.1.2)
+    rspec-mocks (2.6.0)
+    webmock (1.7.5)
+      addressable (> 2.2.5, ~> 2.2)
+      crack (>= 0.1.7)
+    yajl-ruby (0.8.3)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  mocha (>= 0.9.10)
+  rspec (>= 2.2.0)
+  twilio-rb!
+  webmock (>= 1.6.1)
