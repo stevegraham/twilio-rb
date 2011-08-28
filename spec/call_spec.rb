@@ -25,7 +25,7 @@ describe Twilio::Call do
   def canned_response(resp)
     File.new File.join(File.expand_path(File.dirname __FILE__), 'support', 'responses', "#{resp}.json")
   end
-  
+
   describe '.all' do
     context 'on the master account' do
       before do
@@ -43,7 +43,7 @@ describe Twilio::Call do
       end
 
       JSON.parse(canned_response('list_calls').read)['calls'].each_with_index do |obj,i|
-        obj.each do |attr, value| 
+        obj.each do |attr, value|
           specify { resp[i].send(attr).should == value }
         end
       end
@@ -73,7 +73,7 @@ describe Twilio::Call do
         end
 
         JSON.parse(canned_response('list_calls').read)['calls'].each_with_index do |obj,i|
-          obj.each do |attr, value| 
+          obj.each do |attr, value|
             specify { resp[i].send(attr).should == value }
           end
         end
@@ -103,7 +103,7 @@ describe Twilio::Call do
         end
 
         JSON.parse(canned_response('list_calls').read)['calls'].each_with_index do |obj,i|
-          obj.each do |attr, value| 
+          obj.each do |attr, value|
             specify { resp[i].send(attr).should == value }
           end
         end
@@ -226,7 +226,7 @@ describe Twilio::Call do
           before { stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/phony' + '.json').to_return :status => 404 }
 
           it 'returns nil' do
-            call = Twilio::Call.find 'phony', :account_sid => 'SUBACCOUNT_SID'  
+            call = Twilio::Call.find 'phony', :account_sid => 'SUBACCOUNT_SID'
             call.should be_nil
           end
         end
@@ -239,7 +239,7 @@ describe Twilio::Call do
               to_return :body => canned_response('call_created'), :status => 200
           end
 
-          let(:call) do 
+          let(:call) do
             Twilio::Call.find 'CAa346467ca321c71dbd5e12f627deb854', :account => mock(:sid => 'SUBACCOUNT_SID')
           end
 
@@ -376,10 +376,10 @@ describe Twilio::Call do
           call.complete!
           call[:status].should == 'completed'
           a_request(:post, resource).with(:body => 'Status=completed').should have_been_made
-        end 
+        end
     end
   end
-  
+
   describe ".create" do
     it "instantiates object and makes API call in one step" do
       stub_api_call
@@ -398,7 +398,7 @@ describe Twilio::Call do
       call['if_machine'].should == 'Continue'
     end
   end
-  
+
   describe 'behaviour on API error' do
     it 'raises an exception' do
       stub_request(:post, resource_uri + '.json').with(:body => minimum_params).to_return :body => canned_response('api_error'), :status => 404
@@ -409,14 +409,28 @@ describe Twilio::Call do
   describe '#update_attributes' do
     before do
       stub_request(:post, resource_uri + '.json').with(:body => minimum_params).
-          to_return :body => canned_response('call_created')
-        stub_request(:post, resource_uri + '/' + call.sid + '.json').with(:body => 'Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback').
-          to_return :body => canned_response('call_created')
+        to_return :body => canned_response('call_created')
+      stub_request(:post, resource_uri + '/' + call.sid + '.json').with(:body => 'Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback').
+        to_return :body => canned_response('call_created')
       end
     context 'when the resource has been persisted' do
       it 'updates the API number the new parameters' do
         call.update_attributes :url => 'http://localhost:3000/hollaback'
         a_request(:post, resource_uri + '/' + call.sid + '.json').with(:body => 'Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback').should have_been_made
+      end
+    end
+  end
+
+  describe 'associations' do
+    describe 'has_many' do
+      describe 'recordings' do
+        it 'proxies method calls to Twilio::Recording with current call sid inserted into options' do
+          stub_request(:post, resource_uri + '.json').with(:body => minimum_params).
+            to_return :body => canned_response('call_created')
+
+          Twilio::Recording.expects(:all).with(:limit => 10, :call_sid => call.sid)
+          call.recordings.all :limit => 10
+        end
       end
     end
   end

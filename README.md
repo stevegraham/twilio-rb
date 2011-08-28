@@ -1,6 +1,6 @@
 # Twilio.rb
 
-Interact with the Twilio API in a nice Ruby way. 
+Interact with the Twilio API in a nice Ruby way.
 
 Twilio.rb is the only library that encapsulates Twilio resources as Ruby objects, has 100% test coverage, and supports the whole API.
 
@@ -41,12 +41,12 @@ Any method that calls the Twilio API will raise `Twilio::ConfigurationError` if 
 ## Making a telephone call
 
 The API used to make a telephone call is similar to interacting with an ActiveRecord model object.
-<pre>Twilio::Call.create :to => '+16465551234', :from => '+19175550000', 
+<pre>Twilio::Call.create :to => '+16465551234', :from => '+19175550000',
                     :url => "http://example.com/call_handler"</pre>
 
 The parameter keys should be given as underscored symbols. They will be converted internally to camelized strings prior to an API call being made.
 
-Please see the Twilio REST API documentation for an up to date list of supported parameters. 
+Please see the Twilio REST API documentation for an up to date list of supported parameters.
 
 If the request was successful, an instance of `Twilio::Call` wil be returned
 
@@ -58,7 +58,7 @@ Once a call has been been created it can be modified with the following methods:
 `Twilio::Call#complete!` will terminate the call even if its state is `in-progress`
 `Twilio::Call#url=` will immediately redirect the call to a new handler URL
 
-`Twilio::Call#cancel!` and `Twilio::Call#complete!` will raise `Twilio::InvalidStateError` if the call has not been "saved". 
+`Twilio::Call#cancel!` and `Twilio::Call#complete!` will raise `Twilio::InvalidStateError` if the call has not been "saved".
 `Twilio::Call#url=` will updated its state with the new URL ready for when `Twilio::Call#save` is called.
 
 ## Finding an existing telephone call
@@ -72,7 +72,7 @@ This returns an instance of `Twilio::Call` if a call with the given SID was foun
 ## Sending an SMS message
 
 The API used to send an SMS message is similar to interacting with an ActiveRecord model object.
-<pre>Twilio::SMS.create :to => '+16465551234', :from => '+19175550000', 
+<pre>Twilio::SMS.create :to => '+16465551234', :from => '+19175550000',
                    :body => "Hey baby, how was your day? x"</pre>
 
 The parameter keys should be given as underscored symbols. They will be converted internally to camelized strings prior to an API call being made.
@@ -97,11 +97,29 @@ To perform an operation on an account other than the master account you can pass
 
 <pre>Twilio::SMS.create :to => '+19175551234' :from => '+16465550000',
   :body => 'This will be billed to a subaccount, sucka!' :account => 'ACXXXXXXXXXXXXXXXXXXXXXXXX'</pre>
-  
+
 You can also pass in an object that responds to sid, i.e. an instance of Twilio::Account
 
 <pre>Twilio::SMS.create :to => '+19175551234' :from => '+16465550000',
   :body => 'This TOO will be billed to a subaccount, sucka!' :account => my_subaccount_object</pre>
+
+# Associations
+
+Certain resources themselves have subresources, e.g. a call can have many recordings. It would be very convenient to access these via an association proxy, so instead of:
+
+<pre>
+calls = Twilio::Call.all
+recordings = Twilio::Recording.all :call_sid => calls.last.sid
+</pre>
+
+You might prefer:
+
+<pre>
+calls = Twilio::Call.all
+recordings = calls.recordings.all
+</pre>
+
+twilio-rb now supports these association proxies
 
 # Building TwiML documents
 
@@ -109,7 +127,7 @@ A TwiML document is an XML document. The best way to build XML in Ruby is with B
 
 The following Ruby code:
 
-<pre>Twilio::TwiML.build do |res| 
+<pre>Twilio::TwiML.build do |res|
   res.say    'Hey man! Listen to this!', :voice => 'man'
   res.play   'http://foo.com/cowbell.mp3'
   res.say    'What did you think of that?!', :voice => 'man'
@@ -172,7 +190,7 @@ Each super-resource, e.g. Calls, OutgoingCallerIds, etc has a Ruby object in the
 
 Resources that can be created via the API, using the HTTP POST verb can be done so in the library using the `.create` class method, e.g.
 
-<pre>Twilio::Call.create :to => '+16465551234', :from => '+19175550000', 
+<pre>Twilio::Call.create :to => '+16465551234', :from => '+19175550000',
                     :url => "http://example.com/call_handler"</pre>
 
 Resources that can be removed via the API, using the HTTP DELETE verb can be done so in the library using the `#destroy` instance method, e.g.
@@ -182,7 +200,7 @@ Resources that can be removed via the API, using the HTTP DELETE verb can be don
 Twilio::Notification.all.each &:destroy
 </pre>
 
-Object representations instantiated by the library respond to all methods that match attributes on its corresponding resource. The method names are those of the parameters in snake case (underscored), i.e. as they are returned in the JSON representation. 
+Object representations instantiated by the library respond to all methods that match attributes on its corresponding resource. The method names are those of the parameters in snake case (underscored), i.e. as they are returned in the JSON representation.
 
 The Twilio API documentation itself is the canonical reference for which resources have what properties, and which of those can be updated by the API. Please refer to the Twilio REST API documentation for thos information.
 
@@ -192,14 +210,14 @@ Resource instances can be accessed ad hoc passsing the resource sid to the `.fin
 
 <pre>call = Twilio::Call.find 'CAe1644a7eed5088b159577c5802d8be38'</pre>
 
-This will return an instance of the resource class, in this case `Twilio::Call`, with the attributes of the resource. These attributes are accessed using dynamically defined getter methods, where the method name is the attribute name underscored, i.e. as they are returned in a JSON response from the API. 
+This will return an instance of the resource class, in this case `Twilio::Call`, with the attributes of the resource. These attributes are accessed using dynamically defined getter methods, where the method name is the attribute name underscored, i.e. as they are returned in a JSON response from the API.
 
 Sometimes these method name might collide with native Ruby methods, one such example is the `method` parameter colliding with `Object#method`. Native Ruby methods are never overridden by the library as they are lazily defined using `method_missing`. To access these otherwise unreachable attributes, there is another syntax for accessing resource attributes:
 
 
 <pre>
 call = Twilio::Call.find 'CAe1644a7eed5088b159577c5802d8be38'
-call[:method] # With a symbol or 
+call[:method] # With a symbol or
 call['method'] # or with a string. Access is indifferent.
 </pre>
 
@@ -324,7 +342,7 @@ Twilio::IncomingPhoneNumber.create :phone_number => numbers.first.phone_number, 
 
 # Recordings
 
-A recording resource instance has an extra instance method: `#mp3` this returns a publicly accessible URL for the MP3 representation of the resource instance. 
+A recording resource instance has an extra instance method: `#mp3` this returns a publicly accessible URL for the MP3 representation of the resource instance.
 
 # Contributors
 

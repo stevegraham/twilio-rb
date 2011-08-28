@@ -2,7 +2,10 @@ module Twilio
   class Call
     include Twilio::Resource
     include Twilio::Persistable
-    extend Twilio::Finder
+    extend  Twilio::Finder
+    extend  Twilio::Associations
+
+    has_many :recordings
 
     class << self
       alias old_create create
@@ -20,7 +23,7 @@ module Twilio
           if %w(started_before started_after ended_before ended_after).include? k
             # Fancy schmancy-ness to handle Twilio <= URI operator for dates
             comparator = k =~ /before$/ ? '<=' : '>='
-            delineator = k =~ /started/ ? 'Start' : 'End' 
+            delineator = k =~ /started/ ? 'Start' : 'End'
             CGI.escape(delineator << "Time" << comparator << v.to_s)
           else
             "#{k.to_s.camelize}=#{CGI.escape v.to_s}"
