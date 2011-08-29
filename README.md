@@ -18,11 +18,11 @@ Please use the Github issue tracker to report any issues or bugs you uncover.
 
 Require the library in your script as
 
-<pre>require 'twilio'</pre>
+<pre>require 'twilio-rb'</pre>
 
 or using bundler:
 
-<pre>gem 'twilio-rb', '1.0beta2', :require => 'twilio'</pre>
+<pre>gem 'twilio-rb', '1.0beta2'</pre>
 
 ## Configuration
 

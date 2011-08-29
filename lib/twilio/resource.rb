@@ -7,6 +7,10 @@ module Twilio
       @attributes = attrs.with_indifferent_access
     end
 
+    def inspect
+      "#<#{self.class} #{@attributes.map { |k,v| "#{k}: #{v.inspect}" }.join ', '}>"
+    end
+
     def [](key)
       attributes[key]
     end
@@ -55,7 +59,7 @@ module Twilio
       elsif meth =~ /^#{meth}\?$/i
         add_predicate meth
         send meth
-      elsif attributes.keys.include? meth 
+      elsif attributes.keys.include? meth
         add_attr_reader meth
         send meth
       else
@@ -95,8 +99,8 @@ module Twilio
 
       class << base
         # decorate http methods with authentication
-        %w<post get put delete>.each do |meth| 
-          define_method(meth) do |*args| # splatted args necessary hack since <= 1.8.7 does not support optional block args 
+        %w<post get put delete>.each do |meth|
+          define_method(meth) do |*args| # splatted args necessary hack since <= 1.8.7 does not support optional block args
             opts = args[1] || {}
             super args.first, opts.merge(:basic_auth => { :username => Twilio::ACCOUNT_SID, :password => Twilio::AUTH_TOKEN })
           end
