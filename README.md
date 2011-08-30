@@ -89,6 +89,41 @@ To retrieve an earlier created SMS message, there is the `Twilio::SMS.find` meth
 
 This returns an instance of `Twilio::SMS` if a SMS message with the given SID was found, otherwise nil is returned
 
+# Twilio Client
+
+To generate capability tokens for use with Twilio Client you can use `Twilio::CapabilityToken.create`
+
+<pre>
+Twilio::CapabilityToken.create \
+  allow_incoming: 'unique_identifier_for_this_user',
+  allow_outgoing: 'your_application_sid'
+</pre>
+
+You can create capability tokens on arbitrary accounts, e.g. subaccounts. Just pass in those details:
+
+<pre>
+Twilio::CapabilityToken.create \
+  account_sid:    'AC00000000000000000000000',
+  auth_token:     'XXXXXXXXXXXXXXXXXXXXXXXXX',
+  allow_incoming: 'unique_identifier_for_this_user',
+  allow_outgoing: 'your_application_sid'
+</pre>
+
+You can also pass arbitrary parameters into your outgoing privilege, these are sent from Twilio as HTTP request params when it hits your app endpoint for TwiML.
+
+<pre>
+Twilio::CapabilityToken.create allow_outgoing: ['your_application_sid', { :foo => 'bar' }]
+</pre>
+
+By default tokens expire exactly one hour from the time they are generated. You can choose your own token ttl like so:
+
+<pre>
+Twilio::CapabilityToken.create \
+  allow_incoming: 'unique_identifier_for_this_user',
+  allow_outgoing: 'your_application_sid',
+  expires:        10.minutes.from_now
+</pre>
+
 # Subaccounts
 
 The Twilio REST API supports subaccounts that is discrete accounts owned by a master account. twilio-rb supports this too.
