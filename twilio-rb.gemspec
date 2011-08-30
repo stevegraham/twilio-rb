@@ -16,6 +16,9 @@ Gem::Specification.new do |s|
   s.add_dependency              'yajl-ruby',     '>= 0.7.7'
   s.add_dependency              'httparty',      '>= 0.6.1'
   s.add_dependency              'builder',       '>= 2.1.2'
+  s.add_dependency              'jwt',           '>= 0.1.3'
+  s.add_dependency              'timecop',       '>= 0.3.5'
+  s.add_dependency              'rack',       '>= 1.3.2'
 
   s.add_development_dependency  'webmock',       '>= 1.6.1'
   s.add_development_dependency  'rspec',         '>= 2.2.0'

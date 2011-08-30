@@ -1,5 +1,5 @@
-require './lib/twilio'
-%w<webmock rspec/expectations webmock/rspec mocha>.each { |lib| require lib }
+require './lib/twilio-rb'
+%w<webmock rspec/expectations webmock/rspec mocha timecop>.each { |lib| require lib }
 
 RSpec.configure do |config|
   config.after(:each) do
