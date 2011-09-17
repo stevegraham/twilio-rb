@@ -94,7 +94,7 @@ describe Twilio::IncomingPhoneNumber do
       end
 
       JSON.parse(canned_response('list_incoming_phone_numbers').read)['incoming_phone_numbers'].each_with_index do |obj,i|
-        obj.each do |attr, value| 
+        obj.each do |attr, value|
           specify { resp[i].send(attr).should == value }
         end
       end
@@ -121,7 +121,7 @@ describe Twilio::IncomingPhoneNumber do
         end
 
         JSON.parse(canned_response('list_incoming_phone_numbers').read)['incoming_phone_numbers'].each_with_index do |obj,i|
-          obj.each do |attr, value| 
+          obj.each do |attr, value|
             specify { resp[i].send(attr).should == value }
           end
         end
@@ -149,7 +149,7 @@ describe Twilio::IncomingPhoneNumber do
           end
 
           JSON.parse(canned_response('list_incoming_phone_numbers').read)['incoming_phone_numbers'].each_with_index do |obj,i|
-            obj.each do |attr, value| 
+            obj.each do |attr, value|
               specify { resp[i].send(attr).should == value }
             end
           end
@@ -178,7 +178,7 @@ describe Twilio::IncomingPhoneNumber do
         let(:number) { Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e' }
 
         it 'returns an instance of Twilio::IncomingPhoneNumber' do
-          number.should be_a Twilio::IncomingPhoneNumber 
+          number.should be_a Twilio::IncomingPhoneNumber
         end
 
         JSON.parse(canned_response('incoming_phone_number').read).each do |k,v|
@@ -208,7 +208,7 @@ describe Twilio::IncomingPhoneNumber do
           let(:number) { Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e', :account_sid => 'SUBACCOUNT_SID' }
 
           it 'returns an instance of Twilio::IncomingPhoneNumber' do
-            number.should be_a Twilio::IncomingPhoneNumber 
+            number.should be_a Twilio::IncomingPhoneNumber
           end
 
           JSON.parse(canned_response('incoming_phone_number').read).each do |k,v|
@@ -240,7 +240,7 @@ describe Twilio::IncomingPhoneNumber do
           end
 
           it 'returns an instance of Twilio::IncomingPhoneNumber' do
-            number.should be_a Twilio::IncomingPhoneNumber 
+            number.should be_a Twilio::IncomingPhoneNumber
           end
 
           JSON.parse(canned_response('incoming_phone_number').read).each do |k,v|
@@ -268,13 +268,13 @@ describe Twilio::IncomingPhoneNumber do
       stub_request(:delete, resource_uri + '/PN2a0747eba6abf96b7e3c3ff0b4530f6e' + '.json').
         to_return :status => 204
     end
-    
+
     let(:number) { Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e' }
 
     it 'deletes the resource' do
       number.destroy
       a_request(:delete, resource_uri + '/PN2a0747eba6abf96b7e3c3ff0b4530f6e' + '.json').
-      should have_been_made  
+      should have_been_made
     end
 
     it 'freezes itself if successful' do
@@ -303,14 +303,14 @@ describe Twilio::IncomingPhoneNumber do
         number.should be_a Twilio::IncomingPhoneNumber
       end
 
-      JSON.parse(canned_response('incoming_phone_number')).map do |k,v|
-        specify { number.send(k).should == v }   
+      JSON.parse(canned_response('incoming_phone_number').read).map do |k,v|
+        specify { number.send(k).should == v }
       end
     end
 
     context 'on a subaccount' do
       context 'found by passing in a account sid string' do
-        before do 
+        before do
           stub_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).to_return :body => canned_response('incoming_phone_number')
         end
 
@@ -325,13 +325,13 @@ describe Twilio::IncomingPhoneNumber do
           number.should be_a Twilio::IncomingPhoneNumber
         end
 
-        JSON.parse(canned_response('incoming_phone_number')).map do |k,v|
-          specify { number.send(k).should == v }   
+        JSON.parse(canned_response('incoming_phone_number').read).map do |k,v|
+          specify { number.send(k).should == v }
         end
       end
 
       context 'found by passing in an actual instance of Twilio::Account' do
-        before do 
+        before do
           stub_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).to_return :body => canned_response('incoming_phone_number')
         end
 
@@ -346,8 +346,8 @@ describe Twilio::IncomingPhoneNumber do
           number.should be_a Twilio::IncomingPhoneNumber
         end
 
-        JSON.parse(canned_response('incoming_phone_number')).map do |k,v|
-          specify { number.send(k).should == v }   
+        JSON.parse(canned_response('incoming_phone_number').read).map do |k,v|
+          specify { number.send(k).should == v }
         end
       end
     end
@@ -377,7 +377,7 @@ describe Twilio::IncomingPhoneNumber do
   %w<friendly_name api_version voice_url voice_method voice_fallback_url voice_fallback_method status_callback status_callback_method sms_url sms_method sms_fallback_url sms_fallback_method voice_caller_id_lookup>.each do |meth|
     describe "##{meth}=" do
       let(:number) { Twilio::IncomingPhoneNumber.create params }
-      
+
       before do
         stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('incoming_phone_number')
         stub_request(:post, resource_uri + '/' + number.sid + '.json').
