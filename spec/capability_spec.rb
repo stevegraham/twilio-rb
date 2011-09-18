@@ -7,7 +7,7 @@ def parse_scope(scope)
 end
 
 describe 'Twilio::CapabilityToken' do
-  before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
+  before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   describe '.create' do
     it 'sets iss in payload' do

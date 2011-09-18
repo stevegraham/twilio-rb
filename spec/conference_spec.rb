@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Twilio::Conference do
 
-  before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
+  before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   def resource_uri(account_sid=nil)
     account_sid ||= Twilio::ACCOUNT_SID
@@ -32,7 +32,7 @@ describe Twilio::Conference do
         resp        = Twilio::Conference.all
 
         conferences.each_with_index do |obj,i|
-          obj.each do |attr, value| 
+          obj.each do |attr, value|
             resp[i].send(attr).should == value
           end
         end
@@ -130,7 +130,7 @@ describe Twilio::Conference do
 
       it 'returns an instance of Twilio::Conference' do
         conference = Twilio::Conference.find 'CFbbe46ff1274e283f7e3ac1df0072ab39'
-        conference.should be_a Twilio::Conference 
+        conference.should be_a Twilio::Conference
       end
 
       it 'returns an object with attributes that correspond to the API response' do
@@ -169,12 +169,12 @@ describe Twilio::Conference do
       participants = JSON.parse(canned_response('list_participants').read)['participants']
 
       participants.each_with_index do |obj,i|
-        obj.each do |attr, value| 
+        obj.each do |attr, value|
           resp[i].send(attr).should == value
         end
       end
     end
-    
+
     it 'returns a collection with a length corresponding to the API response' do
       resp.length.should == 1
     end

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Twilio::Transcription do
 
-  before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
+  before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   def resource_uri(account_sid=nil)
     account_sid ||= Twilio::ACCOUNT_SID
@@ -25,9 +25,9 @@ describe Twilio::Transcription do
       resp = Twilio::Transcription.all
       resp.all? { |r| r.is_a? Twilio::Transcription }.should be_true
     end
-    
+
     JSON.parse(canned_response('list_transcriptions').read)['transcriptions'].each_with_index do |obj,i|
-      obj.each do |attr, value| 
+      obj.each do |attr, value|
         specify { Twilio::Transcription.all[i].send(attr).should == value }
       end
     end
@@ -83,7 +83,7 @@ describe Twilio::Transcription do
           to_return :body => canned_response('transcription'), :status => 200
       end
       let(:transcription) { Twilio::Transcription.find 'TR8c61027b709ffb038236612dc5af8723' }
-      
+
       it 'returns an instance of Twilio::Transcription.all' do
         transcription.should be_a Twilio::Transcription
       end

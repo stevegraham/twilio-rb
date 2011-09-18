@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Twilio::Recording do
 
-  before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
+  before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   def resource_uri(account_sid=nil)
     account_sid ||= Twilio::ACCOUNT_SID
@@ -27,7 +27,7 @@ describe Twilio::Recording do
     end
 
     JSON.parse(canned_response('list_recordings').read)['recordings'].each_with_index do |obj,i|
-      obj.each do |attr, value| 
+      obj.each do |attr, value|
         specify { resp[i].send(attr).should == value }
       end
     end
@@ -104,7 +104,7 @@ describe Twilio::Recording do
       it 'returns an instance of Twilio::Recording.all' do
         recording.should be_a Twilio::Recording
       end
-  
+
       JSON.parse(canned_response('recording').read).each do |k,v|
         specify { recording.send(k).should == v }
       end
@@ -151,13 +151,13 @@ describe Twilio::Recording do
       stub_request(:delete, resource_uri + '/RE557ce644e5ab84fa21cc21112e22c485' + '.json').
         to_return :status => 204
     end
-    
+
     let(:recording) { Twilio::Recording.find 'RE557ce644e5ab84fa21cc21112e22c485' }
 
     it 'deletes the resource' do
       recording.destroy
       a_request(:delete, resource_uri + '/RE557ce644e5ab84fa21cc21112e22c485' + '.json').
-      should have_been_made  
+      should have_been_made
     end
 
     it 'freezes itself if successful' do
@@ -178,7 +178,7 @@ describe Twilio::Recording do
       stub_request(:get, resource_uri + '/RE557ce644e5ab84fa21cc21112e22c485' + '.json').
         to_return :body => canned_response('recording'), :status => 200
     end
-    
+
     let(:recording) { Twilio::Recording.find 'RE557ce644e5ab84fa21cc21112e22c485' }
 
     it 'returns a url to the mp3 file for the recording' do

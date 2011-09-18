@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Twilio::Participant do
 
-  let(:resource_uri) do 
+  let(:resource_uri) do
     "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{Twilio::ACCOUNT_SID}" +
     "/Conferences/CFbbe46ff1274e283f7e3ac1df0072ab39/Participants/CA386025c9bf5d6052a1d1ea42b4d16662.json"
   end
@@ -11,7 +11,7 @@ describe Twilio::Participant do
     Twilio::Participant.new JSON.parse(canned_response('show_participant').read)
   end
 
-  before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
+  before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   def stub_api_call(meth, response_file)
     stub_request(meth, resource_uri).

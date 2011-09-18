@@ -18,7 +18,7 @@ describe Twilio::SMS do
     File.new File.join(File.expand_path(File.dirname __FILE__), 'support', 'responses', "#{resp}.json")
   end
 
-  before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
+  before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   describe '.all' do
     before do
@@ -37,7 +37,7 @@ describe Twilio::SMS do
     end
 
     JSON.parse(canned_response('list_messages').read)['sms_messages'].each_with_index do |obj,i|
-      obj.each do |attr, value| 
+      obj.each do |attr, value|
         specify { resp[i].send(attr).should == value }
       end
     end

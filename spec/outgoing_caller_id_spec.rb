@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Twilio::OutgoingCallerId do
 
-  before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
+  before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
   let(:params) { { :phone_number => '+19175551234', :friendly_name => 'barry' } }
   let(:post_body) { 'PhoneNumber=%2B19175551234&FriendlyName=barry'}
 
@@ -29,7 +29,7 @@ describe Twilio::OutgoingCallerId do
     end
 
     JSON.parse(canned_response('list_caller_ids').read)['outgoing_caller_ids'].each_with_index do |obj,i|
-      obj.each do |attr, value| 
+      obj.each do |attr, value|
         specify { Twilio::OutgoingCallerId.all[i].send(attr).should == value }
       end
     end
@@ -160,13 +160,13 @@ describe Twilio::OutgoingCallerId do
       end
 
       JSON.parse(canned_response('caller_id')).map do |k,v|
-        specify { caller_id.send(k).should == v }   
+        specify { caller_id.send(k).should == v }
       end
     end
 
     context 'on a subaccount' do
       context 'found by passing in a account sid string' do
-        before do 
+        before do
           stub_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).to_return :body => canned_response('caller_id')
         end
 
@@ -182,12 +182,12 @@ describe Twilio::OutgoingCallerId do
         end
 
         JSON.parse(canned_response('caller_id')).map do |k,v|
-          specify { caller_id.send(k).should == v }   
+          specify { caller_id.send(k).should == v }
         end
       end
 
       context 'found by passing in an actual instance of Twilio::Account' do
-        before do 
+        before do
           stub_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).to_return :body => canned_response('caller_id')
         end
 
@@ -203,7 +203,7 @@ describe Twilio::OutgoingCallerId do
         end
 
         JSON.parse(canned_response('caller_id')).map do |k,v|
-          specify { caller_id.send(k).should == v }   
+          specify { caller_id.send(k).should == v }
         end
       end
     end
@@ -222,7 +222,7 @@ describe Twilio::OutgoingCallerId do
     it 'deletes the resource' do
       caller_id.destroy
       a_request(:delete, resource_uri + '/PNe905d7e6b410746a0fb08c57e5a186f3' + '.json').
-        should have_been_made  
+        should have_been_made
     end
 
     it 'freezes itself if successful' do

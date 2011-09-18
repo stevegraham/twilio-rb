@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe 'Twilio::RequestFilter' do
-  before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('1c892n40nd03kdnc0112slzkl3091j20') } }
+  before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '1c892n40nd03kdnc0112slzkl3091j20' }
 
   describe '.filter' do
     context 'when request signatures do match' do

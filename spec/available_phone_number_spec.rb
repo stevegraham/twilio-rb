@@ -3,8 +3,8 @@ require 'spec_helper'
 describe Twilio::AvailablePhoneNumber do
 
   let(:resource_uri) { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{Twilio::ACCOUNT_SID}/AvailablePhoneNumbers" }
-  before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
-  
+  before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
+
   def stub_api_call(uri_tail, response_file)
     stub_request(:get, resource_uri + uri_tail).
       to_return :body => canned_response(response_file), :status => 200
@@ -44,7 +44,7 @@ describe Twilio::AvailablePhoneNumber do
         a_request(:get, resource_uri + '/CA/Local.json').should have_been_made
       end
     end
-    
+
     context 'for US toll free numbers' do
       before { stub_api_call '/US/TollFree.json?Contains=STORM', 'available_toll_free_phone_numbers' }
 

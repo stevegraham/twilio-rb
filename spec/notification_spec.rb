@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Twilio::Notification do
 
-  before { Twilio::Config.setup { account_sid('AC000000000000'); auth_token('79ad98413d911947f0ba369d295ae7a3') } }
+  before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   def resource_uri(account_sid=nil)
     account_sid ||= Twilio::ACCOUNT_SID
@@ -25,9 +25,9 @@ describe Twilio::Notification do
       resp = Twilio::Notification.all
       resp.all? { |r| r.is_a? Twilio::Notification }.should be_true
     end
-    
+
     JSON.parse(canned_response('list_notifications').read)['notifications'].each_with_index do |obj,i|
-      obj.each do |attr, value| 
+      obj.each do |attr, value|
         specify { Twilio::Notification.all[i].send(attr).should == value }
       end
     end
@@ -122,7 +122,7 @@ describe Twilio::Notification do
           to_return :body => canned_response('notification'), :status => 200
       end
       let(:notification) { Twilio::Notification.find 'NO5a7a84730f529f0a76b3e30c01315d1a' }
-      
+
       it 'returns an instance of Twilio::Notification.all' do
         notification.should be_a Twilio::Notification
       end
@@ -150,13 +150,13 @@ describe Twilio::Notification do
       stub_request(:delete, resource_uri + '/NO5a7a84730f529f0a76b3e30c01315d1a' + '.json').
         to_return :status => 204
     end
-    
+
     let(:notification) { Twilio::Notification.find 'NO5a7a84730f529f0a76b3e30c01315d1a' }
 
     it 'deletes the resource' do
       notification.destroy
       a_request(:delete, resource_uri + '/NO5a7a84730f529f0a76b3e30c01315d1a' + '.json').
-      should have_been_made  
+      should have_been_made
     end
 
     it 'freezes itself if successful' do
