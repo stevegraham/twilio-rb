@@ -4,7 +4,7 @@ module Twilio
       opts        = opts.with_indifferent_access
       # Support subaccounts by optionally passing in an account_sid or account object
       account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::ACCOUNT_SID
-      res  = get "/Accounts/#{account_sid}/#{resource_fragment}/#{id}.json"
+      res  = get "/Accounts/#{account_sid}/#{resource_name}/#{id}.json"
       hash = res.parsed_response
       if (200..299).include? res.code
         hash['api_version'] = hash['api_version'].to_s # api_version parsed as a date by http_party
@@ -17,7 +17,7 @@ module Twilio
       # Support subaccounts by optionally passing in an account_sid or account object
       account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::ACCOUNT_SID
       params      = prepare_params opts if opts.any?
-      get("/Accounts/#{account_sid}/#{resource_fragment}.json#{params}").parsed_response['total']
+      get("/Accounts/#{account_sid}/#{resource_name}.json#{params}").parsed_response['total']
     end
 
     def all(opts={})
@@ -25,15 +25,13 @@ module Twilio
       # Support subaccounts by optionally passing in an account_sid or account object
       account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::ACCOUNT_SID
       params      = prepare_params opts if opts.any?
-      handle_response get "/Accounts/#{account_sid}/#{resource_fragment}.json#{params}"
+      handle_response get "/Accounts/#{account_sid}/#{resource_name}.json#{params}"
     end
 
     private
 
-    def resource_fragment # :nodoc:
-      # All Twilio resources follow a convention, except SMS :(
-      klass_name = name.demodulize
-      resource   = klass_name == 'SMS' ? "#{klass_name}/Messages" : klass_name.pluralize
+    def resource_name
+      name.demodulize.pluralize
     end
 
     def prepare_params(opts) # :nodoc:

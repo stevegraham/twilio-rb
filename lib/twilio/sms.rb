@@ -6,6 +6,10 @@ module Twilio
 
     class << self
       private
+      def resource_name
+        "SMS/Messages"
+      end
+
       def prepare_params(opts) # :nodoc:
         pairs = opts.map do |k,v|
           if %w(created_before created_after sent_before sent_after).include? k
