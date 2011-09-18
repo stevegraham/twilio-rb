@@ -26,12 +26,12 @@ or using bundler:
 
 ## Configuration
 
-Configuration for this library is encapsulated within `Twilio::Config`. One needs to setup with an Account SID and an Auth Token, e.g.
+Configuration for this library is achieved with `Twilio::Config.setup`. One needs to setup with an Account SID and an Auth Token, e.g.
 
 <pre># This should be in an initializer or similar
-Twilio::Config.setup do
-  account_sid   'AC0000000000000000000000000000'
-  auth_token    '000000000000000000000000000000'
+Twilio::Config.setup \
+  :account_sid  => 'AC0000000000000000000000000000',
+  :auth_token   => '000000000000000000000000000000'
 end</pre>
 
 Any method that calls the Twilio API will raise `Twilio::ConfigurationError` if either Account SID or Auth Token are not configured.
