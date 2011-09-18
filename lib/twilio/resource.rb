@@ -26,6 +26,10 @@ module Twilio
     end
 
     private
+    def resource_name
+      klass.name.demodulize.pluralize
+    end
+
     def klass
       self.class == Module ? self : self.class
     end
@@ -39,7 +43,7 @@ module Twilio
     end
 
     def path # :nodoc:
-      "/Accounts/#{Twilio::ACCOUNT_SID}/#{klass.name.demodulize.pluralize}/#{self[:sid]}.json"
+      "/Accounts/#{Twilio::ACCOUNT_SID}/#{resource_name}/#{self[:sid]}.json"
     end
 
     def handle_response(res) # :nodoc:
