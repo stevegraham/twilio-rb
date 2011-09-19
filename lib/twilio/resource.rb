@@ -42,8 +42,8 @@ module Twilio
       end
     end
 
-    def path # :nodoc:
-      "/Accounts/#{Twilio::ACCOUNT_SID}/#{resource_name}/#{self[:sid]}.json"
+    def path
+      uri[11,uri.length]
     end
 
     def handle_response(res) # :nodoc:
@@ -107,6 +107,14 @@ module Twilio
           define_method(meth) do |*args| # splatted args necessary hack since <= 1.8.7 does not support optional block args
             opts = args[1] || {}
             super args.first, opts.merge(:basic_auth => { :username => Twilio::ACCOUNT_SID, :password => Twilio::AUTH_TOKEN })
+          end
+        end
+
+        def mutable_attributes(*attrs)
+          attrs.each do |attr|
+            define_method "#{attr}=" do |arg|
+              update_attributes attr => arg
+            end
           end
         end
       end

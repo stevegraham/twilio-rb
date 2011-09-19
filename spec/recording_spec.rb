@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Twilio::Recording do
 
-  before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
+  before { Twilio::Config.setup :account_sid => 'ACda6f1e11047ebd6fe7a55f120be3a900', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   def resource_uri(account_sid=nil)
     account_sid ||= Twilio::ACCOUNT_SID
@@ -182,7 +182,7 @@ describe Twilio::Recording do
     let(:recording) { Twilio::Recording.find 'RE557ce644e5ab84fa21cc21112e22c485' }
 
     it 'returns a url to the mp3 file for the recording' do
-      recording.mp3.should == 'https://api.twilio.com/2010-04-01/Accounts/AC000000000000/Recordings/RE557ce644e5ab84fa21cc21112e22c485.mp3'
+      recording.mp3.should == "https://api.twilio.com/2010-04-01/Accounts/#{recording.account_sid}/Recordings/RE557ce644e5ab84fa21cc21112e22c485.mp3"
     end
   end
 end

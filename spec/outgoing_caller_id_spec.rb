@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Twilio::OutgoingCallerId do
 
-  before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
+  before { Twilio::Config.setup :account_sid => 'AC228ba7a5fe4238be081ea6f3c44186f3', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
   let(:params) { { :phone_number => '+19175551234', :friendly_name => 'barry' } }
   let(:post_body) { 'PhoneNumber=%2B19175551234&FriendlyName=barry'}
 

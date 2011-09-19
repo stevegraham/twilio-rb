@@ -8,7 +8,7 @@ module Twilio
           # Support subaccounts by optionally passing in an account_sid or account object
           account_sid = attrs.delete('account_sid') || attrs.delete('account').try(:sid) || Twilio::ACCOUNT_SID
 
-          res = post "/Accounts/#{account_sid}/#{resource_name}.json", :body => Hash[attrs.map { |k,v| [k.to_s.camelize, v]}]
+          res = post "#{resource_path(account_sid)}.json", :body => Hash[attrs.map { |k,v| [k.to_s.camelize, v]}]
 
           if (400..599).include? res.code
             raise Twilio::APIError.new "Error ##{res.parsed_response['code']}: #{res.parsed_response['message']}"
@@ -19,6 +19,9 @@ module Twilio
         end
 
         private
+        def resource_path(account_sid)
+          "/Accounts/#{account_sid}/#{resource_name}"
+        end
 
         def resource_name
           name.demodulize.pluralize

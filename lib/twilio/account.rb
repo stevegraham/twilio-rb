@@ -1,25 +1,22 @@
 module Twilio
-  module Account
+  class Account
     include Twilio::Resource
-    @attributes = {}.with_indifferent_access
+    include Twilio::Persistable
+    extend Twilio::Associations
+    extend Twilio::Finder
 
-    def attributes
-      @attributes.empty? ? reload! : @attributes
+    mutable_attributes :friendly_name
+
+    has_many :calls, :sms, :recordings, :conferences, :incoming_phone_numbers,
+      :notifications, :outgoing_caller_ids, :transcriptions
+
+    class << self
+      private
+      def resource_path(account_sid)
+        "/Accounts"
+      end
     end
 
-    def reload!
-      handle_response get path
-    end
-
-    def friendly_name=(name)
-      update_attributes :friendly_name => name
-    end
-
-    private
-    def path
-      "/Accounts/#{Twilio::ACCOUNT_SID}.json"
-    end
-
-    extend self
   end
 end
+

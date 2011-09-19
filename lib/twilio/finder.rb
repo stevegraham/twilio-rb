@@ -4,7 +4,7 @@ module Twilio
       opts        = opts.with_indifferent_access
       # Support subaccounts by optionally passing in an account_sid or account object
       account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::ACCOUNT_SID
-      res  = get "/Accounts/#{account_sid}/#{resource_name}/#{id}.json"
+      res  = get "#{resource_path(account_sid)}/#{id}.json"
       hash = res.parsed_response
       if (200..299).include? res.code
         hash['api_version'] = hash['api_version'].to_s # api_version parsed as a date by http_party
@@ -17,7 +17,7 @@ module Twilio
       # Support subaccounts by optionally passing in an account_sid or account object
       account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::ACCOUNT_SID
       params      = prepare_params opts if opts.any?
-      get("/Accounts/#{account_sid}/#{resource_name}.json#{params}").parsed_response['total']
+      get("#{resource_path(account_sid)}.json#{params}").parsed_response['total']
     end
 
     def all(opts={})
@@ -25,10 +25,14 @@ module Twilio
       # Support subaccounts by optionally passing in an account_sid or account object
       account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::ACCOUNT_SID
       params      = prepare_params opts if opts.any?
-      handle_response get "/Accounts/#{account_sid}/#{resource_name}.json#{params}"
+      handle_response get "#{resource_path(account_sid)}.json#{params}"
     end
 
     private
+
+    def resource_path(account_sid)
+      "/Accounts/#{account_sid}/#{resource_name}"
+    end
 
     def resource_name
       name.demodulize.pluralize

@@ -11,11 +11,8 @@ module Twilio
       end
     end
 
-    %w<friendly_name api_version sms_url sms_method sms_fallback_url sms_fallback_method>.each do |meth|
-      define_method "#{meth}=" do |arg|
-        update_attributes meth => arg
-      end
-    end
+    mutable_attributes :friendly_name, :api_version, :sms_url, :sms_method,
+      :sms_fallback_url, :sms_fallback_method
 
     private
     def resource_name
