@@ -8,7 +8,7 @@ It offers an ActiveRecord style API, i.e. one that most Ruby developers are fami
 
 ## Installation
 
-The library has been packaged as a gem and is available from rubygems.org. The version that this readme pertains to is 1.0beta. To install use the `--pre` flag
+The library has been packaged as a gem and is available from rubygems.org. The version that this readme pertains to is 2.0.0.
 
 <pre>gem install twilio-rb --pre</pre>
 
@@ -22,7 +22,7 @@ Require the library in your script as
 
 or using bundler:
 
-<pre>gem 'twilio-rb', '1.0beta2'</pre>
+<pre>gem 'twilio-rb'</pre>
 
 ## Configuration
 
@@ -38,190 +38,9 @@ Any method that calls the Twilio API will raise `Twilio::ConfigurationError` if 
 
 # Getting started
 
-## Making a telephone call
-
-The API used to make a telephone call is similar to interacting with an ActiveRecord model object.
-<pre>Twilio::Call.create :to => '+16465551234', :from => '+19175550000',
-                    :url => "http://example.com/call_handler"</pre>
-
-The parameter keys should be given as underscored symbols. They will be converted internally to camelized strings prior to an API call being made.
-
-Please see the Twilio REST API documentation for an up to date list of supported parameters.
-
-If the request was successful, an instance of `Twilio::Call` wil be returned
-
-### Modifying a live telephone call
-
-Once a call has been been created it can be modified with the following methods:
-
-`Twilio::Call#cancel!` will terminate the call if its state is `queued` or `ringing`
-`Twilio::Call#complete!` will terminate the call even if its state is `in-progress`
-`Twilio::Call#url=` will immediately redirect the call to a new handler URL
-
-`Twilio::Call#cancel!` and `Twilio::Call#complete!` will raise `Twilio::InvalidStateError` if the call has not been "saved".
-`Twilio::Call#url=` will updated its state with the new URL ready for when `Twilio::Call#save` is called.
-
-## Finding an existing telephone call
-
-To retrieve an earlier created call, there is the `Twilio::Call.find` method, which accepts a call SID, e.g.
-
-<pre>call = Twilio::Call.find 'CAa346467ca321c71dbd5e12f627deb854'</pre>
-
-This returns an instance of `Twilio::Call` if a call with the given SID was found, otherwise nil is returned
-
-## Sending an SMS message
-
-The API used to send an SMS message is similar to interacting with an ActiveRecord model object.
-<pre>Twilio::SMS.create :to => '+16465551234', :from => '+19175550000',
-                   :body => "Hey baby, how was your day? x"</pre>
-
-The parameter keys should be given as underscored symbols. They will be converted internally to camelized strings prior to an API call being made.
-
-Please see the Twilio REST API documentation for an up to date list of supported parameters.
-
-If the request was successful, an instance of `Twilio::SMS` wil be returned
-
-## Finding an existing telephone SMS message
-
-To retrieve an earlier created SMS message, there is the `Twilio::SMS.find` method, which accepts a SMS message SID, e.g.
-
-<pre>call = Twilio::SMS.find 'SM90c6fc909d8504d45ecdb3a3d5b3556e'</pre>
-
-This returns an instance of `Twilio::SMS` if a SMS message with the given SID was found, otherwise nil is returned
-
-# Twilio Client
-
-To generate capability tokens for use with Twilio Client you can use `Twilio::CapabilityToken.create`
-
-<pre>
-Twilio::CapabilityToken.create \
-  allow_incoming: 'unique_identifier_for_this_user',
-  allow_outgoing: 'your_application_sid'
-</pre>
-
-You can create capability tokens on arbitrary accounts, e.g. subaccounts. Just pass in those details:
-
-<pre>
-Twilio::CapabilityToken.create \
-  account_sid:    'AC00000000000000000000000',
-  auth_token:     'XXXXXXXXXXXXXXXXXXXXXXXXX',
-  allow_incoming: 'unique_identifier_for_this_user',
-  allow_outgoing: 'your_application_sid'
-</pre>
-
-You can also pass arbitrary parameters into your outgoing privilege, these are sent from Twilio as HTTP request params when it hits your app endpoint for TwiML.
-
-<pre>
-Twilio::CapabilityToken.create allow_outgoing: ['your_application_sid', { :foo => 'bar' }]
-</pre>
-
-By default tokens expire exactly one hour from the time they are generated. You can choose your own token ttl like so:
-
-<pre>
-Twilio::CapabilityToken.create \
-  allow_incoming: 'unique_identifier_for_this_user',
-  allow_outgoing: 'your_application_sid',
-  expires:        10.minutes.from_now
-</pre>
-
-# Subaccounts
-
-The Twilio REST API supports subaccounts that is discrete accounts owned by a master account. twilio-rb supports this too.
-
-To perform an operation on an account other than the master account you can pass in the subaccount sid
-
-<pre>Twilio::SMS.create :to => '+19175551234' :from => '+16465550000',
-  :body => 'This will be billed to a subaccount, sucka!' :account => 'ACXXXXXXXXXXXXXXXXXXXXXXXX'</pre>
-
-You can also pass in an object that responds to sid, i.e. an instance of Twilio::Account
-
-<pre>Twilio::SMS.create :to => '+19175551234' :from => '+16465550000',
-  :body => 'This TOO will be billed to a subaccount, sucka!' :account => my_subaccount_object</pre>
-
-# Associations
-
-Certain resources themselves have subresources, e.g. a call can have many recordings. It would be very convenient to access these via an association proxy, so instead of:
-
-<pre>
-calls = Twilio::Call.all
-recordings = Twilio::Recording.all :call_sid => calls.last.sid
-</pre>
-
-You might prefer:
-
-<pre>
-calls = Twilio::Call.all
-recordings = calls.recordings.all
-</pre>
-
-twilio-rb now supports these association proxies
-
-# Building TwiML documents
-
-A TwiML document is an XML document. The best way to build XML in Ruby is with Builder, and so it follows that we should use builder for TwiML. `Twilio::TwiML.build` behaves like builder except element names are capitalised for you and attributes are camelized for you as well. This is so you may continue to write beautiful code.
-
-The following Ruby code:
-
-<pre>Twilio::TwiML.build do |res|
-  res.say    'Hey man! Listen to this!', :voice => 'man'
-  res.play   'http://foo.com/cowbell.mp3'
-  res.say    'What did you think of that?!', :voice => 'man'
-  res.record :action => "http://foo.com/handleRecording.php",
-             :method => "GET", :max_length => "20",
-             :finish_on_Key => "*"
-  res.gather :action => "/process_gather.php", :method => "GET" do |g|
-    g.say 'Now hit some buttons!'
-  end
-  res.say    'Awesome! Thanks!', :voice => 'man'
-  res.hangup
-end</pre>
-
-Therefore emits the following TwiML document:
-
-<pre><?xml version="1.0" encoding="UTF-8"?>
-&lt;Response&gt;
-  &lt;Say voice="man"&gt;Hey man! Listen to this!&lt;/Say&gt;
-  &lt;Play&gt;http://foo.com/cowbell.mp3&lt;/Play&gt;
-  &lt;Say voice="man"&gt;What did you think of that?!&lt;/Say&gt;
-  &lt;Record maxLength="20" method="GET" action="http://foo.com/handleRecording.php" finishOnKey="*"/&gt;
-  &lt;Gather method="GET" action="/process_gather.php"&gt;
-    &lt;Say&gt;Now hit some buttons!&lt;/Say&gt;
-  &lt;/Gather&gt;
-  &lt;Say voice="man"&gt;Awesome! Thanks!&lt;/Say&gt;
-  &lt;Hangup/&gt;
-&lt;/Response&gt;
-</pre>
-
-This specialised behaviour only affects `Twilio::TwiML.build` and does not affect Builder in general.
-
-# Rails 3 integration
-
-Twilio.rb has Rails integration out of the box. It adds a new mime type :voice and a template handler for TwiML views.
-So now your Rails app can respond_to :voice. Insane!
-
-<pre>
-class FooController &lt; ApplicationController
-  responds_to :html, :voice
-
-  def index
-   ...
-  end
-end
-</pre>
-
-coupled with the following view file `app/views/foo/index.voice`
-
-<pre>
-res.say 'Damn this library is so ill dude!'
-</pre>
-
-It's now easier than ever to integrate Twilio in your Rails app cleanly and easily.
-
-# Basics
-
-Each super-resource, e.g. Calls, OutgoingCallerIds, etc has a Ruby object in the Twilio namespace representing it, Twilio::Call, Twilio::OutgoingCallerId, etc.
-
 ## Summary
+
+Twilio resources are represented as Ruby objects. List resources are represnted by classes, e.g. `Twilio::SMS` and operations on list resources are performed using class methods, e.g. `Twilio::SMS.create`. Resource instances are represented by instances of those classes, and operations on those resource instances are perfomed using instance methods.
 
 Resources that can be created via the API, using the HTTP POST verb can be done so in the library using the `.create` class method, e.g.
 
@@ -248,7 +67,6 @@ Resource instances can be accessed ad hoc passsing the resource sid to the `.fin
 This will return an instance of the resource class, in this case `Twilio::Call`, with the attributes of the resource. These attributes are accessed using dynamically defined getter methods, where the method name is the attribute name underscored, i.e. as they are returned in a JSON response from the API.
 
 Sometimes these method name might collide with native Ruby methods, one such example is the `method` parameter colliding with `Object#method`. Native Ruby methods are never overridden by the library as they are lazily defined using `method_missing`. To access these otherwise unreachable attributes, there is another syntax for accessing resource attributes:
-
 
 <pre>
 call = Twilio::Call.find 'CAe1644a7eed5088b159577c5802d8be38'
@@ -320,6 +138,197 @@ call.update_attributes :url => 'http://example.com/in_ur_apiz_hijackin_ur_callz.
 
 These are both equivalent, i.e. they immediately make an API request and update the state of the object with the API response. The first one in fact uses the second one internally and is just a shortcut. Use the second when there is more than one attribute to be updated in the same HTTP request.
 
+## Making a telephone call
+
+The API used to make a telephone call is similar to interacting with an ActiveRecord model object.
+<pre>Twilio::Call.create :to => '+16465551234', :from => '+19175550000',
+                    :url => "http://example.com/call_handler"</pre>
+
+The parameter keys should be given as underscored symbols. They will be converted internally to camelized strings prior to an API call being made.
+
+Please see the Twilio REST API documentation for an up to date list of supported parameters.
+
+If the request was successful, an instance of `Twilio::Call` wil be returned
+
+### Modifying a live telephone call
+
+As well as the the aforementioned setter methods, once a call has been been created it can be modified with the following convenience methods:
+
+`Twilio::Call#cancel!` will terminate the call if its state is `queued` or `ringing`
+`Twilio::Call#complete!` will terminate the call even if its state is `in-progress`
+`Twilio::Call#url=` will immediately redirect the call to a new handler URL
+
+## Finding an existing telephone call
+
+To retrieve an earlier created call, there is the `Twilio::Call.find` method, which accepts a call SID, e.g.
+
+<pre>call = Twilio::Call.find 'CAa346467ca321c71dbd5e12f627deb854'</pre>
+
+This returns an instance of `Twilio::Call` if a call with the given SID was found, otherwise nil is returned
+
+## Sending an SMS message
+
+The API used to send an SMS message is similar to interacting with an ActiveRecord model object.
+<pre>Twilio::SMS.create :to => '+16465551234', :from => '+19175550000',
+                   :body => "Hey baby, how was your day? x"</pre>
+
+The parameter keys should be given as underscored symbols. They will be converted internally to camelized strings prior to an API call being made.
+
+Please see the Twilio REST API documentation for an up to date list of supported parameters.
+
+If the request was successful, an instance of `Twilio::SMS` wil be returned
+
+## Finding an existing SMS message
+
+To retrieve an earlier created SMS message, there is the `Twilio::SMS.find` method, which accepts a SMS message SID, e.g.
+
+<pre>call = Twilio::SMS.find 'SM90c6fc909d8504d45ecdb3a3d5b3556e'</pre>
+
+This returns an instance of `Twilio::SMS` if a SMS message with the given SID was found, otherwise nil is returned
+
+# Twilio Client
+
+To generate capability tokens for use with Twilio Client you can use `Twilio::CapabilityToken.create`
+
+<pre>
+Twilio::CapabilityToken.create \
+  allow_incoming: 'unique_identifier_for_this_user',
+  allow_outgoing: 'your_application_sid'
+</pre>
+
+You can create capability tokens on arbitrary accounts, e.g. subaccounts. Just pass in those details:
+
+<pre>
+Twilio::CapabilityToken.create \
+  account_sid:    'AC00000000000000000000000',
+  auth_token:     'XXXXXXXXXXXXXXXXXXXXXXXXX',
+  allow_incoming: 'unique_identifier_for_this_user',
+  allow_outgoing: 'your_application_sid'
+</pre>
+
+You can also pass arbitrary parameters into your outgoing privilege, these are sent from Twilio as HTTP request params when it hits your app endpoint for TwiML.
+
+<pre>
+Twilio::CapabilityToken.create allow_outgoing: ['your_application_sid', { :foo => 'bar' }]
+</pre>
+
+By default tokens expire exactly one hour from the time they are generated. You can choose your own token ttl like so:
+
+<pre>
+Twilio::CapabilityToken.create \
+  allow_incoming: 'unique_identifier_for_this_user',
+  allow_outgoing: 'your_application_sid',
+  expires:        10.minutes.from_now
+</pre>
+
+# Associations
+
+Certain resources themselves have subresources, e.g. a call can have many recordings. It would be very convenient to access these via an association proxy, so instead of:
+
+<pre>
+calls = Twilio::Call.all
+recordings = Twilio::Recording.all :call_sid => calls.last.sid
+</pre>
+
+You might prefer:
+
+<pre>
+calls = Twilio::Call.all
+recordings = calls.recordings.all
+</pre>
+
+twilio-rb now supports these association proxies
+
+# Subaccounts
+
+The Twilio REST API supports subaccounts that is discrete accounts owned by a master account. twilio-rb supports this too.o
+
+## Subaccount creation
+
+You can create new subaccounts by using `Twilio::Account.create`
+
+## Performing actions on resources belonging to subaccounts
+
+There are three ways to perform an operation on an account other than the master account: you can pass in the subaccount sid
+
+<pre>Twilio::SMS.create :to => '+19175551234' :from => '+16465550000',
+  :body => 'This will be billed to a subaccount, sucka!' :account => 'ACXXXXXXXXXXXXXXXXXXXXXXXX'</pre>
+
+You can also pass in an object that responds to sid, i.e. an instance of Twilio::Account
+
+<pre>Twilio::SMS.create :to => '+19175551234' :from => '+16465550000',
+  :body => 'This TOO will be billed to a subaccount, sucka!' :account => my_subaccount_object</pre>
+
+By using an association proxy. By chaining the list resource methods, e.g. find, create, etc, on the association proxy, they are scoped to that account
+
+<pre>
+bobs_account = Twilio::Account.find :friendly_name => "Bob's subaccount"
+
+# This will send a SMS message on Bob's subaccount
+bobs_account.sms.create :to => '+16465551234', :from => '+19175550000', :body => "Bob is paying for this text. What a guy!"
+</pre>
+
+# Building TwiML documents
+
+A TwiML document is an XML document. The best way to build XML in Ruby is with Builder, and so it follows that we should use builder for TwiML. `Twilio::TwiML.build` behaves like builder except element names are capitalised for you and attributes are camelized for you as well. This is so you may continue to write beautiful code.
+
+The following Ruby code:
+
+<pre>Twilio::TwiML.build do |res|
+  res.say    'Hey man! Listen to this!', :voice => 'man'
+  res.play   'http://foo.com/cowbell.mp3'
+  res.say    'What did you think of that?!', :voice => 'man'
+  res.record :action => "http://foo.com/handleRecording.php",
+             :method => "GET", :max_length => "20",
+             :finish_on_Key => "*"
+  res.gather :action => "/process_gather.php", :method => "GET" do |g|
+    g.say 'Now hit some buttons!'
+  end
+  res.say    'Awesome! Thanks!', :voice => 'man'
+  res.hangup
+end</pre>
+
+Therefore emits the following TwiML document:
+
+<pre><?xml version="1.0" encoding="UTF-8"?>
+&lt;Response&gt;
+  &lt;Say voice="man"&gt;Hey man! Listen to this!&lt;/Say&gt;
+  &lt;Play&gt;http://foo.com/cowbell.mp3&lt;/Play&gt;
+  &lt;Say voice="man"&gt;What did you think of that?!&lt;/Say&gt;
+  &lt;Record maxLength="20" method="GET" action="http://foo.com/handleRecording.php" finishOnKey="*"/&gt;
+  &lt;Gather method="GET" action="/process_gather.php"&gt;
+    &lt;Say&gt;Now hit some buttons!&lt;/Say&gt;
+  &lt;/Gather&gt;
+  &lt;Say voice="man"&gt;Awesome! Thanks!&lt;/Say&gt;
+  &lt;Hangup/&gt;
+&lt;/Response&gt;
+</pre>
+
+This specialised behaviour only affects `Twilio::TwiML.build` and does not affect Builder in general.
+
+# Rails 3 integration
+
+Twilio.rb has Rails integration out of the box. It adds a new mime type :voice and a template handler for TwiML views.
+So now your Rails app can respond_to :voice. Insane!
+
+<pre>
+class FooController &lt; ApplicationController
+  responds_to :html, :voice
+
+  def index
+   ...
+  end
+end
+</pre>
+
+coupled with the following view file `app/views/foo/index.voice`
+
+<pre>
+res.say 'Damn this library is so ill dude!'
+</pre>
+
+It's now easier than ever to integrate Twilio in your Rails app cleanly and easily.
+
 ## Manipulating conference participants
 
 The participants list resource is a subresource of a conference resource instance:
@@ -338,26 +347,17 @@ Participants can be removed from the conference using the '#destroy instance met
 
 # Singleton resources
 
-The Twilio API in its current incarnation has two singleton (scoped per account) resources, correspondingly there are the Twilio::Account, and Twilio::Sandbox singleton objects.
+The Twilio API in its current incarnation has one singleton (scoped per account) resource, correspondingly there is Twilio::Sandbox singleton objects.
 
 To access properties of a singleton object the property name should be called as a method on the object itself, e.g.
 
-<pre>Twilio::Account.friendly_name</pre>
+<pre>Twilio::Sandobox.friendly_name</pre>
 
 The first time a method is invoked on the object an API call is made to retrieve the data. The methods themselves are not defined until they are called, i.e. lazy evaluation. This strategy means that addtional properties added to subsequent versions of the API should not break the library.
 
 To reload the data when needed `Twilio::Account.reload!` will make another API call and update its own internal state.
 
-The account has a predicate method i.e.  ending in `?`, it maps directly to the status of the account, e.g. `Twilio::Account.suspended?` returns true if Twilio have suspended your account. Again, this is defined on the fly.
-
-The only account property that can be modified via the REST API is the friendly name, e.g.
-
-<pre>Twilio::Account.friendly_name = "I'm so vain, I had to change my name!"</pre>
-<pre>Twilio::Account.update_attributes :friendly_name => "I'm so vain, I had to change my name!"</pre>
-
-This will update the API immediately with a POST request.
-
-Twilio::Sandbox supports more options. Please refer to the Twilio REST API documentation for an up to date list of properties.
+Please refer to the Twilio REST API documentation for an up to date list of properties that the sandbox resource implements
 
 # Searching for and purchasing available phone numbers
 
