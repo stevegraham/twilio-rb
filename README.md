@@ -10,7 +10,7 @@ It offers an ActiveRecord style API, i.e. one that most Ruby developers are fami
 
 The library has been packaged as a gem and is available from rubygems.org. The version that this readme pertains to is 2.0.0.
 
-<pre>gem install twilio-rb --pre</pre>
+<pre>gem install twilio-rb</pre>
 
 Please use the Github issue tracker to report any issues or bugs you uncover.
 
