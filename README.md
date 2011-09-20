@@ -252,7 +252,7 @@ You can create new subaccounts by using `Twilio::Account.create`
 There are three ways to perform an operation on an account other than the master account: you can pass in the subaccount sid
 
 <pre>Twilio::SMS.create :to => '+19175551234' :from => '+16465550000',
-  :body => 'This will be billed to a subaccount, sucka!' :account => 'ACXXXXXXXXXXXXXXXXXXXXXXXX'</pre>
+  :body => 'This will be billed to a subaccount, sucka!' :account_sid => 'ACXXXXXXXXXXXXXXXXXXXXXXXX'</pre>
 
 You can also pass in an object that responds to sid, i.e. an instance of Twilio::Account
 
@@ -354,8 +354,6 @@ To access properties of a singleton object the property name should be called as
 <pre>Twilio::Sandobox.friendly_name</pre>
 
 The first time a method is invoked on the object an API call is made to retrieve the data. The methods themselves are not defined until they are called, i.e. lazy evaluation. This strategy means that addtional properties added to subsequent versions of the API should not break the library.
-
-To reload the data when needed `Twilio::Account.reload!` will make another API call and update its own internal state.
 
 Please refer to the Twilio REST API documentation for an up to date list of properties that the sandbox resource implements
 
