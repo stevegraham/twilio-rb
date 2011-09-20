@@ -355,7 +355,6 @@ describe Twilio::Call do
       it 'updates the callback URL with the API' do
         stub_request(:post, resource).with(:body => 'Url=http%3A%2F%2Ffoo.com').to_return :body => canned_response('call_url_modified'), :status => 201
         call.url = 'http://foo.com'
-        call[:url].should == 'http://foo.com'
         a_request(:post, resource).with(:body => 'Url=http%3A%2F%2Ffoo.com').should have_been_made
       end
     end
@@ -417,6 +416,23 @@ describe Twilio::Call do
       it 'updates the API number the new parameters' do
         call.update_attributes :url => 'http://localhost:3000/hollaback'
         a_request(:post, resource_uri + '/' + call.sid + '.json').with(:body => 'Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback').should have_been_made
+      end
+    end
+  end
+
+  %w<url method status>.each do |meth|
+    describe "##{meth}=" do
+
+      before do
+        stub_request(:post, resource_uri + '.json').with(:body => minimum_params).to_return :body => canned_response('call_created')
+        stub_request(:post, resource_uri + '/' + call.sid + '.json').
+          with(:body => "#{meth.camelize}=foo").to_return :body => canned_response('call_url_modified'), :status => 201
+      end
+
+      it "updates the #{meth} property with the API" do
+        call.send "#{meth}=", 'foo'
+        a_request(:post, resource_uri + '/' + call.sid + '.json').
+          with(:body => "#{meth.camelize}=foo").should have_been_made
       end
     end
   end

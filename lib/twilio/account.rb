@@ -5,7 +5,7 @@ module Twilio
     extend Twilio::Associations
     extend Twilio::Finder
 
-    mutable_attributes :friendly_name
+    mutable_attributes :friendly_name, :status
 
     has_many :calls, :sms, :recordings, :conferences, :incoming_phone_numbers,
       :notifications, :outgoing_caller_ids, :transcriptions

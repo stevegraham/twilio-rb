@@ -3,6 +3,8 @@ module Twilio
     include Twilio::Resource
     include Twilio::Deletable
 
+    mutable_attributes :muted
+
     alias kick! destroy
 
     def mute!

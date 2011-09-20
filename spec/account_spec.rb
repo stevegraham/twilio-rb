@@ -146,26 +146,28 @@ describe Twilio::Account do
       account.should be_active
     end
     it 'returns false when the account is inactive' do
-      account.status = 'dead'
+      account.attributes['status'] = 'dead'
       account.should_not be_active
     end
   end
   describe "#suspended?" do
     before { stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('account') }
     it 'returns true when the account is suspended' do
-      account.status = 'suspended'
+      account.attributes['status'] = 'suspended'
       account.should be_suspended
     end
     it 'returns false when the account not suspended' do
       account.should_not be_suspended
     end
   end
-  describe '#friendly_name=' do
-    before { stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('account') }
-    it 'updates the friendly name' do
-      stub_request(:post, resource_uri + '/' + account.sid + '.json').with(:body => 'FriendlyName=vanity%20name').to_return :body => canned_response('account'), :status => 201
-      account.friendly_name = 'vanity name'
-      a_request(:post, resource_uri + '/' + account.sid + '.json').with(:body => 'FriendlyName=vanity%20name').should have_been_made
+  %w<friendly_name status>.each do |meth|
+    describe "##{meth}=" do
+      before { stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('account') }
+      it 'updates the friendly name' do
+        stub_request(:post, resource_uri + '/' + account.sid + '.json').with(:body => "#{meth.camelize}=foo").to_return :body => canned_response('account'), :status => 201
+        account.send "#{meth}=", 'foo'
+        a_request(:post, resource_uri + '/' + account.sid + '.json').with(:body => "#{meth.camelize}=foo").should have_been_made
+      end
     end
   end
 

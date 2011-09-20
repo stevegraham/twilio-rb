@@ -42,6 +42,14 @@ describe Twilio::Participant do
     end
   end
 
+  describe '#muted=' do
+    it 'makes an api call with the new value' do
+      stub_request(:post, resource_uri).to_return :status => 201, :body => canned_response('muted_participant')
+      participant.muted = true
+      a_request(:post, resource_uri).with(:body => 'Muted=true').should have_been_made
+    end
+  end
+
   describe '#mute!' do
     context 'when the participant is unmuted' do
       before { stub_request(:post, resource_uri).to_return :status => 201, :body => canned_response('muted_participant') }

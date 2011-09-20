@@ -5,8 +5,6 @@ module Twilio
     include Twilio::Persistable
     extend Twilio::Finder
 
-    def friendly_name=(value)
-      update_attributes :friendly_name => value
-    end
+    mutable_attributes :friendly_name
   end
 end

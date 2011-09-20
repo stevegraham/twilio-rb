@@ -7,6 +7,8 @@ module Twilio
 
     has_many :recordings
 
+    mutable_attributes :url, :method, :status
+
     class << self
       alias old_create create
       def create(attrs={})
@@ -42,11 +44,5 @@ module Twilio
       update_attributes :status => 'completed'
     end
 
-    # Update Handler URL
-    def url=(url)
-      # If this attribute exists it is assumed the API call to create a call has been made, so we need to tell Twilio.
-      update_attributes :url => url if self[:status]
-      self[:url] = url
-    end
   end
 end
