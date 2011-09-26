@@ -32,7 +32,7 @@ Configuration for this library is achieved with `Twilio::Config.setup`. One need
 Twilio::Config.setup \
   :account_sid  => 'AC0000000000000000000000000000',
   :auth_token   => '000000000000000000000000000000'
-end</pre>
+</pre>
 
 Any method that calls the Twilio API will raise `Twilio::ConfigurationError` if either Account SID or Auth Token are not configured.
 
@@ -313,7 +313,7 @@ So now your Rails app can respond_to :voice. Insane!
 
 <pre>
 class FooController &lt; ApplicationController
-  responds_to :html, :voice
+  respond_to :html, :voice
 
   def index
    ...
