@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'lib', 'twilio')
+require File.join(File.dirname(__FILE__), 'lib', 'twilio-rb')
 require 'rake/gempackagetask'
 require 'rspec'
 require 'rspec/core/rake_task'
