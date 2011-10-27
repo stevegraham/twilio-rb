@@ -55,5 +55,14 @@ describe 'Twilio::RequestFilter' do
         Twilio::RequestFilter.filter(controller)
       end
     end
+
+    context "when format is not available" do
+      it 'does not raise' do
+        request = mock :format => nil
+        controller = mock :request => request
+
+        lambda { Twilio::RequestFilter.filter(controller) }.should_not raise_error
+      end
+    end
   end
 end
