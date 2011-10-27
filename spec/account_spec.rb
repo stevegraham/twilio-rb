@@ -64,11 +64,11 @@ describe Twilio::Account do
   describe '.find' do
     context 'for a valid account' do
       before do
-        stub_request(:get, resource_uri + '/AP2a0747eba6abf96b7e3c3ff0b4530f6e' + '.json').
+        stub_request(:get, resource_uri + '/AC2a0747eba6abf96b7e3c3ff0b4530f6e' + '.json').
           to_return :body => canned_response('account'), :status => 200
       end
 
-      let(:account) { Twilio::Account.find 'AP2a0747eba6abf96b7e3c3ff0b4530f6e' }
+      let(:account) { Twilio::Account.find 'AC2a0747eba6abf96b7e3c3ff0b4530f6e' }
 
       it 'returns an instance of Twilio::Account' do
         account.should be_a Twilio::Account
