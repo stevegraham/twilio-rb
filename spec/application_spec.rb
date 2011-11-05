@@ -4,10 +4,11 @@ describe Twilio::Application do
 
   before { Twilio::Config.setup :account_sid => 'ACdc5f1e11047ebd6fe7a55f120be3a900', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
-  def resource_uri(account_sid=nil)
+  def resource_uri(account_sid=nil, connect=nil)
     account_sid ||= Twilio::ACCOUNT_SID
-    "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Applications"
+    "https://#{connect ? account_sid : Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Applications"
   end
+
 
   def stub_api_call(response_file, account_sid=nil)
     stub_request(:get, resource_uri(account_sid) + '.json').
@@ -33,6 +34,15 @@ describe Twilio::Application do
   describe '.count' do
     context 'on the master account' do
       before { stub_api_call 'list_applications' }
+
+      context 'using a twilio connect subaccount' do
+        it 'uses the account sid as the username for basic auth' do
+          stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+            to_return :body => canned_response('list_connect_applications'), :status => 200
+          Twilio::Application.count :account_sid => 'AC0000000000000000000000000000', :connect => true
+        end
+      end
+
       it 'returns the application count' do
         Twilio::Application.count.should == 6
       end
@@ -80,6 +90,13 @@ describe Twilio::Application do
   end
 
   describe '.all' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          to_return :body => canned_response('list_connect_applications'), :status => 200
+        Twilio::Application.all :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
     context 'on the master account' do
       before { stub_api_call 'list_applications' }
       let(:resp) { resp = Twilio::Application.all }
@@ -164,6 +181,13 @@ describe Twilio::Application do
   end
 
   describe '.find' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '/APa346467ca321c71dbd5e12f627deb854' + '.json' ).
+          to_return :body => canned_response('connect_application'), :status => 200
+        Twilio::Application.find 'APa346467ca321c71dbd5e12f627deb854', :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
     context 'on the master account' do
       context 'for a valid account' do
         before do
@@ -265,6 +289,18 @@ describe Twilio::Application do
         to_return :status => 204
     end
 
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:post, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          with(:body => "FriendlyName=test").
+          to_return :body => canned_response('connect_application'), :status => 200
+        app = Twilio::Application.create :friendly_name => 'test', :account_sid => 'AC0000000000000000000000000000', :connect => true
+        stub_request(:delete, resource_uri('AC0000000000000000000000000000', true) + '/' + app.sid + '.json' )
+        app.destroy
+        a_request(:delete, resource_uri('AC0000000000000000000000000000', true) + '/' + app.sid + '.json' ).should have_been_made
+      end
+    end
+
     let(:application) { Twilio::Application.find 'AP2a0747eba6abf96b7e3c3ff0b4530f6e' }
 
     it 'deletes the resource' do
@@ -287,6 +323,15 @@ describe Twilio::Application do
   end
 
   describe '.create' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:post, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          with(:body => "FriendlyName=test").
+          to_return :body => canned_response('connect_application'), :status => 200
+        Twilio::Application.create :friendly_name => 'test', :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
+
     context 'on the main account' do
       before { stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('application')}
 
@@ -351,10 +396,28 @@ describe Twilio::Application do
 
   describe '#update_attributes' do
     before do
-        stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('application')
-        stub_request(:post, resource_uri + '/' + application.sid + '.json').with(:body => post_body).
-          to_return :body => canned_response('application')
+      stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('application')
+      stub_request(:post, resource_uri + '/' + application.sid + '.json').with(:body => post_body).
+        to_return :body => canned_response('application')
+    end
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:post, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          with(:body => "FriendlyName=test").
+          to_return :body => canned_response('connect_application'), :status => 200
+        app = Twilio::Application.create :friendly_name => 'test', :account_sid => 'AC0000000000000000000000000000', :connect => true
+        stub_request(:post, resource_uri('AC0000000000000000000000000000', true) + '/' + app.sid + '.json' ).
+          with(:body => 'FriendlyName=awesome').
+          to_return :body => canned_response('connect_application'), :status => 200
+
+        app.update_attributes :friendly_name => 'awesome'
+
+        a_request(:post, resource_uri('AC0000000000000000000000000000', true) + '/' + app.sid + '.json' ).
+          with(:body => 'FriendlyName=awesome').
+          should have_been_made
       end
+    end
+
     context 'when the resource has been destroyed' do
       it 'raises a RuntimeError' do
         stub_request(:delete, resource_uri + '/' + application.sid + '.json').to_return :status => 204, :body => ''
