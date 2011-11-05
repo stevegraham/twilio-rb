@@ -1,0 +1,16 @@
+{
+    "account_sid": "AC0000000000000000000000000000",
+    "connect_app_sid": "CN0000000000000000000000000000",
+    "api_version": "2010-04-01",
+    "body": "Jenny please?! I love you <3",
+    "date_created": "Wed, 18 Aug 2010 20:01:40 +0000",
+    "date_sent": null,
+    "date_updated": "Wed, 18 Aug 2010 20:01:40 +0000",
+    "direction": "outbound-api",
+    "from": "+14158141829",
+    "price": null,
+    "sid": "SM90c6fc909d8504d45ecdb3a3d5b3556e",
+    "status": "queued",
+    "to": "+14159352345",
+    "uri": "/2010-04-01/Accounts/AC0000000000000000000000000000/SMS/Messages/SM90c6fc909d8504d45ecdb3a3d5b3556e.json"
+}
