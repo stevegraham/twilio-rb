@@ -1,0 +1,41 @@
+{
+    "page": 0,
+    "num_pages": 3,
+    "page_size": 50,
+    "total": 147,
+    "start": 0,
+    "end": 49,
+    "uri": "\/2010-04-01\/Accounts\/AC5ef877a5fe4238be081ea6f3c44186f3\/Calls.json",
+    "first_page_uri": "\/2010-04-01\/Accounts\/AC5ef877a5fe4238be081ea6f3c44186f3\/Calls.json?Page=0&PageSize=50",
+    "previous_page_uri": null,
+    "next_page_uri": "\/2010-04-01\/Accounts\/AC5ef877a5fe4238be081ea6f3c44186f3\/Calls.json?Page=1&PageSize=50",
+    "last_page_uri": "\/2010-04-01\/Accounts\/AC5ef877a5fe4238be081ea6f3c44186f3\/Calls.json?Page=2&PageSize=50",
+    "calls": [
+        {
+            "sid": "CA92d4405c9237c4ea04b56cbda88e128c",
+            "date_created": "Fri, 13 Aug 2010 01:16:22 +0000",
+            "date_updated": "Fri, 13 Aug 2010 01:16:22 +0000",
+            "connect_app_sid": "CN7c262ef394bc449fb1a3309fa204c4fd",
+            "parent_call_sid": null,
+            "account_sid": "AC5ef877a5fe4238be081ea6f3c44186f3",
+            "to": "+15304551166",
+            "from": "+15105555555",
+            "phone_number_sid": "PNe2d8e63b37f46f2adb16f228afdb9058",
+            "status": "queued",
+            "start_time": null,
+            "end_time": null,
+            "duration": null,
+            "price": null,
+            "direction": "outbound-api",
+            "answered_by": null,
+            "api_version": "2010-04-01",
+            "forwarded_from": null,
+            "caller_name": null,
+            "uri": "\/2010-04-01\/Accounts\/AC5ef877a5fe4238be081ea6f3c44186f3\/Calls\/CA92d4405c9237c4ea04b56cbda88e128c.json",
+            "subresource_uris": {
+                "notifications": "\/2010-04-01\/Accounts\/AC5ef877a5fe4238be081ea6f3c44186f3\/Calls\/CA92d4405c9237c4ea04b56cbda88e128c\/Notifications.json",
+                "recordings": "\/2010-04-01\/Accounts\/AC5ef877a5fe4238be081ea6f3c44186f3\/Calls\/CA92d4405c9237c4ea04b56cbda88e128c\/Recordings.json"
+            }
+        }
+    ]
+}

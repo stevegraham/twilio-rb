@@ -8,9 +8,10 @@ describe Twilio::Call do
 
   before { Twilio::Config.setup :account_sid => 'AC228ba7a5fe4238be081ea6f3c44186f3', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
-  def resource_uri(account_sid=nil)
+  def resource_uri(account_sid=nil, connect=nil)
+
     account_sid ||= Twilio::ACCOUNT_SID
-    "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Calls"
+    "https://#{connect ? account_sid : Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Calls"
   end
 
   def stub_api_call
@@ -53,6 +54,14 @@ describe Twilio::Call do
           to_return :body => canned_response('list_calls'), :status => 200
         Twilio::Call.all :page => 5, :status => 'dialled', :started_before => Date.parse('2010-12-12'), :ended_after => Date.parse('2010-11-12')
         a_request(:get, resource_uri + '.json?EndTime>=2010-11-12&Page=5&StartTime<=2010-12-12&Status=dialled').should have_been_made
+      end
+    end
+
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          to_return :body => canned_response('list_connect_calls'), :status => 200
+        Twilio::Call.all :account_sid => 'AC0000000000000000000000000000', :connect => true
       end
     end
 
@@ -136,6 +145,14 @@ describe Twilio::Call do
       end
     end
 
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          to_return :body => canned_response('list_connect_calls'), :status => 200
+        Twilio::Call.count :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
+
     context 'on a subaccount' do
       context 'found by passing in an account sid' do
         it 'returns the number of resources' do
@@ -199,6 +216,14 @@ describe Twilio::Call do
           call = Twilio::Call.find 'phony'
           call.should be_nil
         end
+      end
+    end
+
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '/CAa346467ca321c71dbd5e12f627deb854' + '.json' ).
+          to_return :body => canned_response('connect_call_created'), :status => 200
+        Twilio::Call.find 'CAa346467ca321c71dbd5e12f627deb854', :account_sid => 'AC0000000000000000000000000000', :connect => true
       end
     end
 
@@ -278,6 +303,16 @@ describe Twilio::Call do
         stub_request(:post, resource_uri + '.json').
           with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%252300&IfMachine=Continue").
           to_return(:status => 200, :body => canned_response('call_created'))
+      end
+
+      context 'using a twilio connect subaccount' do
+        it 'uses the account sid as the username for basic auth' do
+          stub_request(:post, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+            with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%252300&IfMachine=Continue").
+            to_return :body => canned_response('connect_call_created'), :status => 200
+          Twilio::Call.create :to => '+14155551212', :from => '+14158675309', :url => 'http://localhost:3000/hollaback',
+            :send_digits => '1234#00', :if_machine => 'Continue', :account_sid => 'AC0000000000000000000000000000', :connect => true
+        end
       end
 
       context 'on a subaccount' do
@@ -416,6 +451,26 @@ describe Twilio::Call do
       it 'updates the API number the new parameters' do
         call.update_attributes :url => 'http://localhost:3000/hollaback'
         a_request(:post, resource_uri + '/' + call.sid + '.json').with(:body => 'Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback').should have_been_made
+      end
+      context 'using a twilio connect subaccount' do
+        it 'uses the account sid for basic auth' do
+          stub_request(:post, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+            with(:body => minimum_params).
+            to_return :body => canned_response('connect_call_created'), :status => 200
+          call = Twilio::Call.create :to => '+14155551212', :from => '+14158675309', :url => 'http://localhost:3000/hollaback',
+            :account_sid => 'AC0000000000000000000000000000', :connect => true
+
+          stub_request(:post, resource_uri('AC0000000000000000000000000000', true) + '/CAa346467ca321c71dbd5e12f627deb854' + '.json' ).
+            with(:body => 'Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback').
+            to_return :body => canned_response('connect_call_created'), :status => 200
+
+          call.update_attributes :url => 'http://localhost:3000/hollaback'
+
+          a_request(:post, resource_uri('AC0000000000000000000000000000', true) + '/CAa346467ca321c71dbd5e12f627deb854' + '.json' ).
+            with(:body => 'Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback').
+            should have_been_made
+
+        end
       end
     end
   end
