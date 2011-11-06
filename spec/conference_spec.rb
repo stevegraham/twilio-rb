@@ -2,11 +2,16 @@ require 'spec_helper'
 
 describe Twilio::Conference do
 
-  before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
+  before { Twilio::Config.setup :account_sid => 'AC5ef872f6da5a21de157d80997a64bd33', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   def resource_uri(account_sid=nil)
     account_sid ||= Twilio::ACCOUNT_SID
     "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Conferences"
+  end
+
+  def resource_uri(account_sid=nil, connect=nil)
+    account_sid ||= Twilio::ACCOUNT_SID
+    "https://#{connect ? account_sid : Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Conferences"
   end
 
   def stub_api_call(response_file, account_sid=nil)
@@ -15,6 +20,15 @@ describe Twilio::Conference do
   end
 
   describe '.all' do
+
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          to_return :body => canned_response('list_connect_conferences'), :status => 200
+        Twilio::Conference.all :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
+
     context 'context on the master account' do
       before { stub_api_call 'list_conferences' }
       it 'returns a collection of objects with a length corresponding to the response' do
@@ -68,6 +82,15 @@ describe Twilio::Conference do
 
   describe '.count' do
     before { stub_api_call 'list_conferences' }
+
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          to_return :body => canned_response('list_connect_conferences'), :status => 200
+        Twilio::Conference.count :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
+
     it 'returns the number of resources' do
       Twilio::Conference.count.should == 462
     end
@@ -103,6 +126,14 @@ describe Twilio::Conference do
       before do
         stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/CFbbe46ff1274e283f7e3ac1df0072ab39' + '.json').
           to_return :body => canned_response('conference'), :status => 200
+      end
+
+      context 'using a twilio connect subaccount' do
+        it 'uses the account sid as the username for basic auth' do
+          stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '/CFbbe46ff1274e283f7e3ac1df0072ab39.json' ).
+            to_return :body => canned_response('connect_conference'), :status => 200
+          Twilio::Conference.find 'CFbbe46ff1274e283f7e3ac1df0072ab39', :account_sid => 'AC0000000000000000000000000000', :connect => true
+        end
       end
 
       context 'found by passing in an account_sid' do
@@ -156,6 +187,21 @@ describe Twilio::Conference do
       stub_api_call 'list_conferences'
       stub_request(:get, resource_uri + '/CFbbe46ff1274e283f7e3ac1df0072ab39/Participants.json').
         to_return :body => canned_response('list_participants'), :status => 200
+    end
+
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '/CFbbe46ff1274e283f7e3ac1df0072ab39.json' ).
+          to_return :body => canned_response('connect_conference'), :status => 200
+        conference = Twilio::Conference.find 'CFbbe46ff1274e283f7e3ac1df0072ab39', :account_sid => 'AC0000000000000000000000000000', :connect => true
+
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '/CFbbe46ff1274e283f7e3ac1df0072ab39/Participants.json' ).
+          to_return :body => canned_response('list_participants'), :status => 200
+        conference.participants
+
+        a_request(:get, resource_uri('AC0000000000000000000000000000', true) + '/CFbbe46ff1274e283f7e3ac1df0072ab39/Participants.json' ).
+          should have_been_made
+      end
     end
 
     let(:resp) { Twilio::Conference.all.first.participants }

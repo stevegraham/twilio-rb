@@ -4,7 +4,8 @@ module Twilio
     extend Twilio::Finder
 
     def participants
-      res = self.class.get "/Accounts/#{Twilio::ACCOUNT_SID}/Conferences/#{sid}/Participants.json"
+      account_sid = self[:account_sid] if self[:connect_app_sid]
+      res = self.class.get "/Accounts/#{self[:account_sid]}/Conferences/#{sid}/Participants.json", :account_sid => account_sid
       if (400..599).include? res.code
         raise Twilio::APIError.new "Error ##{res.parsed_response['code']}: #{res.parsed_response['message']}"
       else
