@@ -4,9 +4,9 @@ describe Twilio::IncomingPhoneNumber do
 
   before { Twilio::Config.setup :account_sid => 'ACdc5f1e11047ebd6fe7a55f120be3a900', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
-  def resource_uri(account_sid=nil)
+  def resource_uri(account_sid=nil, connect=nil)
     account_sid ||= Twilio::ACCOUNT_SID
-    "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/IncomingPhoneNumbers"
+    "https://#{connect ? account_sid : Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/IncomingPhoneNumbers"
   end
 
   def stub_api_call(response_file, account_sid=nil)
@@ -31,6 +31,14 @@ describe Twilio::IncomingPhoneNumber do
   let(:number) { Twilio::IncomingPhoneNumber.create params }
 
   describe '.count' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          to_return :body => canned_response('list_connect_incoming_phone_numbers'), :status => 200
+        Twilio::IncomingPhoneNumber.count :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
+
     context 'on the master account' do
       before { stub_api_call 'list_incoming_phone_numbers' }
       it 'returns the number of resources' do
@@ -82,6 +90,13 @@ describe Twilio::IncomingPhoneNumber do
   end
 
   describe '.all' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          to_return :body => canned_response('list_connect_incoming_phone_numbers'), :status => 200
+        Twilio::IncomingPhoneNumber.all :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
     context 'on the master account' do
       before { stub_api_call 'list_incoming_phone_numbers' }
       let(:resp) { resp = Twilio::IncomingPhoneNumber.all }
@@ -168,6 +183,14 @@ describe Twilio::IncomingPhoneNumber do
   end
 
   describe '.find' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '/PN2a0747eba6abf96b7e3c3ff0b4530f6e.json' ).
+          to_return :body => canned_response('connect_incoming_phone_number'), :status => 200
+        Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e', :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
+
     context 'on the master account' do
       context 'for a valid number' do
         before do
@@ -262,6 +285,17 @@ describe Twilio::IncomingPhoneNumber do
   end
 
   describe '#destroy' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '/PN2a0747eba6abf96b7e3c3ff0b4530f6e.json' ).
+          to_return :body => canned_response('connect_incoming_phone_number'), :status => 200
+        number = Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e', :account_sid => 'AC0000000000000000000000000000', :connect => true
+        stub_request(:delete, resource_uri('AC0000000000000000000000000000', true) + '/' + number.sid + '.json' )
+        number.destroy
+        a_request(:delete, resource_uri('AC0000000000000000000000000000', true) + '/' + number.sid + '.json' ).should have_been_made
+      end
+    end
+
     before do
       stub_request(:get, resource_uri + '/PN2a0747eba6abf96b7e3c3ff0b4530f6e' + '.json').
         to_return :body => canned_response('incoming_phone_number'), :status => 200
@@ -291,6 +325,14 @@ describe Twilio::IncomingPhoneNumber do
   end
 
   describe '.create' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:post, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          with(:body => "PhoneNumber=%2B19175551234").
+          to_return :body => canned_response('connect_incoming_phone_number'), :status => 200
+          Twilio::IncomingPhoneNumber.create :phone_number => '+19175551234', :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
     context 'on the main account' do
       before { stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('incoming_phone_number')}
 
@@ -354,6 +396,25 @@ describe Twilio::IncomingPhoneNumber do
   end
 
   describe '#update_attributes' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid for basic auth' do
+        stub_request(:post, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          with(:body => "PhoneNumber=%2B19175551234").
+          to_return :body => canned_response('connect_incoming_phone_number'), :status => 200
+          number = Twilio::IncomingPhoneNumber.create :phone_number => '+19175551234', :account_sid => 'AC0000000000000000000000000000', :connect => true
+
+        stub_request(:post, resource_uri('AC0000000000000000000000000000', true) + '/' + number.sid + '.json' ).
+          with(:body => 'FriendlyName=Sam').
+          to_return :body => canned_response('connect_incoming_phone_number'), :status => 200
+
+        number.update_attributes :friendly_name => 'Sam'
+
+        a_request(:post, resource_uri('AC0000000000000000000000000000', true) + '/' + number.sid + '.json' ).
+          with(:body => 'FriendlyName=Sam').
+          should have_been_made
+
+      end
+    end
     before do
         stub_request(:post, resource_uri + '.json').with(:body => post_body).to_return :body => canned_response('incoming_phone_number')
         stub_request(:post, resource_uri + '/' + number.sid + '.json').with(:body => post_body).
