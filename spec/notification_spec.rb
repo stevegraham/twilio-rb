@@ -4,9 +4,9 @@ describe Twilio::Notification do
 
   before { Twilio::Config.setup :account_sid => 'ACda6f1e11047ebd6fe7a55f120be3a900', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
-  def resource_uri(account_sid=nil)
+  def resource_uri(account_sid=nil, connect=nil)
     account_sid ||= Twilio::ACCOUNT_SID
-    "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Notifications"
+    "https://#{connect ? account_sid : Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Notifications"
   end
 
   def stub_api_call(response_file, account_sid=nil)
@@ -15,6 +15,14 @@ describe Twilio::Notification do
   end
 
   describe '.all' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          to_return :body => canned_response('list_connect_notifications'), :status => 200
+        Twilio::Notification.all :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
+
     before { stub_api_call 'list_notifications' }
     it 'returns a collection of objects with a length corresponding to the response' do
       resp = Twilio::Notification.all
@@ -60,6 +68,14 @@ describe Twilio::Notification do
   end
 
   describe '.count' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          to_return :body => canned_response('list_connect_notifications'), :status => 200
+        Twilio::Notification.count :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
+
     before { stub_api_call 'list_notifications' }
     it 'returns the number of resources' do
       Twilio::Notification.count.should == 1224
@@ -93,6 +109,14 @@ describe Twilio::Notification do
   end
 
   describe '.find' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '/NO5a7a84730f529f0a76b3e30c01315d1a.json' ).
+          to_return :body => canned_response('connect_notification'), :status => 200
+        Twilio::Notification.find 'NO5a7a84730f529f0a76b3e30c01315d1a', :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
+
     context 'on a subaccount' do
       before do
         stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/NO5a7a84730f529f0a76b3e30c01315d1a' + '.json').
@@ -144,6 +168,17 @@ describe Twilio::Notification do
   end
 
   describe '#destroy' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '/NO5a7a84730f529f0a76b3e30c01315d1a.json' ).
+          to_return :body => canned_response('connect_notification'), :status => 200
+        notification = Twilio::Notification.find 'NO5a7a84730f529f0a76b3e30c01315d1a', :account_sid => 'AC0000000000000000000000000000', :connect => true
+        stub_request(:delete, resource_uri('AC0000000000000000000000000000', true) + '/' + notification.sid + '.json' )
+        notification.destroy
+        a_request(:delete, resource_uri('AC0000000000000000000000000000', true) + '/' + notification.sid + '.json' ).should have_been_made
+      end
+    end
+
     before do
       stub_request(:get, resource_uri + '/NO5a7a84730f529f0a76b3e30c01315d1a' + '.json').
         to_return :body => canned_response('notification'), :status => 200
