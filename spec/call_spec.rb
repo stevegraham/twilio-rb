@@ -493,13 +493,25 @@ describe Twilio::Call do
 
   describe 'associations' do
     describe 'has_many' do
-      describe 'recordings' do
-        it 'proxies method calls to Twilio::Recording with current call sid inserted into options' do
-          stub_request(:post, resource_uri + '.json').with(:body => minimum_params).
-            to_return :body => canned_response('call_created')
+      it 'delegates the method to the associated class with the account sid merged into the options' do
+        stub_request(:post, resource_uri + '.json').with(:body => minimum_params).
+          to_return :body => canned_response('call_created')
 
-          Twilio::Recording.expects(:all).with(:limit => 10, :call_sid => call.sid)
-          call.recordings.all :limit => 10
+        [:recordings, :notifications].each do |association|
+          klass = Twilio.const_get association.to_s.classify
+          klass.expects(:foo).with  :limit => 5, call_sid: call.sid
+          call.send(association).foo :limit => 5
+        end
+      end
+
+      context 'where the account is a connect subaccount' do
+        it 'delegates the method to the associated class with the account sid merged into the options' do
+          call = Twilio::Call.new JSON.parse(canned_response('connect_call_created').read)
+          [:recordings, :notifications].each do |association|
+            klass = Twilio.const_get association.to_s.classify
+            klass.expects(:foo).with :limit => 5, call_sid: call.sid, :account_sid => call.account_sid, :connect => true
+            call.send(association).foo :limit => 5
+          end
         end
       end
     end

@@ -15,6 +15,9 @@ module Twilio
     def method_missing(meth, *args, &blk)
       options = args.empty? ? args.<<({})[-1] : args[-1]
       options.update :"#{@delegator_name}_sid" => @delegator.sid
+      if @delegator[:connect_app_sid]
+        options.update :connect => true, :account_sid => (@delegator[:account_sid] || @delegator[:sid])
+      end
       @target.__send__ meth, *args, &blk
     end
   end

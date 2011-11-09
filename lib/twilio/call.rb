@@ -5,7 +5,7 @@ module Twilio
     extend  Twilio::Finder
     extend  Twilio::Associations
 
-    has_many :recordings
+    has_many :recordings, :notifications
 
     mutable_attributes :url, :method, :status
 

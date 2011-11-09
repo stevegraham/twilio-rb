@@ -181,6 +181,17 @@ describe Twilio::Account do
           account.send(association).foo
         end
       end
+
+      context 'where the account is a connect subaccount' do
+        it 'delegates the method to the associated class with the account sid merged into the options' do
+          account = Twilio::Account.new JSON.parse(canned_response('connect_account').read)
+          [:calls, :recordings, :conferences, :incoming_phone_numbers, :notifications, :outgoing_caller_ids, :transcriptions].each do |association|
+            klass = Twilio.const_get association.to_s.classify
+            klass.expects(:foo).with :account_sid => account.sid, :connect => true
+            account.send(association).foo
+          end
+        end
+      end
     end
   end
 end
