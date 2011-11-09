@@ -20,7 +20,7 @@ module Twilio
     private
 
     def path
-      "/Accounts/#{Twilio::ACCOUNT_SID}/Conferences/#{conference_sid}/Participants/#{call_sid}.json"
+      "/Accounts/#{account_sid}/Conferences/#{conference_sid}/Participants/#{call_sid}.json"
     end
   end
 end
