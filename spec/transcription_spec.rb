@@ -4,9 +4,9 @@ describe Twilio::Transcription do
 
   before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
-  def resource_uri(account_sid=nil)
+  def resource_uri(account_sid=nil, connect=nil)
     account_sid ||= Twilio::ACCOUNT_SID
-    "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Transcriptions"
+    "https://#{connect ? account_sid : Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Transcriptions"
   end
 
   def stub_api_call(response_file, account_sid=nil)
@@ -15,6 +15,14 @@ describe Twilio::Transcription do
   end
 
   describe '.all' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          to_return :body => canned_response('list_connect_transcriptions'), :status => 200
+        Twilio::Transcription.all :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
+
     before { stub_api_call 'list_transcriptions' }
     it 'returns a collection of objects with a length corresponding to the response' do
       resp = Twilio::Transcription.all
@@ -52,6 +60,14 @@ describe Twilio::Transcription do
   end
 
   describe '.count' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          to_return :body => canned_response('list_connect_transcriptions'), :status => 200
+        Twilio::Transcription.count :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
+
     before { stub_api_call 'list_transcriptions' }
     it 'returns the number of resources' do
       Twilio::Transcription.count.should == 150
@@ -77,6 +93,13 @@ describe Twilio::Transcription do
   end
 
   describe '.find' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '/TR8c61027b709ffb038236612dc5af8723.json' ).
+          to_return :body => canned_response('connect_transcription'), :status => 200
+        Twilio::Transcription.find 'TR8c61027b709ffb038236612dc5af8723', :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
     context 'for a valid transcription' do
       before do
         stub_request(:get, resource_uri + '/TR8c61027b709ffb038236612dc5af8723' + '.json').
