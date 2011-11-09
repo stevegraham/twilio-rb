@@ -221,6 +221,15 @@ Twilio::CapabilityToken.create \
   expires:        10.minutes.from_now
 </pre>
 
+# Twilio Connect
+
+With Twilio Connect you can attribute Twilio usage to accounts of customers that have authorised you to perform API calls on there behalf. twilio-rb supports Twilio Connect. To make an API call using a Twilio Connect account, two extra parameters are required, `account_sid` and `connect`
+
+<pre>
+Twilio::SMS.create to: '+12125551234', from: '+6165550000', body: 'this will not be billed to the application developer',
+  account_sid: CONNECT_ACCOUNT_SID, connect: true
+</pre>
+
 # Associations
 
 Certain resources themselves have subresources, e.g. a call can have many recordings. It would be very convenient to access these via an association proxy, so instead of:
