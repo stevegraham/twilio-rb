@@ -4,9 +4,9 @@ describe Twilio::Recording do
 
   before { Twilio::Config.setup :account_sid => 'ACda6f1e11047ebd6fe7a55f120be3a900', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
-  def resource_uri(account_sid=nil)
+  def resource_uri(account_sid=nil, connect=nil)
     account_sid ||= Twilio::ACCOUNT_SID
-    "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Recordings"
+    "https://#{connect ? account_sid : Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Recordings"
   end
 
   def stub_api_call(response_file, account_sid=nil)
@@ -15,6 +15,13 @@ describe Twilio::Recording do
   end
 
   describe '.all' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          to_return :body => canned_response('list_connect_recordings'), :status => 200
+        Twilio::Recording.all :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
     before { stub_api_call 'list_recordings' }
     let (:resp) { Twilio::Recording.all }
 
@@ -60,6 +67,14 @@ describe Twilio::Recording do
   end
 
   describe '.count' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          to_return :body => canned_response('list_connect_recordings'), :status => 200
+        Twilio::Recording.count :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
+
     before { stub_api_call 'list_recordings' }
     it 'returns the number of resources' do
       Twilio::Recording.count.should == 527
@@ -93,6 +108,14 @@ describe Twilio::Recording do
   end
 
   describe '.find' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '/RE557ce644e5ab84fa21cc21112e22c485.json' ).
+          to_return :body => canned_response('list_connect_recordings'), :status => 200
+        Twilio::Recording.find 'RE557ce644e5ab84fa21cc21112e22c485', :account_sid => 'AC0000000000000000000000000000', :connect => true
+      end
+    end
+
     context 'for a valid recording' do
       before do
         stub_request(:get, resource_uri + '/RE557ce644e5ab84fa21cc21112e22c485' + '.json').
@@ -145,6 +168,17 @@ describe Twilio::Recording do
   end
 
   describe '#destroy' do
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid as the username for basic auth' do
+        stub_request(:get, resource_uri('AC0000000000000000000000000000', true) + '/RE557ce644e5ab84fa21cc21112e22c485.json' ).
+          to_return :body => canned_response('connect_recording'), :status => 200
+        recording = Twilio::Recording.find 'RE557ce644e5ab84fa21cc21112e22c485', :account_sid => 'AC0000000000000000000000000000', :connect => true
+        stub_request(:delete, resource_uri('AC0000000000000000000000000000', true) + '/' + recording.sid + '.json' )
+        recording.destroy
+        a_request(:delete, resource_uri('AC0000000000000000000000000000', true) + '/' + recording.sid + '.json' ).should have_been_made
+      end
+    end
+
     before do
       stub_request(:get, resource_uri + '/RE557ce644e5ab84fa21cc21112e22c485' + '.json').
         to_return :body => canned_response('recording'), :status => 200
