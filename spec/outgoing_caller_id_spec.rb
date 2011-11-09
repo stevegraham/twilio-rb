@@ -284,6 +284,27 @@ describe Twilio::OutgoingCallerId do
   describe '#update_attributes' do
     let(:caller_id) { Twilio::OutgoingCallerId.create params }
 
+
+    context 'using a twilio connect subaccount' do
+      it 'uses the account sid for basic auth' do
+        stub_request(:post, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
+          with(:body => post_body).
+          to_return :body => canned_response('connect_caller_id'), :status => 200
+        caller_id = Twilio::OutgoingCallerId.create params.merge :account_sid => 'AC0000000000000000000000000000', :connect => true
+
+        stub_request(:post, resource_uri('AC0000000000000000000000000000', true) + '/' + caller_id.sid + '.json' ).
+          with(:body => 'FriendlyName=foo').
+          to_return :body => canned_response('connect_caller_id'), :status => 200
+
+        caller_id.update_attributes :friendly_name => 'foo'
+
+        a_request(:post, resource_uri('AC0000000000000000000000000000', true) + '/' + caller_id.sid + '.json' ).
+          with(:body => 'FriendlyName=foo').
+          should have_been_made
+
+      end
+    end
+
     before do
       stub_request(:post, resource_uri + '.json').with(:body => post_body).
         to_return :body => canned_response('caller_id')
