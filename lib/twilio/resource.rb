@@ -112,7 +112,7 @@ module Twilio
             opts        = args.extract_options!
             account_sid = opts.delete :account_sid
             # if account sid is passed in as an option use it for basic auth (twilio connect)
-            super args.first, opts.merge(:basic_auth => { :username => account_sid || Twilio::ACCOUNT_SID, :password => Twilio::AUTH_TOKEN })
+            super args.first, opts.merge(:headers => { 'User-Agent' => 'twilio-rb/2.1.1' }, :basic_auth => { :username => account_sid || Twilio::ACCOUNT_SID, :password => Twilio::AUTH_TOKEN })
           end
         end
 
