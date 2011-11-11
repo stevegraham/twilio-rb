@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency                'activesupport', '>= 3.0.0'
   s.add_dependency                'i18n',          '~> 0.5'
-  s.add_dependency                'yajl-ruby',     '~> 0.8.3'
+  s.add_dependency                'yajl-ruby',     '~> 1.0.0'
   s.add_dependency                'httparty',      '>= 0.6.1'
   s.add_dependency                'builder',       '>= 3.0.0'
   s.add_dependency                'jwt',           '>= 0.1.3'
