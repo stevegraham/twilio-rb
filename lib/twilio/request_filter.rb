@@ -6,8 +6,8 @@ module Twilio
   module RequestFilter
     def filter(controller)
       request = controller.request
-      if request.format.try(:voice?) && request.ssl?
-        controller.head(:forbidden) if expected_signature_for(request) != request.env['HTTP_X_TWILIO_SIGNATURE']
+      if request.format.try(:voice?)
+        controller.head(:forbidden) if expected_signature_for(request) != (request.env['HTTP_X_TWILIO_SIGNATURE'] || request.env['X-Twilio-Signature'])
       end
     end
 

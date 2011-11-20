@@ -6,8 +6,8 @@ describe 'Twilio::RequestFilter' do
   describe '.filter' do
     context 'when request signatures do match' do
       it 'does not trigger a 401 response' do
-        request = mock \
-          :params => {
+        request = stub \
+          :request_parameters => {
                 'AccountSid' => 'AC9a9f9392lad99kla0sklakjs90j092j3', 'ApiVersion' => '2010-04-01',
                 'CallSid' => 'CAd800bb12c0426a7ea4230e492fef2a4f', 'CallStatus' => 'ringing',
                 'Called' => '+15306384866', 'CalledCity' => 'OAKLAND', 'CalledCountry' => 'US',
@@ -18,12 +18,13 @@ describe 'Twilio::RequestFilter' do
                 'FromCity' => 'SOUTH LAKE TAHOE', 'FromCountry' => 'US', 'FromState' => 'CA',
                 'FromZip' => '89449', 'To' => '+15306384866', 'ToCity' => 'OAKLAND',
                 'ToCountry' => 'US', 'ToState' => 'CA', 'ToZip' => '94612' },
-          :env    => { 'X-Twilio-Signature' => 'fF+xx6dTinOaCdZ0aIeNkHr/ZAA=' },
+          :env    => {
+                'X-Twilio-Signature' => 'fF+xx6dTinOaCdZ0aIeNkHr/ZAA=',
+                'HTTP_X_TWILIO_SIGNATURE' => 'fF+xx6dTinOaCdZ0aIeNkHr/ZAA=' },
           :format => mock(:voice? => true),
-          :ssl?   => true,
           :url    => 'http://www.postbin.org/1ed898x'
 
-        controller = mock :request => request
+        controller = stub :request => request
 
         controller.expects(:head).with(:forbidden).never
         Twilio::RequestFilter.filter(controller)
@@ -32,8 +33,8 @@ describe 'Twilio::RequestFilter' do
 
     context 'when request signatures do not match' do
       it 'returns 401 response' do
-         request = mock \
-            :params => {
+         request = stub \
+            :request_parameters => {
                   'AccountSid' => 'AC9a9f9392lad99kla0sklakjs90j092j3', 'ApiVersion' => '2010-04-01',
                   'CallSid' => 'CAd800bb12c0426a7ea4230e492fef2a4f', 'CallStatus' => 'ringing',
                   'Called' => '+15306384866', 'CalledCity' => 'OAKLAND', 'CalledCountry' => 'US',
@@ -44,12 +45,13 @@ describe 'Twilio::RequestFilter' do
                   'FromCity' => 'SOUTH LAKE TAHOE', 'FromCountry' => 'US', 'FromState' => 'CA',
                   'FromZip' => '89449', 'To' => '+15306384866', 'ToCity' => 'OAKLAND',
                   'ToCountry' => 'US', 'ToState' => 'CA', 'ToZip' => '94612' },
-            :env    => { 'X-Twilio-Signature' => nil },
+            :env => {
+                  'X-Twilio-Signature' => nil,
+                  'HTTP_X_TWILIO_SIGNATURE' => nil },
             :format => mock(:voice? => true),
-            :ssl?   => true,
             :url    => 'http://www.postbin.org/1ed898x'
 
-        controller = mock :request => request
+        controller = stub :request => request
 
         controller.expects(:head).with(:forbidden)
         Twilio::RequestFilter.filter(controller)
