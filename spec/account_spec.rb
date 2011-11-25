@@ -46,7 +46,7 @@ describe Twilio::Account do
       resp.all? { |r| r.is_a? Twilio::Account }.should be_true
     end
 
-    JSON.parse(canned_response('list_accounts').read)['accounts'].each_with_index do |obj,i|
+    JSON.parse(canned_response('list_accounts'))['accounts'].each_with_index do |obj,i|
       obj.each do |attr, value|
         specify { resp[i].send(attr).should == value }
       end
@@ -74,7 +74,7 @@ describe Twilio::Account do
         account.should be_a Twilio::Account
       end
 
-      JSON.parse(canned_response('account').read).each do |k,v|
+      JSON.parse(canned_response('account')).each do |k,v|
         specify { account.send(k).should == v }
       end
     end
@@ -102,7 +102,7 @@ describe Twilio::Account do
       account.should be_a Twilio::Account
     end
 
-    JSON.parse(canned_response('account').read).map do |k,v|
+    JSON.parse(canned_response('account')).map do |k,v|
       specify { account.send(k).should == v }
     end
   end
@@ -184,7 +184,7 @@ describe Twilio::Account do
 
       context 'where the account is a connect subaccount' do
         it 'delegates the method to the associated class with the account sid merged into the options' do
-          account = Twilio::Account.new JSON.parse(canned_response('connect_account').read)
+          account = Twilio::Account.new JSON.parse(canned_response('connect_account'))
           [:calls, :recordings, :conferences, :incoming_phone_numbers, :notifications, :outgoing_caller_ids, :transcriptions].each do |association|
             klass = Twilio.const_get association.to_s.classify
             klass.expects(:foo).with :account_sid => account.sid, :connect => true

@@ -33,7 +33,7 @@ describe Twilio::Recording do
       resp.all? { |r| r.is_a? Twilio::Recording }.should be_true
     end
 
-    JSON.parse(canned_response('list_recordings').read)['recordings'].each_with_index do |obj,i|
+    JSON.parse(canned_response('list_recordings'))['recordings'].each_with_index do |obj,i|
       obj.each do |attr, value|
         specify { resp[i].send(attr).should == value }
       end
@@ -128,7 +128,7 @@ describe Twilio::Recording do
         recording.should be_a Twilio::Recording
       end
 
-      JSON.parse(canned_response('recording').read).each do |k,v|
+      JSON.parse(canned_response('recording')).each do |k,v|
         specify { recording.send(k).should == v }
       end
     end

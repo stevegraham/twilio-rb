@@ -9,7 +9,7 @@ describe Twilio::Participant do
   end
 
   let(:participant) do
-    Twilio::Participant.new JSON.parse(canned_response('show_participant').read)
+    Twilio::Participant.new JSON.parse(canned_response('show_participant'))
   end
 
   before { Twilio::Config.setup :account_sid => 'AC5ef872f6da5a21de157d80997a64bd33', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
@@ -22,7 +22,7 @@ describe Twilio::Participant do
   describe '#destroy' do
     context 'using a twilio connect subaccount' do
       it 'uses the account sid as the username for basic auth' do
-        participant = Twilio::Participant.new JSON.parse(canned_response('show_connect_participant').read)
+        participant = Twilio::Participant.new JSON.parse(canned_response('show_connect_participant'))
         stub_request(:delete, resource_uri('AC0000000000000000000000000000', true))
         participant.destroy
         a_request(:delete, resource_uri('AC0000000000000000000000000000', true))
@@ -55,7 +55,7 @@ describe Twilio::Participant do
   describe '#update_attributes=' do
     context 'using a twilio connect subaccount' do
       it 'uses the account sid for basic auth' do
-        participant = Twilio::Participant.new JSON.parse(canned_response('show_connect_participant').read)
+        participant = Twilio::Participant.new JSON.parse(canned_response('show_connect_participant'))
 
         stub_request(:post, resource_uri('AC0000000000000000000000000000', true)).
           with(:body => 'Muted=false').
@@ -92,7 +92,7 @@ describe Twilio::Participant do
       before { stub_request(:post, resource_uri).to_return :status => 201, :body => canned_response('show_participant') }
 
       let(:participant) do
-        Twilio::Participant.new JSON.parse(canned_response('muted_participant').read)
+        Twilio::Participant.new JSON.parse(canned_response('muted_participant'))
       end
 
       it "unmutes the participant" do

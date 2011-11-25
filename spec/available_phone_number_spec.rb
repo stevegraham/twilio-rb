@@ -32,7 +32,7 @@ describe Twilio::AvailablePhoneNumber do
         resp.all? { |r| r.is_a? Twilio::AvailablePhoneNumber }.should be_true
       end
 
-      JSON.parse(canned_response('available_local_phone_numbers').read)['available_phone_numbers'].each_with_index do |obj,i|
+      JSON.parse(canned_response('available_local_phone_numbers'))['available_phone_numbers'].each_with_index do |obj,i|
         obj.each { |attr, value| specify { resp[i].send(attr).should == value } }
       end
     end
@@ -59,7 +59,7 @@ describe Twilio::AvailablePhoneNumber do
       end
 
       its 'collection contains objects whose attributes correspond to the response' do
-        numbers = JSON.parse(canned_response('available_toll_free_phone_numbers').read)['available_phone_numbers']
+        numbers = JSON.parse(canned_response('available_toll_free_phone_numbers'))['available_phone_numbers']
         resp    = Twilio::AvailablePhoneNumber.all :toll_free => true, :contains => 'STORM'
 
         numbers.each_with_index do |obj,i|

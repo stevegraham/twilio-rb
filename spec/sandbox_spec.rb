@@ -1,9 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-def canned_response(resp)
-  File.new File.join(File.expand_path(File.dirname __FILE__), 'support', 'responses', "#{resp}.json")
-end
-
 describe Twilio::Sandbox do
   before do
     Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3'
@@ -12,7 +8,7 @@ describe Twilio::Sandbox do
   let(:resource) { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{Twilio::ACCOUNT_SID}/Sandbox.json" }
 
   describe 'accessing sandbox properties' do
-    JSON.parse(canned_response('sandbox').read).
+    JSON.parse(canned_response('sandbox')).
       each { |meth, value| specify { Twilio::Sandbox.send(meth).should == value } }
   end
   %w<voice_url voice_method sms_url sms_method>.each do |meth|

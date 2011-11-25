@@ -108,7 +108,7 @@ describe Twilio::Application do
         resp.all? { |r| r.is_a? Twilio::Application }.should be_true
       end
 
-      JSON.parse(canned_response('list_applications').read)['applications'].each_with_index do |obj,i|
+      JSON.parse(canned_response('list_applications'))['applications'].each_with_index do |obj,i|
         obj.each do |attr, value|
           specify { resp[i].send(attr).should == value }
         end
@@ -135,7 +135,7 @@ describe Twilio::Application do
           resp.all? { |r| r.is_a? Twilio::Application }.should be_true
         end
 
-        JSON.parse(canned_response('list_applications').read)['applications'].each_with_index do |obj,i|
+        JSON.parse(canned_response('list_applications'))['applications'].each_with_index do |obj,i|
           obj.each do |attr, value|
             specify { resp[i].send(attr).should == value }
           end
@@ -162,7 +162,7 @@ describe Twilio::Application do
             resp.all? { |r| r.is_a? Twilio::Application }.should be_true
           end
 
-          JSON.parse(canned_response('list_applications').read)['applications'].each_with_index do |obj,i|
+          JSON.parse(canned_response('list_applications'))['applications'].each_with_index do |obj,i|
             obj.each do |attr, value|
               specify { resp[i].send(attr).should == value }
             end
@@ -201,7 +201,7 @@ describe Twilio::Application do
           application.should be_a Twilio::Application
         end
 
-        JSON.parse(canned_response('application').read).each do |k,v|
+        JSON.parse(canned_response('application')).each do |k,v|
           specify { application.send(k).should == v }
         end
       end
@@ -231,7 +231,7 @@ describe Twilio::Application do
             application.should be_a Twilio::Application
           end
 
-          JSON.parse(canned_response('application').read).each do |k,v|
+          JSON.parse(canned_response('application')).each do |k,v|
             specify { application.send(k).should == v }
           end
         end
@@ -263,7 +263,7 @@ describe Twilio::Application do
             application.should be_a Twilio::Application
           end
 
-          JSON.parse(canned_response('application').read).each do |k,v|
+          JSON.parse(canned_response('application')).each do |k,v|
             specify { application.send(k).should == v }
           end
         end
@@ -344,7 +344,7 @@ describe Twilio::Application do
         application.should be_a Twilio::Application
       end
 
-      JSON.parse(canned_response('application').read).map do |k,v|
+      JSON.parse(canned_response('application')).map do |k,v|
         specify { application.send(k).should == v }
       end
     end
@@ -366,7 +366,7 @@ describe Twilio::Application do
           application.should be_a Twilio::Application
         end
 
-        JSON.parse(canned_response('application').read).map do |k,v|
+        JSON.parse(canned_response('application')).map do |k,v|
           specify { application.send(k).should == v }
         end
       end
@@ -387,7 +387,7 @@ describe Twilio::Application do
           application.should be_a Twilio::Application
         end
 
-        JSON.parse(canned_response('application').read).map do |k,v|
+        JSON.parse(canned_response('application')).map do |k,v|
           specify { application.send(k).should == v }
         end
       end

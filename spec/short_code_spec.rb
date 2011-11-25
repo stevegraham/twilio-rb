@@ -75,7 +75,7 @@ describe Twilio::ShortCode do
         resp.all? { |r| r.is_a? Twilio::ShortCode }.should be_true
       end
 
-      JSON.parse(canned_response('list_short_codes').read)['short_codes'].each_with_index do |obj,i|
+      JSON.parse(canned_response('list_short_codes'))['short_codes'].each_with_index do |obj,i|
         obj.each do |attr, value|
           specify { resp[i].send(attr).should == value }
         end
@@ -102,7 +102,7 @@ describe Twilio::ShortCode do
           resp.all? { |r| r.is_a? Twilio::ShortCode }.should be_true
         end
 
-        JSON.parse(canned_response('list_short_codes').read)['short_codes'].each_with_index do |obj,i|
+        JSON.parse(canned_response('list_short_codes'))['short_codes'].each_with_index do |obj,i|
           obj.each do |attr, value|
             specify { resp[i].send(attr).should == value }
           end
@@ -129,7 +129,7 @@ describe Twilio::ShortCode do
             resp.all? { |r| r.is_a? Twilio::ShortCode }.should be_true
           end
 
-          JSON.parse(canned_response('list_short_codes').read)['short_codes'].each_with_index do |obj,i|
+          JSON.parse(canned_response('list_short_codes'))['short_codes'].each_with_index do |obj,i|
             obj.each do |attr, value|
               specify { resp[i].send(attr).should == value }
             end
@@ -161,7 +161,7 @@ describe Twilio::ShortCode do
           short_code.should be_a Twilio::ShortCode
         end
 
-        JSON.parse(canned_response('short_code').read).each do |k,v|
+        JSON.parse(canned_response('short_code')).each do |k,v|
           specify { short_code.send(k).should == v }
         end
       end
@@ -191,7 +191,7 @@ describe Twilio::ShortCode do
             short_code.should be_a Twilio::ShortCode
           end
 
-          JSON.parse(canned_response('short_code').read).each do |k,v|
+          JSON.parse(canned_response('short_code')).each do |k,v|
             specify { short_code.send(k).should == v }
           end
         end
@@ -223,7 +223,7 @@ describe Twilio::ShortCode do
             short_code.should be_a Twilio::ShortCode
           end
 
-          JSON.parse(canned_response('short_code').read).each do |k,v|
+          JSON.parse(canned_response('short_code')).each do |k,v|
             specify { short_code.send(k).should == v }
           end
         end

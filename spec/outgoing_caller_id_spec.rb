@@ -36,7 +36,7 @@ describe Twilio::OutgoingCallerId do
       resp.all? { |r| r.is_a? Twilio::OutgoingCallerId }.should be_true
     end
 
-    JSON.parse(canned_response('list_caller_ids').read)['outgoing_caller_ids'].each_with_index do |obj,i|
+    JSON.parse(canned_response('list_caller_ids'))['outgoing_caller_ids'].each_with_index do |obj,i|
       obj.each do |attr, value|
         specify { Twilio::OutgoingCallerId.all[i].send(attr).should == value }
       end
@@ -130,7 +130,7 @@ describe Twilio::OutgoingCallerId do
         caller_id.should be_a Twilio::OutgoingCallerId
       end
 
-      JSON.parse(canned_response('caller_id').read).each do |k,v|
+      JSON.parse(canned_response('caller_id')).each do |k,v|
         specify { caller_id.send(k).should == v }
       end
     end

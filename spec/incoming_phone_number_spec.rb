@@ -108,7 +108,7 @@ describe Twilio::IncomingPhoneNumber do
         resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be_true
       end
 
-      JSON.parse(canned_response('list_incoming_phone_numbers').read)['incoming_phone_numbers'].each_with_index do |obj,i|
+      JSON.parse(canned_response('list_incoming_phone_numbers'))['incoming_phone_numbers'].each_with_index do |obj,i|
         obj.each do |attr, value|
           specify { resp[i].send(attr).should == value }
         end
@@ -135,7 +135,7 @@ describe Twilio::IncomingPhoneNumber do
           resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be_true
         end
 
-        JSON.parse(canned_response('list_incoming_phone_numbers').read)['incoming_phone_numbers'].each_with_index do |obj,i|
+        JSON.parse(canned_response('list_incoming_phone_numbers'))['incoming_phone_numbers'].each_with_index do |obj,i|
           obj.each do |attr, value|
             specify { resp[i].send(attr).should == value }
           end
@@ -163,7 +163,7 @@ describe Twilio::IncomingPhoneNumber do
             resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be_true
           end
 
-          JSON.parse(canned_response('list_incoming_phone_numbers').read)['incoming_phone_numbers'].each_with_index do |obj,i|
+          JSON.parse(canned_response('list_incoming_phone_numbers'))['incoming_phone_numbers'].each_with_index do |obj,i|
             obj.each do |attr, value|
               specify { resp[i].send(attr).should == value }
             end
@@ -204,7 +204,7 @@ describe Twilio::IncomingPhoneNumber do
           number.should be_a Twilio::IncomingPhoneNumber
         end
 
-        JSON.parse(canned_response('incoming_phone_number').read).each do |k,v|
+        JSON.parse(canned_response('incoming_phone_number')).each do |k,v|
           specify { number.send(k).should == v }
         end
       end
@@ -234,7 +234,7 @@ describe Twilio::IncomingPhoneNumber do
             number.should be_a Twilio::IncomingPhoneNumber
           end
 
-          JSON.parse(canned_response('incoming_phone_number').read).each do |k,v|
+          JSON.parse(canned_response('incoming_phone_number')).each do |k,v|
             specify { number.send(k).should == v }
           end
         end
@@ -266,7 +266,7 @@ describe Twilio::IncomingPhoneNumber do
             number.should be_a Twilio::IncomingPhoneNumber
           end
 
-          JSON.parse(canned_response('incoming_phone_number').read).each do |k,v|
+          JSON.parse(canned_response('incoming_phone_number')).each do |k,v|
             specify { number.send(k).should == v }
           end
         end
@@ -345,7 +345,7 @@ describe Twilio::IncomingPhoneNumber do
         number.should be_a Twilio::IncomingPhoneNumber
       end
 
-      JSON.parse(canned_response('incoming_phone_number').read).map do |k,v|
+      JSON.parse(canned_response('incoming_phone_number')).map do |k,v|
         specify { number.send(k).should == v }
       end
     end
@@ -367,7 +367,7 @@ describe Twilio::IncomingPhoneNumber do
           number.should be_a Twilio::IncomingPhoneNumber
         end
 
-        JSON.parse(canned_response('incoming_phone_number').read).map do |k,v|
+        JSON.parse(canned_response('incoming_phone_number')).map do |k,v|
           specify { number.send(k).should == v }
         end
       end
@@ -388,7 +388,7 @@ describe Twilio::IncomingPhoneNumber do
           number.should be_a Twilio::IncomingPhoneNumber
         end
 
-        JSON.parse(canned_response('incoming_phone_number').read).map do |k,v|
+        JSON.parse(canned_response('incoming_phone_number')).map do |k,v|
           specify { number.send(k).should == v }
         end
       end

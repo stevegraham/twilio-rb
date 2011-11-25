@@ -42,7 +42,7 @@ describe Twilio::Conference do
       end
 
       it 'returns a collection containing objects with attributes corresponding to the response' do
-        conferences = JSON.parse(canned_response('list_conferences').read)['conferences']
+        conferences = JSON.parse(canned_response('list_conferences'))['conferences']
         resp        = Twilio::Conference.all
 
         conferences.each_with_index do |obj,i|
@@ -165,7 +165,7 @@ describe Twilio::Conference do
       end
 
       it 'returns an object with attributes that correspond to the API response' do
-        response   = JSON.parse(canned_response('conference').read)
+        response   = JSON.parse(canned_response('conference'))
         conference = Twilio::Conference.find 'CFbbe46ff1274e283f7e3ac1df0072ab39'
         response.each { |k,v| conference.send(k).should == v }
       end
@@ -212,7 +212,7 @@ describe Twilio::Conference do
     end
 
     it 'returns a collection containing objects with attributes corresponding to the response' do
-      participants = JSON.parse(canned_response('list_participants').read)['participants']
+      participants = JSON.parse(canned_response('list_participants'))['participants']
 
       participants.each_with_index do |obj,i|
         obj.each do |attr, value|

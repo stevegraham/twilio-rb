@@ -22,10 +22,6 @@ describe Twilio::Call do
     a_request(:post, resource_uri + '.json').with(:body => minimum_params).should have_been_made
   end
 
-  def canned_response(resp)
-    File.new File.join(File.expand_path(File.dirname __FILE__), 'support', 'responses', "#{resp}.json")
-  end
-
   describe '.all' do
     context 'on the master account' do
       before do
@@ -42,7 +38,7 @@ describe Twilio::Call do
         resp.all? { |r| r.is_a? Twilio::Call }.should be_true
       end
 
-      JSON.parse(canned_response('list_calls').read)['calls'].each_with_index do |obj,i|
+      JSON.parse(canned_response('list_calls'))['calls'].each_with_index do |obj,i|
         obj.each do |attr, value|
           specify { resp[i].send(attr).should == value }
         end
@@ -80,7 +76,7 @@ describe Twilio::Call do
           resp.all? { |r| r.is_a? Twilio::Call }.should be_true
         end
 
-        JSON.parse(canned_response('list_calls').read)['calls'].each_with_index do |obj,i|
+        JSON.parse(canned_response('list_calls'))['calls'].each_with_index do |obj,i|
           obj.each do |attr, value|
             specify { resp[i].send(attr).should == value }
           end
@@ -110,7 +106,7 @@ describe Twilio::Call do
           resp.all? { |r| r.is_a? Twilio::Call }.should be_true
         end
 
-        JSON.parse(canned_response('list_calls').read)['calls'].each_with_index do |obj,i|
+        JSON.parse(canned_response('list_calls'))['calls'].each_with_index do |obj,i|
           obj.each do |attr, value|
             specify { resp[i].send(attr).should == value }
           end
@@ -202,7 +198,7 @@ describe Twilio::Call do
           call.should be_a Twilio::Call
         end
 
-        JSON.parse(canned_response('call_created').read).except('method').each do |k,v|
+        JSON.parse(canned_response('call_created')).except('method').each do |k,v|
           # OOPS! Collides with Object#method, access with obj[:method] syntax
           specify { call.send(k).should == v }
         end
@@ -240,7 +236,7 @@ describe Twilio::Call do
             call.should be_a Twilio::Call
           end
 
-          JSON.parse(canned_response('call_created').read).except('method').each do |k,v|
+          JSON.parse(canned_response('call_created')).except('method').each do |k,v|
             # OOPS! Collides with Object#method, access with obj[:method] syntax
             specify { call.send(k).should == v }
           end
@@ -271,7 +267,7 @@ describe Twilio::Call do
             call.should be_a Twilio::Call
           end
 
-          JSON.parse(canned_response('call_created').read).except('method').each do |k,v|
+          JSON.parse(canned_response('call_created')).except('method').each do |k,v|
             # OOPS! Collides with Object#method, access with obj[:method] syntax
             specify { call.send(k).should == v }
           end
@@ -340,7 +336,7 @@ describe Twilio::Call do
           end
         end
       end
-      JSON.parse(canned_response('call_created').read).except('method').each do |k,v|
+      JSON.parse(canned_response('call_created')).except('method').each do |k,v|
         # OOPS! Collides with Object#method, access with obj[:method] syntax
         specify { call.send(k).should == v }
       end
@@ -506,7 +502,7 @@ describe Twilio::Call do
 
       context 'where the account is a connect subaccount' do
         it 'delegates the method to the associated class with the account sid merged into the options' do
-          call = Twilio::Call.new JSON.parse(canned_response('connect_call_created').read)
+          call = Twilio::Call.new JSON.parse(canned_response('connect_call_created'))
           [:recordings, :notifications].each do |association|
             klass = Twilio.const_get association.to_s.classify
             klass.expects(:foo).with :limit => 5, call_sid: call.sid, :account_sid => call.account_sid, :connect => true

@@ -27,7 +27,7 @@ describe Twilio::ConnectApp do
       resp.all? { |r| r.is_a? Twilio::ConnectApp }.should be_true
     end
 
-    JSON.parse(canned_response('list_connect_apps').read)['connect_apps'].each_with_index do |obj,i|
+    JSON.parse(canned_response('list_connect_apps'))['connect_apps'].each_with_index do |obj,i|
       obj.each do |attr, value|
         specify { Twilio::ConnectApp.all[i].send(attr).should == value }
       end
@@ -105,7 +105,7 @@ describe Twilio::ConnectApp do
         connect_app.should be_a Twilio::ConnectApp
       end
 
-      JSON.parse(canned_response('connect_app').read).each do |k,v|
+      JSON.parse(canned_response('connect_app')).each do |k,v|
         specify { connect_app.send(k).should == v }
       end
     end
@@ -145,7 +145,7 @@ describe Twilio::ConnectApp do
   end
   describe '#update_attributes=' do
     it 'updates the API number the new parameters' do
-      connect_app = Twilio::ConnectApp.new JSON.parse(canned_response('connect_app').read)
+      connect_app = Twilio::ConnectApp.new JSON.parse(canned_response('connect_app'))
       stub_request(:post, resource_uri + '/' + connect_app.sid + '.json').with(:body => 'FriendlyName=foo').
         to_return body: canned_response('connect_app'), status: 200
       connect_app.update_attributes :friendly_name => 'foo'

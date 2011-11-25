@@ -34,7 +34,7 @@ describe Twilio::Transcription do
       resp.all? { |r| r.is_a? Twilio::Transcription }.should be_true
     end
 
-    JSON.parse(canned_response('list_transcriptions').read)['transcriptions'].each_with_index do |obj,i|
+    JSON.parse(canned_response('list_transcriptions'))['transcriptions'].each_with_index do |obj,i|
       obj.each do |attr, value|
         specify { Twilio::Transcription.all[i].send(attr).should == value }
       end
@@ -111,7 +111,7 @@ describe Twilio::Transcription do
         transcription.should be_a Twilio::Transcription
       end
 
-      JSON.parse(canned_response('transcription').read).each do |k,v|
+      JSON.parse(canned_response('transcription')).each do |k,v|
         specify { transcription.send(k).should == v }
       end
     end

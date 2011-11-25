@@ -35,7 +35,7 @@ describe Twilio::AuthorizedConnectApp do
       resp.all? { |r| r.is_a? Twilio::AuthorizedConnectApp }.should be_true
     end
 
-    JSON.parse(canned_response('list_authorized_connect_apps').read)['authorized_connect_apps'].each_with_index do |obj,i|
+    JSON.parse(canned_response('list_authorized_connect_apps'))['authorized_connect_apps'].each_with_index do |obj,i|
       obj.each do |attr, value|
         specify { Twilio::AuthorizedConnectApp.all[i].send(attr).should == value }
       end
@@ -129,7 +129,7 @@ describe Twilio::AuthorizedConnectApp do
         authorized_connect_app.should be_a Twilio::AuthorizedConnectApp
       end
 
-      JSON.parse(canned_response('authorized_connect_app').read).each do |k,v|
+      JSON.parse(canned_response('authorized_connect_app')).each do |k,v|
         specify { authorized_connect_app.send(k).should == v }
       end
     end

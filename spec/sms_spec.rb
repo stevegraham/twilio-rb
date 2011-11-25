@@ -18,10 +18,6 @@ describe Twilio::SMS do
     a_request(:post, resource_uri + '.json').with(:body => minimum_sms_params).should have_been_made
   end
 
-  def canned_response(resp)
-    File.new File.join(File.expand_path(File.dirname __FILE__), 'support', 'responses', "#{resp}.json")
-  end
-
   before { Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   describe '.all' do
@@ -48,7 +44,7 @@ describe Twilio::SMS do
       resp.all? { |r| r.is_a? Twilio::SMS }.should be_true
     end
 
-    JSON.parse(canned_response('list_messages').read)['sms_messages'].each_with_index do |obj,i|
+    JSON.parse(canned_response('list_messages'))['sms_messages'].each_with_index do |obj,i|
       obj.each do |attr, value|
         specify { resp[i].send(attr).should == value }
       end
@@ -105,7 +101,7 @@ describe Twilio::SMS do
 
       let(:sms) { Twilio::SMS.find 'SM90c6fc909d8504d45ecdb3a3d5b3556e' }
 
-      JSON.parse(canned_response('sms_created').read).each do |k,v|
+      JSON.parse(canned_response('sms_created')).each do |k,v|
         specify { sms.send(k).should == v }
       end
 
@@ -147,7 +143,7 @@ describe Twilio::SMS do
         new_sms_should_have_been_made
       end
 
-      JSON.parse(canned_response('sms_created').read).each do |k,v|
+      JSON.parse(canned_response('sms_created')).each do |k,v|
         specify { sms.send(k).should == v }
       end
     end

@@ -1,5 +1,5 @@
 require './lib/twilio-rb'
-%w<webmock rspec/expectations webmock/rspec mocha timecop>.each { |lib| require lib }
+%w<webmock rspec/expectations webmock/rspec mocha json timecop>.each { |lib| require lib }
 
 RSpec.configure do |config|
   config.after(:each) do
@@ -11,5 +11,5 @@ RSpec.configure do |config|
 end
 
 def canned_response(resp)
-  File.new File.join(File.expand_path(File.dirname __FILE__), 'support', 'responses', "#{resp}.json")
+  File.new(File.join(File.expand_path(File.dirname __FILE__), 'support', 'responses', "#{resp}.json")).read
 end

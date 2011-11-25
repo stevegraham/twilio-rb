@@ -34,7 +34,7 @@ describe Twilio::Notification do
       resp.all? { |r| r.is_a? Twilio::Notification }.should be_true
     end
 
-    JSON.parse(canned_response('list_notifications').read)['notifications'].each_with_index do |obj,i|
+    JSON.parse(canned_response('list_notifications'))['notifications'].each_with_index do |obj,i|
       obj.each do |attr, value|
         specify { Twilio::Notification.all[i].send(attr).should == value }
       end
@@ -151,7 +151,7 @@ describe Twilio::Notification do
         notification.should be_a Twilio::Notification
       end
 
-      JSON.parse(canned_response('notification').read).each do |k,v|
+      JSON.parse(canned_response('notification')).each do |k,v|
         specify { notification.send(k).should == v }
       end
     end
