@@ -4,15 +4,19 @@ module Twilio
       module ActionView
         class Template
           module Handlers
-            class TwiML < ::ActionView::Template::Handler
+            class TwiML
+              class_attribute :default_format
               self.default_format = 'text/xml'
-              include ::ActionView::Template::Handlers::Compilable
 
               def compile(template)
                 <<-EOS
                 controller.content_type = 'text/xml'
                 Twilio::TwiML.build { |res| #{template.source} }
                 EOS
+              end
+
+              def self.call(template)
+                new.compile(template)
               end
             end
           end
