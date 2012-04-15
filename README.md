@@ -393,3 +393,4 @@ A recording resource instance has an extra instance method: `#mp3` this returns 
 * Christopher Durtschi
 * Dan Imrie-Situnayake
 * John Trupiano
+* Aaron Lerch
