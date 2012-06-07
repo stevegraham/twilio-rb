@@ -40,7 +40,7 @@ Any method that calls the Twilio API will raise `Twilio::ConfigurationError` if 
 
 ## Summary
 
-Twilio resources are represented as Ruby objects. List resources are represnted by classes, e.g. `Twilio::SMS` and operations on list resources are performed using class methods, e.g. `Twilio::SMS.create`. Resource instances are represented by instances of those classes, and operations on those resource instances are perfomed using instance methods.
+Twilio resources are represented as Ruby objects. List resources are represented by classes, e.g. `Twilio::SMS` and operations on list resources are performed using class methods, e.g. `Twilio::SMS.create`. Resource instances are represented by instances of those classes, and operations on those resource instances are performed using instance methods.
 
 Resources that can be created via the API, using the HTTP POST verb can be done so in the library using the `.create` class method, e.g.
 
@@ -56,11 +56,11 @@ Twilio::Notification.all.each &:destroy
 
 Object representations instantiated by the library respond to all methods that match attributes on its corresponding resource. The method names are those of the parameters in snake case (underscored), i.e. as they are returned in the JSON representation.
 
-The Twilio API documentation itself is the canonical reference for which resources have what properties, and which of those can be updated by the API. Please refer to the Twilio REST API documentation for thos information.
+The Twilio API documentation itself is the canonical reference for which resources have what properties, and which of those can be updated by the API. Please refer to the Twilio REST API documentation for that information.
 
 ## Accessing resource instances
 
-Resource instances can be accessed ad hoc passsing the resource sid to the `.find` class method on the resource class, e.g.
+Resource instances can be accessed ad hoc passing the resource sid to the `.find` class method on the resource class, e.g.
 
 <pre>call = Twilio::Call.find 'CAe1644a7eed5088b159577c5802d8be38'</pre>
 
@@ -92,7 +92,7 @@ Twilio does some fancy stuff to implement date ranges, consider the API request:
 
 <pre>GET /2010-04-01/Accounts/AC5ef87.../Calls?StartTime&gt;=2009-07-06&EndTime&lt;=2009-07-10</pre>
 
-This will return all calls started after midnight July 06th 2009 and completed before July 10th 2009. Any call started and ended within that time range matches those criteria and will be returned. To make the same reqest using this library:
+This will return all calls started after midnight July 06th 2009 and completed before July 10th 2009. Any call started and ended within that time range matches those criteria and will be returned. To make the same request using this library:
 
 <pre>
 require 'date'
@@ -101,14 +101,14 @@ start_date, end_date = Date.parse('2009-07-06'),  Date.parse('2009-07-10')
 Twilio::Call.all :started_after => start_date, :ended_before => end_date
 </pre>
 
-All option parameters pertaining to dates accept a string or any object that returns a RFC 2822 date when `#to_s` is called on it, e.g. an instance of `Date`. If a date parameter is not a rnage but absolute, one can of course use the normal option, e.g.
+All option parameters pertaining to dates accept a string or any object that returns a RFC 2822 date when `#to_s` is called on it, e.g. an instance of `Date`. If a date parameter is not a range but absolute, one can of course use the normal option, e.g.
 
 <pre>Twilio::Call.all :start_time => start_date</pre>
 
 The key names for these Date filters are inconsistent across resources, in the library they are:
 
 <pre>
-Twilio::SMS.all :created_before => date, :created_after => date, :sent_before => date, :sent_after # :"created_#{when}" and :"sent_#{when}" are synonomous
+Twilio::SMS.all :created_before => date, :created_after => date, :sent_before => date, :sent_after # :"created_#{when}" and :"sent_#{when}" are synonymous
 Twilio::Notification.all :created_before => date, :created_after => date
 Twilio::Call.all :started_before => date, :started_after => date, :ended_before => date, :ended_after => date
 </pre>
@@ -223,7 +223,7 @@ Twilio::CapabilityToken.create \
 
 # Twilio Connect
 
-With Twilio Connect you can attribute Twilio usage to accounts of customers that have authorised you to perform API calls on there behalf. twilio-rb supports Twilio Connect. To make an API call using a Twilio Connect account, two extra parameters are required, `account_sid` and `connect`
+With Twilio Connect you can attribute Twilio usage to accounts of customers that have authorized you to perform API calls on there behalf. twilio-rb supports Twilio Connect. To make an API call using a Twilio Connect account, two extra parameters are required, `account_sid` and `connect`
 
 <pre>
 Twilio::SMS.create to: '+12125551234', from: '+6165550000', body: 'this will not be billed to the application developer',
@@ -279,7 +279,7 @@ bobs_account.sms.create :to => '+16465551234', :from => '+19175550000', :body =>
 
 # Building TwiML documents
 
-A TwiML document is an XML document. The best way to build XML in Ruby is with Builder, and so it follows that we should use builder for TwiML. `Twilio::TwiML.build` behaves like builder except element names are capitalised for you and attributes are camelized for you as well. This is so you may continue to write beautiful code.
+A TwiML document is an XML document. The best way to build XML in Ruby is with Builder, and so it follows that we should use builder for TwiML. `Twilio::TwiML.build` behaves like builder except element names are capitalized for you and attributes are camelized for you as well. This is so you may continue to write beautiful code.
 
 The following Ruby code:
 
@@ -313,7 +313,7 @@ Therefore emits the following TwiML document:
 &lt;/Response&gt;
 </pre>
 
-This specialised behaviour only affects `Twilio::TwiML.build` and does not affect Builder in general.
+This specialized behaviour only affects `Twilio::TwiML.build` and does not affect Builder in general.
 
 # Rails 3 integration
 
@@ -344,7 +344,7 @@ The participants list resource is a subresource of a conference resource instanc
 
 <pre>conference = Twilio::Conference.find 'CFbbe46ff1274e283f7e3ac1df0072ab39'</pre>
 
-Conference participants are accessed via the `#particpants` instance method, e.g.
+Conference participants are accessed via the `#participants` instance method, e.g.
 
 <pre>participants = conference.participants</pre>
 
@@ -362,7 +362,7 @@ To access properties of a singleton object the property name should be called as
 
 <pre>Twilio::Sandobox.friendly_name</pre>
 
-The first time a method is invoked on the object an API call is made to retrieve the data. The methods themselves are not defined until they are called, i.e. lazy evaluation. This strategy means that addtional properties added to subsequent versions of the API should not break the library.
+The first time a method is invoked on the object an API call is made to retrieve the data. The methods themselves are not defined until they are called, i.e. lazy evaluation. This strategy means that additional properties added to subsequent versions of the API should not break the library.
 
 Please refer to the Twilio REST API documentation for an up to date list of properties that the sandbox resource implements
 
