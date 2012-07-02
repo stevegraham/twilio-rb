@@ -26,7 +26,7 @@ module Twilio
       ActionController::Base.class_eval { before_filter Twilio::RequestFilter }
 
       ::ActionView::Template.register_template_handler(:voice, ActionView::Template::Handlers::TwiML)
-      ::Mime::Type.register_alias 'text/xml', :voice
+      ::Mime::Type.register 'text/xml', :voice
     end
   end
 end
