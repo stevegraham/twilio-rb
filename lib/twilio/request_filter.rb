@@ -7,16 +7,28 @@ module Twilio
     def filter(controller)
       request = controller.request
       if request.format.try(:voice?)
-        controller.head(:forbidden) unless authorised?
+        controller.head(:forbidden) unless authorised?(request)
       end
     end
 
     private
 
-    def authorised?
-      return true if Rails.env.development?
+    def authorised? request
+      return true if development?
 
-      expected_signature_for(request) != (request.env['HTTP_X_TWILIO_SIGNATURE'] || request.env['X-Twilio-Signature'])
+      expected_signature_for(request) == (request.env['HTTP_X_TWILIO_SIGNATURE'] || request.env['X-Twilio-Signature'])
+    end
+
+    def development?
+      if const_defined? "Rails"
+        Rails.env.development?
+      elsif ENV["RACK_ENV"] == "development"
+        true
+      else
+        false
+      end
+    rescue
+      false
     end
 
     def expected_signature_for(request)
