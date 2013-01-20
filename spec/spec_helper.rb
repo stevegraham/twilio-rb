@@ -11,5 +11,5 @@ RSpec.configure do |config|
 end
 
 def canned_response(resp)
-  File.new(File.join(File.expand_path(File.dirname __FILE__), 'support', 'responses', "#{resp}.json")).read
+  File.read "./spec/support/responses/#{resp}.json"
 end
