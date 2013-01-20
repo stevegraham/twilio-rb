@@ -3,3 +3,4 @@ pkg/*
 *.swo
 *.swp
 *.swn
+Gemfile.lock
