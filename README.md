@@ -394,3 +394,5 @@ A recording resource instance has an extra instance method: `#mp3` this returns 
 * Dan Imrie-Situnayake
 * John Trupiano
 * Aaron Lerch
+* Joël Franusic
+* Mark Burns
