@@ -1,8 +1,26 @@
-require 'active_support/core_ext/module'
 
-module Twilio
+
+  module Twilio
   module Config
-    mattr_accessor :account_sid, :auth_token
+    attr_writer :account_sid, :auth_token
+
+    def account_sid
+      if @account_sid
+        @account_sid
+      else
+        raise Twilio::ConfigurationError.new \
+          "Cannot complete request. Please set account_sid with Twilio::Config.setup first!"
+      end
+    end
+
+    def auth_token
+      if @auth_token
+        @auth_token
+      else
+        raise Twilio::ConfigurationError.new \
+          "Cannot complete request. Please set auth_token with Twilio::Config.setup first!"
+      end
+    end
 
     def setup(opts={}, &blk)
       if block_given?

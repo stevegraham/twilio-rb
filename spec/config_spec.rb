@@ -15,4 +15,22 @@ describe Twilio::Config do
       Twilio::Config.auth_token.should == '19ad98413d911947f0ba369d295ae7a3'
     end
   end
+
+  describe '.auth_token' do
+    it 'raises an exception when invoked before set' do
+      expect {
+        Twilio::Config.auth_token
+      }.to raise_error(Twilio::ConfigurationError, \
+        "Cannot complete request. Please set auth_token with Twilio::Config.setup first!")
+    end
+  end
+
+  describe '.account_sid' do
+    it 'raises an exception when invoked before set' do
+      expect {
+        Twilio::Config.account_sid
+      }.to raise_error(Twilio::ConfigurationError, \
+        "Cannot complete request. Please set account_sid with Twilio::Config.setup first!")
+    end
+  end
 end

@@ -106,21 +106,11 @@ module Twilio
       end
 
       class << base
-        def ensure_auth_setup!
-          [:account_sid, :auth_token].each do |attr|
-            if Twilio::Config.send(attr).nil?
-              raise Twilio::ConfigurationError.new "Cannot complete request. Please set #{attr} with Twilio::Config.setup first!"
-            end
-          end
-        end
-
         # decorate http methods with authentication
         %w<post get put delete>.each do |meth|
           define_method(meth) do |*args| # splatted args necessary hack since <= 1.8.7 does not support optional block args
             opts        = args.extract_options!
             account_sid = opts.delete :account_sid
-
-            ensure_auth_setup!
 
             # if account sid is passed in as an option use it for basic auth (twilio connect)
             super args.first, opts.merge(:headers => { 'User-Agent' => 'twilio-rb/2.1.1' }, :basic_auth => { :username => account_sid || Twilio::Config.account_sid, :password => Twilio::Config.auth_token })
