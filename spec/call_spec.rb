@@ -357,8 +357,13 @@ describe Twilio::Call do
     end
 
     context 'when authentication credentials are not configured' do
-      it 'raises Twilio::ConfigurationError' do
+      it 'raises Twilio::ConfigurationError when account_sid is not set' do
         Twilio::Config.account_sid = nil
+        lambda { call }.should raise_error(Twilio::ConfigurationError)
+      end
+
+      it 'raises Twilio::ConfigurationError when auth_token is not set' do
+        Twilio::Config.auth_token = nil
         lambda { call }.should raise_error(Twilio::ConfigurationError)
       end
     end
