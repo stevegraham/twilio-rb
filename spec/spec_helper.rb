@@ -3,7 +3,8 @@ require './lib/twilio-rb'
 
 RSpec.configure do |config|
   config.after(:each) do
-    [:ACCOUNT_SID, :AUTH_TOKEN].each { |c| Twilio.instance_eval { remove_const c if const_defined? c } }
+    Twilio::Config.account_sid = nil
+    Twilio::Config.auth_token = nil
     WebMock.reset!
   end
   config.include WebMock::API
