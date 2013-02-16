@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/stevegraham/twilio-rb.png)](https://travis-ci.org/stevegraham/twilio-rb)
+
 # Twilio.rb
 
 Interact with the Twilio API in a nice Ruby way.
