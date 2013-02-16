@@ -19,7 +19,7 @@ module Twilio
 
     private
     def path
-      "/Accounts/#{Twilio::ACCOUNT_SID}/Sandbox.json"
+      "/Accounts/#{Twilio::Config.account_sid}/Sandbox.json"
     end
     extend self
   end

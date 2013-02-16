@@ -6,7 +6,7 @@ module Twilio
         def create(attrs={})
           attrs        = attrs.with_indifferent_access
           # Support subaccounts by optionally passing in an account_sid or account object
-          account_sid  = attrs.delete('account_sid') || attrs.delete('account').try(:sid) || Twilio::ACCOUNT_SID
+          account_sid  = attrs.delete('account_sid') || attrs.delete('account').try(:sid) || Twilio::Config.account_sid
           connect      = attrs.delete 'connect'
           request_opts = { :body => Hash[attrs.map { |k,v| [k.to_s.camelize, v]}] }
 

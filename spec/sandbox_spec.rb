@@ -5,7 +5,7 @@ describe Twilio::Sandbox do
     Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3'
     stub_request(:get, resource).to_return :body => canned_response('sandbox'), :status => 200
   end
-  let(:resource) { "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{Twilio::ACCOUNT_SID}/Sandbox.json" }
+  let(:resource) { "https://#{Twilio::Config.account_sid}:#{Twilio::Config.auth_token}@api.twilio.com/2010-04-01/Accounts/#{Twilio::Config.account_sid}/Sandbox.json" }
 
   describe 'accessing sandbox properties' do
     JSON.parse(canned_response('sandbox')).

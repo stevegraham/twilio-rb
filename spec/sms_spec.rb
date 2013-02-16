@@ -6,8 +6,8 @@ describe Twilio::SMS do
   let(:sms)                { Twilio::SMS.create(:to => '+14158141829', :from => '+14159352345', :body => 'Jenny please?! I love you <3') }
 
   def resource_uri(account_sid=nil, connect=nil)
-    account_sid ||= Twilio::ACCOUNT_SID
-    "https://#{connect ? account_sid : Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/SMS/Messages"
+    account_sid ||= Twilio::Config.account_sid
+    "https://#{connect ? account_sid : Twilio::Config.account_sid}:#{Twilio::Config.auth_token}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/SMS/Messages"
   end
 
   def stub_new_sms
@@ -131,7 +131,7 @@ describe Twilio::SMS do
     end
     context 'when authentication credentials are not configured' do
       it 'raises Twilio::ConfigurationError' do
-        Twilio.send :remove_const, :ACCOUNT_SID
+        Twilio::Config.account_sid = nil
         lambda { sms }.should raise_error(Twilio::ConfigurationError)
       end
     end

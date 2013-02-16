@@ -5,8 +5,8 @@ describe Twilio::Application do
   before { Twilio::Config.setup :account_sid => 'ACdc5f1e11047ebd6fe7a55f120be3a900', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   def resource_uri(account_sid=nil, connect=nil)
-    account_sid ||= Twilio::ACCOUNT_SID
-    "https://#{connect ? account_sid : Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Applications"
+    account_sid ||= Twilio::Config.account_sid
+    "https://#{connect ? account_sid : Twilio::Config.account_sid}:#{Twilio::Config.auth_token}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Applications"
   end
 
 

@@ -5,13 +5,13 @@ describe Twilio::Conference do
   before { Twilio::Config.setup :account_sid => 'AC5ef872f6da5a21de157d80997a64bd33', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   def resource_uri(account_sid=nil)
-    account_sid ||= Twilio::ACCOUNT_SID
-    "https://#{Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Conferences"
+    account_sid ||= Twilio::Config.account_sid
+    "https://#{Twilio::Config.account_sid}:#{Twilio::Config.auth_token}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Conferences"
   end
 
   def resource_uri(account_sid=nil, connect=nil)
-    account_sid ||= Twilio::ACCOUNT_SID
-    "https://#{connect ? account_sid : Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Conferences"
+    account_sid ||= Twilio::Config.account_sid
+    "https://#{connect ? account_sid : Twilio::Config.account_sid}:#{Twilio::Config.auth_token}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Conferences"
   end
 
   def stub_api_call(response_file, account_sid=nil)

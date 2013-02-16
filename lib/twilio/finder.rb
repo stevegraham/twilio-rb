@@ -3,7 +3,7 @@ module Twilio
     def find(id, opts={})
       opts        = opts.with_indifferent_access
       # Support subaccounts by optionally passing in an account_sid or account object
-      account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::ACCOUNT_SID
+      account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::Config.account_sid
       connect     = opts.delete 'connect'
 
       res  = get "#{resource_path(account_sid)}/#{id}.json", :account_sid => (connect && account_sid)
@@ -17,7 +17,7 @@ module Twilio
     def count(opts={})
       opts        = opts.with_indifferent_access
       # Support subaccounts by optionally passing in an account_sid or account object
-      account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::ACCOUNT_SID
+      account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::Config.account_sid
       connect     = opts.delete 'connect'
 
       params      = prepare_params opts if opts.any?
@@ -27,7 +27,7 @@ module Twilio
     def all(opts={})
       opts        = opts.with_indifferent_access
       # Support subaccounts by optionally passing in an account_sid or account object
-      account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::ACCOUNT_SID
+      account_sid = opts.delete('account_sid') || opts.delete('account').try(:sid) || Twilio::Config.account_sid
       connect     = opts.delete 'connect'
 
       params      = prepare_params opts if opts.any?
