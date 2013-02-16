@@ -10,7 +10,7 @@ module Twilio
         number_type              = opts.delete('TollFree') ? 'TollFree' : 'Local'
         params                   = { :query => opts } if opts.any?
 
-        handle_response get "/Accounts/#{Twilio::ACCOUNT_SID}/AvailablePhoneNumbers/#{country_code}/#{number_type}.json", params 
+        handle_response get "/Accounts/#{Twilio::Config.account_sid}/AvailablePhoneNumbers/#{country_code}/#{number_type}.json", params 
       end
 
       private :new

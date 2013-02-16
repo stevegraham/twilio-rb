@@ -15,8 +15,8 @@ describe 'Twilio::CapabilityToken' do
         :allow_incoming => 'client_identifier',
         :allow_outgoing => 'APXXXXXXXXXXXXXXXXXXXXX'
 
-      decoded = JWT.decode token, Twilio::AUTH_TOKEN
-      decoded['iss'].should == Twilio::ACCOUNT_SID
+      decoded = JWT.decode token, Twilio::Config.auth_token
+      decoded['iss'].should == Twilio::Config.account_sid
     end
 
     context 'when no specified expiry time is given' do
@@ -26,7 +26,7 @@ describe 'Twilio::CapabilityToken' do
             :allow_incoming => 'client_identifier',
             :allow_outgoing => 'APXXXXXXXXXXXXXXXXXXXXX'
 
-          decoded = JWT.decode token, Twilio::AUTH_TOKEN
+          decoded = JWT.decode token, Twilio::Config.auth_token
           decoded['exp'].should == 1.hour.from_now.to_i
         end
       end
@@ -40,7 +40,7 @@ describe 'Twilio::CapabilityToken' do
             :allow_outgoing => 'APXXXXXXXXXXXXXXXXXXXXX',
             :expires        => 4.hours.from_now
 
-          decoded = JWT.decode token, Twilio::AUTH_TOKEN
+          decoded = JWT.decode token, Twilio::Config.auth_token
           decoded['exp'].should == 4.hours.from_now.to_i
         end
       end
@@ -50,7 +50,7 @@ describe 'Twilio::CapabilityToken' do
       token = Twilio::CapabilityToken.create \
         :allow_incoming => 'client_identifier',
         :allow_outgoing => ['APXXXXXXXXXXXXXXXXXXXXX', { :app_param => 'foo' }]
-      scopes = JWT.decode(token, Twilio::AUTH_TOKEN)['scope'].split
+      scopes = JWT.decode(token, Twilio::Config.auth_token)['scope'].split
       scopes.one? do |scope|
         parse_scope(scope) == ["client", "incoming", {"clientName"=>["client_identifier"]}]
       end.should be_true

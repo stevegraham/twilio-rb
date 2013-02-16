@@ -17,7 +17,7 @@ module Twilio
       if opts['account_sid'] && opts['auth_token']
         [opts.delete('account_sid'), opts.delete('auth_token')]
       else
-        [Twilio::ACCOUNT_SID, Twilio::AUTH_TOKEN]
+        [Twilio::Config.account_sid, Twilio::Config.auth_token]
       end
     end
 

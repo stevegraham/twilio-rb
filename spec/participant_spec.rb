@@ -3,8 +3,8 @@ require 'spec_helper'
 describe Twilio::Participant do
 
   def resource_uri(account_sid=nil, connect=nil)
-    account_sid ||= Twilio::ACCOUNT_SID
-    "https://#{connect ? account_sid : Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}" +
+    account_sid ||= Twilio::Config.account_sid
+    "https://#{connect ? account_sid : Twilio::Config.account_sid}:#{Twilio::Config.auth_token}@api.twilio.com/2010-04-01/Accounts/#{account_sid}" +
     "/Conferences/CFbbe46ff1274e283f7e3ac1df0072ab39/Participants/CA386025c9bf5d6052a1d1ea42b4d16662.json"
   end
 

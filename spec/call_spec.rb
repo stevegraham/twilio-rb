@@ -9,8 +9,8 @@ describe Twilio::Call do
   before { Twilio::Config.setup :account_sid => 'AC228ba7a5fe4238be081ea6f3c44186f3', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   def resource_uri(account_sid=nil, connect=nil)
-    account_sid ||= Twilio::ACCOUNT_SID
-    "https://#{connect ? account_sid : Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Calls"
+    account_sid ||= Twilio::Config.account_sid
+    "https://#{connect ? account_sid : Twilio::Config.account_sid}:#{Twilio::Config.auth_token}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Calls"
   end
 
   def stub_api_call
@@ -358,7 +358,7 @@ describe Twilio::Call do
 
     context 'when authentication credentials are not configured' do
       it 'raises Twilio::ConfigurationError' do
-        Twilio.send :remove_const, :ACCOUNT_SID
+        Twilio::Config.account_sid = nil
         lambda { call }.should raise_error(Twilio::ConfigurationError)
       end
     end
