@@ -7,8 +7,8 @@ describe Twilio::OutgoingCallerId do
   let(:post_body) { 'PhoneNumber=%2B19175551234&FriendlyName=barry'}
 
   def resource_uri(account_sid=nil, connect=nil)
-    account_sid ||= Twilio::ACCOUNT_SID
-    "https://#{connect ? account_sid : Twilio::ACCOUNT_SID}:#{Twilio::AUTH_TOKEN}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/OutgoingCallerIds"
+    account_sid ||= Twilio::Config.account_sid
+    "https://#{connect ? account_sid : Twilio::Config.account_sid}:#{Twilio::Config.auth_token}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/OutgoingCallerIds"
   end
 
   def stub_api_call(response_file, account_sid=nil)

@@ -15,7 +15,7 @@ module Twilio
     def expected_signature_for(request)
       string_to_sign = request.url + request.request_parameters.sort.join
       digest         = OpenSSL::Digest::Digest.new('sha1')
-      hash           = OpenSSL::HMAC.digest(digest, Twilio::AUTH_TOKEN, string_to_sign)
+      hash           = OpenSSL::HMAC.digest(digest, Twilio::Config.auth_token, string_to_sign)
 
       Base64.encode64(hash).strip
     end

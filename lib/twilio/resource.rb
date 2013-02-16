@@ -111,8 +111,9 @@ module Twilio
           define_method(meth) do |*args| # splatted args necessary hack since <= 1.8.7 does not support optional block args
             opts        = args.extract_options!
             account_sid = opts.delete :account_sid
+
             # if account sid is passed in as an option use it for basic auth (twilio connect)
-            super args.first, opts.merge(:headers => { 'User-Agent' => 'twilio-rb/2.1.1' }, :basic_auth => { :username => account_sid || Twilio::ACCOUNT_SID, :password => Twilio::AUTH_TOKEN })
+            super args.first, opts.merge(:headers => { 'User-Agent' => 'twilio-rb/2.1.1' }, :basic_auth => { :username => account_sid || Twilio::Config.account_sid, :password => Twilio::Config.auth_token })
           end
         end
 
