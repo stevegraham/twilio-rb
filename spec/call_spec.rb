@@ -367,10 +367,8 @@ describe Twilio::Call do
         lambda { call }.should raise_error(Twilio::ConfigurationError)
       end
     end
+
     context 'when authentication credentials are configured' do
-      before(:each) do
-        Twilio::Config.setup :account_sid => 'AC000000000000', :auth_token => '79ad98413d911947f0ba369d295ae7a3'
-      end
       it 'makes the API call to Twilio' do
         call
         new_call_should_have_been_made
