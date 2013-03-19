@@ -219,4 +219,17 @@ describe Twilio::Recording do
       recording.mp3.should == "https://api.twilio.com/2010-04-01/Accounts/#{recording.account_sid}/Recordings/RE557ce644e5ab84fa21cc21112e22c485.mp3"
     end
   end
+
+  describe '#wav' do
+    before do
+      stub_request(:get, resource_uri + '/RE557ce644e5ab84fa21cc21112e22c485' + '.json').
+        to_return :body => canned_response('recording'), :status => 200
+    end
+
+    let(:recording) { Twilio::Recording.find 'RE557ce644e5ab84fa21cc21112e22c485' }
+
+    it 'returns a url to the wav file for the recording' do
+      recording.wav.should == "https://api.twilio.com/2010-04-01/Accounts/#{recording.account_sid}/Recordings/RE557ce644e5ab84fa21cc21112e22c485.wav"
+    end
+  end
 end
