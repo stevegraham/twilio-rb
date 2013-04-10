@@ -1,0 +1,35 @@
+{
+    "first_page_uri": "/2010-04-01/Accounts/ACdc5f1e11047ebd6fe7a55f120be3a900/Queues.json?Page=0&PageSize=50",
+    "num_pages": 1,
+    "previous_page_uri": null,
+    "queues": [
+        {
+            "sid": "QU14fbe51706f6ef1e4756afXXbed88055",
+            "friendly_name": "switchboard",
+            "current_size": 0,
+            "average_wait_time": 0,
+            "max_size": 40,
+            "date_created": "Wed, 10 Apr 2013 01:36:39 +0000",
+            "date_updated": "Wed, 10 Apr 2013 01:36:39 +0000",
+            "uri": "/2010-04-01/Accounts/ACdc5f1e11047ebd6fe7a55f120be3a900/Queues/QU14fbe51706f6ef1e4756afXXbed88055.json"
+        },
+        {
+            "sid": "QUc74cc4eedc52e282f81dXXbafddb0e9c",
+            "friendly_name": "support",
+            "current_size": 0,
+            "average_wait_time": 0,
+            "max_size": 100,
+            "date_created": "Wed, 10 Apr 2013 00:01:27 +0000",
+            "date_updated": "Wed, 10 Apr 2013 00:01:27 +0000",
+            "uri": "/2010-04-01/Accounts/ACdc5f1e11047ebd6fe7a55f120be3a900/Queues/QUc74cc4eedc52e282f81dXXbafddb0e9c.json"
+        }
+    ],
+    "uri": "/2010-04-01/Accounts/ACdc5f1e11047ebd6fe7a55f120be3a900/Queues.json",
+    "page_size": 50,
+    "start": 0,
+    "next_page_uri": null,
+    "end": 1,
+    "total": 2,
+    "last_page_uri": "/2010-04-01/Accounts/ACdc5f1e11047ebd6fe7a55f120be3a900/Queues.json?Page=0&PageSize=50",
+    "page": 0
+}
