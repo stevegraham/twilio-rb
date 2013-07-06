@@ -5,7 +5,8 @@ module Twilio
     include Twilio::Persistable
     include Twilio::Deletable
 
-    mutable_attributes :sid, :friendly_name, :current_size, :max_size, :average_wait_time
+    mutable_attributes :sid, :friendly_name, :current_size,
+      :max_size, :average_wait_time
 
   end
 end

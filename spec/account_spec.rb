@@ -14,7 +14,7 @@ describe Twilio::Account do
       to_return :body => canned_response(response_file), :status => 200
   end
 
-  let(:post_body) { "FriendlyName=REST%20test" }
+  post_body = "FriendlyName=REST%20test"
 
   let(:params) { { :friendly_name => 'REST test' } }
 

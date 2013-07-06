@@ -1,17 +1,10 @@
 require File.join(File.dirname(__FILE__), 'lib', 'twilio-rb')
-require 'rake/gempackagetask'
 require 'rspec'
 require 'rspec/core/rake_task'
 
 RSpec::Core::RakeTask.new do |t|
   t.rspec_opts = %w<-c>
   t.pattern = 'spec/*.rb'
-end
-
-spec = eval(File.read('twilio-rb.gemspec'))
-
-Rake::GemPackageTask.new(spec) do |p|
-  p.gem_spec = spec
 end
 
 task :default => :spec

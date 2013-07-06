@@ -89,7 +89,7 @@ describe Twilio::Queue do
       end
     end
   end
-  
+
   describe '.find' do
     context 'using a twilio connect subaccount' do
       it 'uses the account sid as the username for basic auth' do
@@ -149,5 +149,4 @@ describe Twilio::Queue do
       end
     end
   end
-  
 end
