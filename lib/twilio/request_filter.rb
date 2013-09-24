@@ -10,6 +10,7 @@ module Twilio
         controller.head(:forbidden) if expected_signature_for(request) != (request.env['HTTP_X_TWILIO_SIGNATURE'] || request.env['X-Twilio-Signature'])
       end
     end
+    alias before filter
 
     private
     def expected_signature_for(request)
