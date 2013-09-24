@@ -10,4 +10,4 @@ end
 
 Dir[File.join(File.dirname(__FILE__), 'twilio', '*.rb')].each { |lib| require lib }
 
-require File.join(File.dirname(__FILE__), 'railtie.rb') if Object.const_defined?(:Rails) && Rails.version =~ /^3/
+require File.join(File.dirname(__FILE__), 'railtie.rb') if Object.const_defined?(:Rails) && Rails::VERSION::MAJOR >= 3
