@@ -212,7 +212,7 @@ If the request was successful, an instance of `Twilio::SMS` wil be returned
 To retrieve an earlier created SMS message, there is the `Twilio::SMS.find` method, which accepts a SMS message SID, e.g.
 
 ```ruby
-call = Twilio::SMS.find 'SM90c6fc909d8504d45ecdb3a3d5b3556e'
+text = Twilio::SMS.find 'SM90c6fc909d8504d45ecdb3a3d5b3556e'
 ```
 
 This returns an instance of `Twilio::SMS` if a SMS message with the given SID was found, otherwise nil is returned
