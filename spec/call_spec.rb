@@ -296,14 +296,14 @@ describe Twilio::Call do
 
       before do
         stub_request(:post, resource_uri + '.json').
-          with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%252300&IfMachine=Continue").
+          with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%2300&IfMachine=Continue").
           to_return(:status => 200, :body => canned_response('call_created'))
       end
 
       context 'using a twilio connect subaccount' do
         it 'uses the account sid as the username for basic auth' do
           stub_request(:post, resource_uri('AC0000000000000000000000000000', true) + '.json' ).
-            with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%252300&IfMachine=Continue").
+            with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%2300&IfMachine=Continue").
             to_return :body => canned_response('connect_call_created'), :status => 200
           Twilio::Call.create :to => '+14155551212', :from => '+14158675309', :url => 'http://localhost:3000/hollaback',
             :send_digits => '1234#00', :if_machine => 'Continue', :account_sid => 'AC0000000000000000000000000000', :connect => true
@@ -344,14 +344,14 @@ describe Twilio::Call do
       it 'escapes send digits because pound, i.e. "#" has special meaning in a url' do
         call
         a_request(:post, resource_uri + '.json').
-          with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%252300&IfMachine=Continue").
+          with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%2300&IfMachine=Continue").
           should have_been_made
       end
 
       it 'capitalises the value of "IfMachine" parameter' do
         call
         a_request(:post, resource_uri + '.json').
-          with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%252300&IfMachine=Continue").
+          with(:body => "To=%2B14155551212&From=%2B14158675309&Url=http%3A%2F%2Flocalhost%3A3000%2Fhollaback&SendDigits=1234%2300&IfMachine=Continue").
           should have_been_made
       end
     end
