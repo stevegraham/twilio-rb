@@ -281,7 +281,7 @@ twilio-rb now supports these association proxies
 
 # Subaccounts
 
-The Twilio REST API supports subaccounts that is discrete accounts owned by a master account. twilio-rb supports this too.o
+The Twilio REST API supports subaccounts that is discrete accounts owned by a master account. twilio-rb supports this too.
 
 ## Subaccount creation
 
