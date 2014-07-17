@@ -14,7 +14,6 @@ module Twilio
       def create(attrs={})
         attrs = attrs.with_indifferent_access
         attrs.each { |k,v| v.upcase! if k.to_s =~ /method$/ }
-        attrs[:send_digits] = CGI.escape(attrs[:send_digits]) if attrs[:send_digits]
         attrs['if_machine'].try :capitalize
         old_create attrs
       end
