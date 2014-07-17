@@ -30,6 +30,7 @@ module Twilio
     end
 
     private
+
     def resource_name #:nodoc:
       klass.name.demodulize.pluralize
     end
@@ -76,25 +77,26 @@ module Twilio
     end
 
     def add_predicate(attribute) # :nodoc:
-      metaclass.class_eval do
+      singleton_class.class_eval do
         define_method(attribute) { self['status'] =~ /^#{attribute.gsub '?', ''}/i ? true : false }
       end
     end
 
     def add_attr_writer(attribute) # :nodoc:
-      metaclass.class_eval do
+      singleton_class.class_eval do
         define_method(attribute) { |value| self[attribute.to_s.gsub(/\=$/, '').to_sym] = value }
       end
     end
 
     def add_attr_reader(attribute) #:nodoc:
-      metaclass.class_eval do
+      singleton_class.class_eval do
         define_method(attribute) { self[attribute] }
       end
     end
 
-    def metaclass #:nodoc:
-      class << self; self; end
+    def respond_to_missing?(attribute, include_private = false)
+      attribute = attribute.to_s
+      attribute =~ /\?\Z/ || self[attribute.gsub '=', ''].present? || super
     end
 
     def self.included(base)

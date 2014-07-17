@@ -23,6 +23,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency    'mocha',         '>= 0.9.10'
   s.add_development_dependency    'timecop',       '>= 0.3.5'
   s.add_development_dependency    'rake',          '~> 10.1.0'
+  s.add_development_dependency    'rspec-its',     '>= 1.0.1'
+
 
   s.files                       = Dir['README.md', 'lib/**/*']
   s.require_path                = 'lib'

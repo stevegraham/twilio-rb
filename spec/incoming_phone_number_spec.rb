@@ -74,7 +74,7 @@ describe Twilio::IncomingPhoneNumber do
       context 'found by passing in an instance of Twilio::Account' do
         before { stub_api_call 'list_incoming_phone_numbers', 'SUBACCOUNT_SID' }
         it 'returns the number of resources' do
-          Twilio::IncomingPhoneNumber.count(:account => mock(:sid => 'SUBACCOUNT_SID')).should == 6
+          Twilio::IncomingPhoneNumber.count(:account => double(:sid => 'SUBACCOUNT_SID')).should == 6
         end
 
         it 'accepts options to refine the search' do
@@ -82,7 +82,7 @@ describe Twilio::IncomingPhoneNumber do
           stub_request(:get, resource_uri('SUBACCOUNT_SID') + query).
             to_return :body => canned_response('list_incoming_phone_numbers'), :status => 200
           Twilio::IncomingPhoneNumber.count :phone_number => '2125550000',
-            :friendly_name => 'example', :account => mock(:sid => 'SUBACCOUNT_SID')
+            :friendly_name => 'example', :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + query).should have_been_made
         end
       end
@@ -154,7 +154,7 @@ describe Twilio::IncomingPhoneNumber do
       context 'found by passing in an instance of Twilio::Account' do
         context 'found by passing in an account sid' do
           before { stub_api_call 'list_incoming_phone_numbers', 'SUBACCOUNT_SID' }
-          let(:resp) { resp = Twilio::IncomingPhoneNumber.all :account => mock(:sid =>'SUBACCOUNT_SID') }
+          let(:resp) { resp = Twilio::IncomingPhoneNumber.all :account => double(:sid =>'SUBACCOUNT_SID') }
           it 'returns a collection of objects with a length corresponding to the response' do
             resp.length.should == 1
           end
@@ -174,7 +174,7 @@ describe Twilio::IncomingPhoneNumber do
             stub_request(:get, resource_uri('SUBACCOUNT_SID') + query).
               to_return :body => canned_response('list_incoming_phone_numbers'), :status => 200
             Twilio::IncomingPhoneNumber.all :page => 5, :phone_number => '2125550000',
-              :friendly_name => 'example', :account => mock(:sid =>'SUBACCOUNT_SID')
+              :friendly_name => 'example', :account => double(:sid =>'SUBACCOUNT_SID')
             a_request(:get, resource_uri('SUBACCOUNT_SID') + query).should have_been_made
           end
         end
@@ -259,7 +259,7 @@ describe Twilio::IncomingPhoneNumber do
 
           let(:number) do
             Twilio::IncomingPhoneNumber.find 'PN2a0747eba6abf96b7e3c3ff0b4530f6e',
-              :account => mock(:sid => 'SUBACCOUNT_SID')
+              :account => double(:sid => 'SUBACCOUNT_SID')
           end
 
           it 'returns an instance of Twilio::IncomingPhoneNumber' do
@@ -276,7 +276,7 @@ describe Twilio::IncomingPhoneNumber do
             stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/phony' + '.json').to_return :status => 404
           end
           it 'returns nil' do
-            number = Twilio::IncomingPhoneNumber.find 'phony', :account => mock(:sid => 'SUBACCOUNT_SID')
+            number = Twilio::IncomingPhoneNumber.find 'phony', :account => double(:sid => 'SUBACCOUNT_SID')
             number.should be_nil
           end
         end
@@ -377,7 +377,7 @@ describe Twilio::IncomingPhoneNumber do
           stub_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).to_return :body => canned_response('incoming_phone_number')
         end
 
-        let(:number) { Twilio::IncomingPhoneNumber.create params.merge(:account => mock(:sid => 'SUBACCOUNT_SID')) }
+        let(:number) { Twilio::IncomingPhoneNumber.create params.merge(:account => double(:sid => 'SUBACCOUNT_SID')) }
 
         it 'creates a new incoming number on the account' do
           number

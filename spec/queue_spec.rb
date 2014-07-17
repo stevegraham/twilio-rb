@@ -50,7 +50,7 @@ describe Twilio::Queue do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Queue.all :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Queue.all :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -83,7 +83,7 @@ describe Twilio::Queue do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Queue.count :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Queue.count :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -142,7 +142,7 @@ describe Twilio::Queue do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Queue.find 'QU14fbe51706f6ef1e4756afXXbed88055', :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Queue.find 'QU14fbe51706f6ef1e4756afXXbed88055', :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '/QU14fbe51706f6ef1e4756afXXbed88055' + '.json').
             should have_been_made
         end

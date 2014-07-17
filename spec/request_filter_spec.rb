@@ -23,7 +23,7 @@ describe 'Twilio::RequestFilter' do
             :env    => {
                   'X-Twilio-Signature' => 'fF+xx6dTinOaCdZ0aIeNkHr/ZAA=',
                   'HTTP_X_TWILIO_SIGNATURE' => 'fF+xx6dTinOaCdZ0aIeNkHr/ZAA=' },
-            :format => mock(:voice? => true),
+            :format => double(:voice? => true),
             :url    => 'http://www.postbin.org/1ed898x'
 
           controller = stub :request => request
@@ -50,7 +50,7 @@ describe 'Twilio::RequestFilter' do
               :env => {
                     'X-Twilio-Signature' => nil,
                     'HTTP_X_TWILIO_SIGNATURE' => nil },
-              :format => mock(:voice? => true),
+              :format => double(:voice? => true),
               :url    => 'http://www.postbin.org/1ed898x'
 
           controller = stub :request => request

@@ -52,7 +52,7 @@ describe Twilio::Transcription do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Transcription.all :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Transcription.all :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -85,7 +85,7 @@ describe Twilio::Transcription do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Transcription.count :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Transcription.count :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -142,7 +142,7 @@ describe Twilio::Transcription do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Transcription.find 'TR8c61027b709ffb038236612dc5af8723', :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Transcription.find 'TR8c61027b709ffb038236612dc5af8723', :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '/TR8c61027b709ffb038236612dc5af8723' + '.json').
             should have_been_made
         end

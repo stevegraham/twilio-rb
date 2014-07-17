@@ -2,8 +2,8 @@ module Twilio
   class Account
     include Twilio::Resource
     include Twilio::Persistable
-    extend Twilio::Associations
-    extend Twilio::Finder
+    extend  Twilio::Associations
+    extend  Twilio::Finder
 
     mutable_attributes :friendly_name, :status
 
@@ -19,4 +19,3 @@ module Twilio
 
   end
 end
-

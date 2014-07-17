@@ -59,7 +59,7 @@ describe Twilio::Recording do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Recording.all :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Recording.all :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -100,7 +100,7 @@ describe Twilio::Recording do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Recording.count :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Recording.count :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -159,7 +159,7 @@ describe Twilio::Recording do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Recording.find 'RE557ce644e5ab84fa21cc21112e22c485', :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Recording.find 'RE557ce644e5ab84fa21cc21112e22c485', :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '/RE557ce644e5ab84fa21cc21112e22c485' + '.json').
             should have_been_made
         end

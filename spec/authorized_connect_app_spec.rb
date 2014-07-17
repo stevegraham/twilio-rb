@@ -61,7 +61,7 @@ describe Twilio::AuthorizedConnectApp do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::AuthorizedConnectApp.all :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::AuthorizedConnectApp.all :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -102,7 +102,7 @@ describe Twilio::AuthorizedConnectApp do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::AuthorizedConnectApp.count :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::AuthorizedConnectApp.count :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -160,7 +160,7 @@ describe Twilio::AuthorizedConnectApp do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::AuthorizedConnectApp.find 'CN47260e643654388faabe8aaa18ea6756', :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::AuthorizedConnectApp.find 'CN47260e643654388faabe8aaa18ea6756', :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '/CN47260e643654388faabe8aaa18ea6756' + '.json').
             should have_been_made
         end

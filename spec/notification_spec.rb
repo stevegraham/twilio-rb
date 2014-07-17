@@ -60,7 +60,7 @@ describe Twilio::Notification do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Notification.all :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Notification.all :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -101,7 +101,7 @@ describe Twilio::Notification do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Notification.count :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Notification.count :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -133,7 +133,7 @@ describe Twilio::Notification do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Notification.find 'NO5a7a84730f529f0a76b3e30c01315d1a', :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Notification.find 'NO5a7a84730f529f0a76b3e30c01315d1a', :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '/NO5a7a84730f529f0a76b3e30c01315d1a' + '.json').
             should have_been_made
         end

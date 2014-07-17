@@ -1,5 +1,11 @@
 require './lib/twilio-rb'
-%w<webmock rspec/expectations webmock/rspec mocha/api json timecop>.
+
+require 'bundler'
+Bundler.require
+
+Dir["./spec/support/**/*.rb"].each { |f| require f }
+
+%w<webmock webmock/rspec json timecop rspec/its>.
   each { |lib| require lib }
 
 RSpec.configure do |config|
@@ -9,7 +15,7 @@ RSpec.configure do |config|
     WebMock.reset!
   end
   config.include WebMock::API
-  config.mock_with 'mocha'
+  config.mock_with :rspec
 end
 
 def canned_response(resp)
