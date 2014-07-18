@@ -32,7 +32,7 @@ describe Twilio::AuthorizedConnectApp do
 
     it 'returns a collection containing instances of Twilio::AuthorizedConnectApp' do
       resp = Twilio::AuthorizedConnectApp.all
-      resp.all? { |r| r.is_a? Twilio::AuthorizedConnectApp }.should be_true
+      resp.all? { |r| r.is_a? Twilio::AuthorizedConnectApp }.should be true
     end
 
     JSON.parse(canned_response('list_authorized_connect_apps'))['authorized_connect_apps'].each_with_index do |obj,i|

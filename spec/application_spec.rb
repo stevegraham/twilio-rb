@@ -104,7 +104,7 @@ describe Twilio::Application do
       end
 
       it 'returns a collection containing instances of Twilio::Application' do
-        resp.all? { |r| r.is_a? Twilio::Application }.should be_true
+        resp.all? { |r| r.is_a? Twilio::Application }.should be true
       end
 
       JSON.parse(canned_response('list_applications'))['applications'].each_with_index do |obj,i|
@@ -131,7 +131,7 @@ describe Twilio::Application do
         end
 
         it 'returns a collection containing instances of Twilio::Application' do
-          resp.all? { |r| r.is_a? Twilio::Application }.should be_true
+          resp.all? { |r| r.is_a? Twilio::Application }.should be true
         end
 
         JSON.parse(canned_response('list_applications'))['applications'].each_with_index do |obj,i|
@@ -158,7 +158,7 @@ describe Twilio::Application do
           end
 
           it 'returns a collection containing instances of Twilio::Application' do
-            resp.all? { |r| r.is_a? Twilio::Application }.should be_true
+            resp.all? { |r| r.is_a? Twilio::Application }.should be true
           end
 
           JSON.parse(canned_response('list_applications'))['applications'].each_with_index do |obj,i|

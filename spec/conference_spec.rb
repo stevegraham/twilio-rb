@@ -38,7 +38,7 @@ describe Twilio::Conference do
 
       it 'returns a collection containing instances of Twilio::Conference' do
         resp = Twilio::Conference.all
-        resp.all? { |r| r.is_a? Twilio::Conference }.should be_true
+        resp.all? { |r| r.is_a? Twilio::Conference }.should be true
       end
 
       it 'returns a collection containing objects with attributes corresponding to the response' do
@@ -208,7 +208,7 @@ describe Twilio::Conference do
 
     it 'returns a collection of participants' do
       resp.should_not be_empty
-      resp.all? { |r| r.is_a? Twilio::Participant }.should be_true
+      resp.all? { |r| r.is_a? Twilio::Participant }.should be true
     end
 
     it 'returns a collection containing objects with attributes corresponding to the response' do

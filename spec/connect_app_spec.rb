@@ -24,7 +24,7 @@ describe Twilio::ConnectApp do
 
     it 'returns a collection containing instances of Twilio::ConnectApp' do
       resp = Twilio::ConnectApp.all
-      resp.all? { |r| r.is_a? Twilio::ConnectApp }.should be_true
+      resp.all? { |r| r.is_a? Twilio::ConnectApp }.should be true
     end
 
     JSON.parse(canned_response('list_connect_apps'))['connect_apps'].each_with_index do |obj,i|

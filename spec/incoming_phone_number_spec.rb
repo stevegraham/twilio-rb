@@ -105,7 +105,7 @@ describe Twilio::IncomingPhoneNumber do
       end
 
       it 'returns a collection containing instances of Twilio::AvailablePhoneNumber' do
-        resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be_true
+        resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be true
       end
 
       JSON.parse(canned_response('list_incoming_phone_numbers'))['incoming_phone_numbers'].each_with_index do |obj,i|
@@ -132,7 +132,7 @@ describe Twilio::IncomingPhoneNumber do
         end
 
         it 'returns a collection containing instances of Twilio::AvailablePhoneNumber' do
-          resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be_true
+          resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be true
         end
 
         JSON.parse(canned_response('list_incoming_phone_numbers'))['incoming_phone_numbers'].each_with_index do |obj,i|
@@ -160,7 +160,7 @@ describe Twilio::IncomingPhoneNumber do
           end
 
           it 'returns a collection containing instances of Twilio::AvailablePhoneNumber' do
-            resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be_true
+            resp.all? { |r| r.is_a? Twilio::IncomingPhoneNumber }.should be true
           end
 
           JSON.parse(canned_response('list_incoming_phone_numbers'))['incoming_phone_numbers'].each_with_index do |obj,i|

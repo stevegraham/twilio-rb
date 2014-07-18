@@ -72,7 +72,7 @@ describe Twilio::ShortCode do
       end
 
       it 'returns a collection containing instances of Twilio::ShortCode' do
-        resp.all? { |r| r.is_a? Twilio::ShortCode }.should be_true
+        resp.all? { |r| r.is_a? Twilio::ShortCode }.should be true
       end
 
       JSON.parse(canned_response('list_short_codes'))['short_codes'].each_with_index do |obj,i|
@@ -99,7 +99,7 @@ describe Twilio::ShortCode do
         end
 
         it 'returns a collection containing instances of Twilio::ShortCode' do
-          resp.all? { |r| r.is_a? Twilio::ShortCode }.should be_true
+          resp.all? { |r| r.is_a? Twilio::ShortCode }.should be true
         end
 
         JSON.parse(canned_response('list_short_codes'))['short_codes'].each_with_index do |obj,i|
@@ -126,7 +126,7 @@ describe Twilio::ShortCode do
           end
 
           it 'returns a collection containing instances of Twilio::ShortCode' do
-            resp.all? { |r| r.is_a? Twilio::ShortCode }.should be_true
+            resp.all? { |r| r.is_a? Twilio::ShortCode }.should be true
           end
 
           JSON.parse(canned_response('list_short_codes'))['short_codes'].each_with_index do |obj,i|

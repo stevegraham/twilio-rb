@@ -35,7 +35,7 @@ describe Twilio::Call do
       end
 
       it 'returns a collection containing instances of Twilio::Call' do
-        resp.all? { |r| r.is_a? Twilio::Call }.should be_true
+        resp.all? { |r| r.is_a? Twilio::Call }.should be true
       end
 
       JSON.parse(canned_response('list_calls'))['calls'].each_with_index do |obj,i|
@@ -73,7 +73,7 @@ describe Twilio::Call do
         end
 
         it 'returns a collection containing instances of Twilio::Call' do
-          resp.all? { |r| r.is_a? Twilio::Call }.should be_true
+          resp.all? { |r| r.is_a? Twilio::Call }.should be true
         end
 
         JSON.parse(canned_response('list_calls'))['calls'].each_with_index do |obj,i|
@@ -103,7 +103,7 @@ describe Twilio::Call do
         end
 
         it 'returns a collection containing instances of Twilio::Call' do
-          resp.all? { |r| r.is_a? Twilio::Call }.should be_true
+          resp.all? { |r| r.is_a? Twilio::Call }.should be true
         end
 
         JSON.parse(canned_response('list_calls'))['calls'].each_with_index do |obj,i|
@@ -498,8 +498,8 @@ describe Twilio::Call do
 
         [:recordings, :notifications].each do |association|
           klass = Twilio.const_get association.to_s.classify
-          klass.expects(:foo).with  :limit => 5, call_sid: call.sid
-          call.send(association).foo :limit => 5
+          expect(klass).to receive(:foo).with limit: 5, call_sid: call.sid
+          call.send(association).foo limit: 5
         end
       end
 
@@ -508,8 +508,8 @@ describe Twilio::Call do
           call = Twilio::Call.new JSON.parse(canned_response('connect_call_created'))
           [:recordings, :notifications].each do |association|
             klass = Twilio.const_get association.to_s.classify
-            klass.expects(:foo).with :limit => 5, call_sid: call.sid, :account_sid => call.account_sid, :connect => true
-            call.send(association).foo :limit => 5
+            expect(klass).to receive(:foo).with limit: 5, call_sid: call.sid, account_sid: call.account_sid, connect: true
+            call.send(association).foo limit: 5
           end
         end
       end

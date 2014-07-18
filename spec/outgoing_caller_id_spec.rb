@@ -33,7 +33,7 @@ describe Twilio::OutgoingCallerId do
 
     it 'returns a collection containing instances of Twilio::OutgoingCallerId' do
       resp = Twilio::OutgoingCallerId.all
-      resp.all? { |r| r.is_a? Twilio::OutgoingCallerId }.should be_true
+      resp.all? { |r| r.is_a? Twilio::OutgoingCallerId }.should be true
     end
 
     JSON.parse(canned_response('list_caller_ids'))['outgoing_caller_ids'].each_with_index do |obj,i|

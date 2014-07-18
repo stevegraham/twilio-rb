@@ -31,7 +31,7 @@ describe Twilio::Transcription do
 
     it 'returns a collection containing instances of Twilio::Transcription' do
       resp = Twilio::Transcription.all
-      resp.all? { |r| r.is_a? Twilio::Transcription }.should be_true
+      resp.all? { |r| r.is_a? Twilio::Transcription }.should be true
     end
 
     JSON.parse(canned_response('list_transcriptions'))['transcriptions'].each_with_index do |obj,i|

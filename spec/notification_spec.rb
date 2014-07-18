@@ -31,7 +31,7 @@ describe Twilio::Notification do
 
     it 'returns a collection containing instances of Twilio::Notification' do
       resp = Twilio::Notification.all
-      resp.all? { |r| r.is_a? Twilio::Notification }.should be_true
+      resp.all? { |r| r.is_a? Twilio::Notification }.should be true
     end
 
     JSON.parse(canned_response('list_notifications'))['notifications'].each_with_index do |obj,i|

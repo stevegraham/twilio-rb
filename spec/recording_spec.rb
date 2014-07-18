@@ -30,7 +30,7 @@ describe Twilio::Recording do
     end
 
     it 'returns a collection containing instances of Twilio::Recording' do
-      resp.all? { |r| r.is_a? Twilio::Recording }.should be_true
+      resp.all? { |r| r.is_a? Twilio::Recording }.should be true
     end
 
     JSON.parse(canned_response('list_recordings'))['recordings'].each_with_index do |obj,i|
