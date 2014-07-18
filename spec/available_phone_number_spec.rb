@@ -10,13 +10,6 @@ describe Twilio::AvailablePhoneNumber do
       to_return :body => canned_response(response_file), :status => 200
   end
 
-  describe '.new' do
-    it 'is a private method because they cannot be created via theTwilio API' do
-      # I think this will fail on 1.8.7 as querying an objects methods returns a collection of strings.
-      Twilio::AvailablePhoneNumber.private_methods.should include :new
-    end
-  end
-
   describe '.all' do
     context 'for US local numbers' do
       before { stub_api_call '/US/Local.json?AreaCode=510&Page=2', 'available_local_phone_numbers' }
@@ -29,7 +22,7 @@ describe Twilio::AvailablePhoneNumber do
 
       it 'returns a collection containing instances of Twilio::AvailablePhoneNumber' do
         resp = Twilio::AvailablePhoneNumber.all :page => 2, :area_code => '510'
-        resp.all? { |r| r.is_a? Twilio::AvailablePhoneNumber }.should be_true
+        resp.all? { |r| r.is_a? Twilio::AvailablePhoneNumber }.should be true
       end
 
       JSON.parse(canned_response('available_local_phone_numbers'))['available_phone_numbers'].each_with_index do |obj,i|
@@ -55,7 +48,7 @@ describe Twilio::AvailablePhoneNumber do
 
       its 'collection contains instances of Twilio::AvailablePhoneNumber' do
         resp = Twilio::AvailablePhoneNumber.all :toll_free => true, :contains => 'STORM'
-        resp.all? { |r| r.is_a? Twilio::AvailablePhoneNumber }.should be_true
+        resp.all? { |r| r.is_a? Twilio::AvailablePhoneNumber }.should be true
       end
 
       its 'collection contains objects whose attributes correspond to the response' do
@@ -70,10 +63,12 @@ describe Twilio::AvailablePhoneNumber do
   end
 
   describe '#purchase!' do
+    let(:available_number) { Twilio::AvailablePhoneNumber.new phone_number: '+12125550000' }
+
     it "delegates to Twilio::IncomingPhoneNumber.create merging self.phone_number with any given args" do
-      Twilio::IncomingPhoneNumber.expects(:create).with :phone_number => '+12125550000',
-        :voice_url => 'http://www.example.com/twiml.xml', :voice_method => 'post'
-      available_number = Twilio::AvailablePhoneNumber.send :new, :phone_number => '+12125550000'
+      expect(Twilio::IncomingPhoneNumber).to receive(:create).with phone_number: '+12125550000',
+        voice_url: 'http://www.example.com/twiml.xml', voice_method: 'post'
+
       available_number.purchase! :voice_url => 'http://www.example.com/twiml.xml', :voice_method => 'post'
     end
   end

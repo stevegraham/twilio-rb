@@ -1,6 +1,6 @@
 module Twilio
   class AvailablePhoneNumber
-    include Twilio::Resource 
+    include Twilio::Resource
     extend  Twilio::Finder
 
     class << self
@@ -10,12 +10,10 @@ module Twilio
         number_type              = opts.delete('TollFree') ? 'TollFree' : 'Local'
         params                   = { :query => opts } if opts.any?
 
-        handle_response get "/Accounts/#{Twilio::Config.account_sid}/AvailablePhoneNumbers/#{country_code}/#{number_type}.json", params 
+        handle_response get "/Accounts/#{Twilio::Config.account_sid}/AvailablePhoneNumbers/#{country_code}/#{number_type}.json", params
       end
-
-      private :new
+      
       undef_method :count
-
     end
 
     # Shortcut for creating a new incoming phone number. Delegates to Twilio::IncomingPhoneNumber.create accepting the same options as that method does.

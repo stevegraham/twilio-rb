@@ -35,7 +35,7 @@ describe Twilio::Call do
       end
 
       it 'returns a collection containing instances of Twilio::Call' do
-        resp.all? { |r| r.is_a? Twilio::Call }.should be_true
+        resp.all? { |r| r.is_a? Twilio::Call }.should be true
       end
 
       JSON.parse(canned_response('list_calls'))['calls'].each_with_index do |obj,i|
@@ -73,7 +73,7 @@ describe Twilio::Call do
         end
 
         it 'returns a collection containing instances of Twilio::Call' do
-          resp.all? { |r| r.is_a? Twilio::Call }.should be_true
+          resp.all? { |r| r.is_a? Twilio::Call }.should be true
         end
 
         JSON.parse(canned_response('list_calls'))['calls'].each_with_index do |obj,i|
@@ -97,13 +97,13 @@ describe Twilio::Call do
             to_return :body => canned_response('list_calls'), :status => 200
         end
 
-        let(:resp) { Twilio::Call.all :account => mock(:sid => 'SUBACCOUNT_SID') }
+        let(:resp) { Twilio::Call.all :account => double(:sid => 'SUBACCOUNT_SID') }
         it 'returns a collection of objects with a length corresponding to the response' do
           resp.length.should == 1
         end
 
         it 'returns a collection containing instances of Twilio::Call' do
-          resp.all? { |r| r.is_a? Twilio::Call }.should be_true
+          resp.all? { |r| r.is_a? Twilio::Call }.should be true
         end
 
         JSON.parse(canned_response('list_calls'))['calls'].each_with_index do |obj,i|
@@ -116,7 +116,7 @@ describe Twilio::Call do
           stub_request(:get, resource_uri('SUBACCOUNT_SID') + '.json?EndTime>=2010-11-12&Page=5&StartTime<=2010-12-12&Status=dialled').
             to_return :body => canned_response('list_calls'), :status => 200
           Twilio::Call.all :page => 5, :status => 'dialled', :started_before => Date.parse('2010-12-12'),
-            :ended_after => Date.parse('2010-11-12'), :account => mock(:sid => 'SUBACCOUNT_SID')
+            :ended_after => Date.parse('2010-11-12'), :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json?EndTime>=2010-11-12&Page=5&StartTime<=2010-12-12&Status=dialled').should have_been_made
         end
       end
@@ -169,7 +169,7 @@ describe Twilio::Call do
         it 'returns the number of resources' do
           stub_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').
             to_return :body => canned_response('list_calls'), :status => 200
-          Twilio::Call.count(:account => mock(:sid =>'SUBACCOUNT_SID')).should == 147
+          Twilio::Call.count(:account => double(:sid =>'SUBACCOUNT_SID')).should == 147
         end
 
         it 'accepts options to refine the search' do
@@ -177,7 +177,7 @@ describe Twilio::Call do
           stub_request(:get, resource_uri('SUBACCOUNT_SID') + query).
             to_return :body => canned_response('list_calls'), :status => 200
           Twilio::Call.count :friendly_name => 'example', :status => 'in-progress',
-            :account => mock(:sid =>'SUBACCOUNT_SID')
+            :account => double(:sid =>'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + query).should have_been_made
         end
       end
@@ -260,7 +260,7 @@ describe Twilio::Call do
           end
 
           let(:call) do
-            Twilio::Call.find 'CAa346467ca321c71dbd5e12f627deb854', :account => mock(:sid => 'SUBACCOUNT_SID')
+            Twilio::Call.find 'CAa346467ca321c71dbd5e12f627deb854', :account => double(:sid => 'SUBACCOUNT_SID')
           end
 
           it 'returns an instance of Twilio::Call' do
@@ -277,7 +277,7 @@ describe Twilio::Call do
           before { stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/phony' + '.json').to_return :status => 404 }
 
           it 'returns nil' do
-            call = Twilio::Call.find 'phony', :account => mock(:sid => 'SUBACCOUNT_SID')
+            call = Twilio::Call.find 'phony', :account => double(:sid => 'SUBACCOUNT_SID')
             call.should be_nil
           end
         end
@@ -329,7 +329,7 @@ describe Twilio::Call do
         context 'found by passing in an instance of Twilio::Account' do
           it 'uses the subaccount sid for the request' do
             Twilio::Call.create :to => '+14155551212', :from => '+14158675309',
-            :url => 'http://localhost:3000/hollaback', :account => mock(:sid => 'SUBACCOUNT_SID')
+            :url => 'http://localhost:3000/hollaback', :account => double(:sid => 'SUBACCOUNT_SID')
 
             a_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').
               should have_been_made
@@ -498,8 +498,8 @@ describe Twilio::Call do
 
         [:recordings, :notifications].each do |association|
           klass = Twilio.const_get association.to_s.classify
-          klass.expects(:foo).with  :limit => 5, call_sid: call.sid
-          call.send(association).foo :limit => 5
+          expect(klass).to receive(:foo).with limit: 5, call_sid: call.sid
+          call.send(association).foo limit: 5
         end
       end
 
@@ -508,8 +508,8 @@ describe Twilio::Call do
           call = Twilio::Call.new JSON.parse(canned_response('connect_call_created'))
           [:recordings, :notifications].each do |association|
             klass = Twilio.const_get association.to_s.classify
-            klass.expects(:foo).with :limit => 5, call_sid: call.sid, :account_sid => call.account_sid, :connect => true
-            call.send(association).foo :limit => 5
+            expect(klass).to receive(:foo).with limit: 5, call_sid: call.sid, account_sid: call.account_sid, connect: true
+            call.send(association).foo limit: 5
           end
         end
       end

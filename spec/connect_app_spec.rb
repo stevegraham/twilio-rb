@@ -24,7 +24,7 @@ describe Twilio::ConnectApp do
 
     it 'returns a collection containing instances of Twilio::ConnectApp' do
       resp = Twilio::ConnectApp.all
-      resp.all? { |r| r.is_a? Twilio::ConnectApp }.should be_true
+      resp.all? { |r| r.is_a? Twilio::ConnectApp }.should be true
     end
 
     JSON.parse(canned_response('list_connect_apps'))['connect_apps'].each_with_index do |obj,i|
@@ -53,7 +53,7 @@ describe Twilio::ConnectApp do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::ConnectApp.all :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::ConnectApp.all :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -86,7 +86,7 @@ describe Twilio::ConnectApp do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::ConnectApp.count :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::ConnectApp.count :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -136,7 +136,7 @@ describe Twilio::ConnectApp do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::ConnectApp.find 'CNb989fdd207b04d16aee578018ef5fd93', :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::ConnectApp.find 'CNb989fdd207b04d16aee578018ef5fd93', :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '/CNb989fdd207b04d16aee578018ef5fd93' + '.json').
             should have_been_made
         end

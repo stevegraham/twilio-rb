@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Twilio::Application do
-
   before { Twilio::Config.setup :account_sid => 'ACdc5f1e11047ebd6fe7a55f120be3a900', :auth_token => '79ad98413d911947f0ba369d295ae7a3' }
 
   def resource_uri(account_sid=nil, connect=nil)
@@ -75,14 +74,14 @@ describe Twilio::Application do
       context 'found by passing in an instance of Twilio::Account' do
         before { stub_api_call 'list_applications', 'SUBACCOUNT_SID' }
         it 'returns the application of resources' do
-          Twilio::Application.count(:account => mock(:sid => 'SUBACCOUNT_SID')).should == 6
+          Twilio::Application.count(:account => double(:sid => 'SUBACCOUNT_SID')).should == 6
         end
 
         it 'accepts options to refine the search' do
           query = '.json?FriendlyName=example'
           stub_request(:get, resource_uri('SUBACCOUNT_SID') + query).
             to_return :body => canned_response('list_applications'), :status => 200
-          Twilio::Application.count :friendly_name => 'example', :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Application.count :friendly_name => 'example', :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + query).should have_been_made
         end
       end
@@ -105,7 +104,7 @@ describe Twilio::Application do
       end
 
       it 'returns a collection containing instances of Twilio::Application' do
-        resp.all? { |r| r.is_a? Twilio::Application }.should be_true
+        resp.all? { |r| r.is_a? Twilio::Application }.should be true
       end
 
       JSON.parse(canned_response('list_applications'))['applications'].each_with_index do |obj,i|
@@ -132,7 +131,7 @@ describe Twilio::Application do
         end
 
         it 'returns a collection containing instances of Twilio::Application' do
-          resp.all? { |r| r.is_a? Twilio::Application }.should be_true
+          resp.all? { |r| r.is_a? Twilio::Application }.should be true
         end
 
         JSON.parse(canned_response('list_applications'))['applications'].each_with_index do |obj,i|
@@ -153,13 +152,13 @@ describe Twilio::Application do
       context 'found by passing in an instance of Twilio::Account' do
         context 'found by passing in an account sid' do
           before { stub_api_call 'list_applications', 'SUBACCOUNT_SID' }
-          let(:resp) { resp = Twilio::Application.all :account => mock(:sid =>'SUBACCOUNT_SID') }
+          let(:resp) { resp = Twilio::Application.all :account => double(:sid =>'SUBACCOUNT_SID') }
           it 'returns a collection of objects with a length corresponding to the response' do
             resp.length.should == 1
           end
 
           it 'returns a collection containing instances of Twilio::Application' do
-            resp.all? { |r| r.is_a? Twilio::Application }.should be_true
+            resp.all? { |r| r.is_a? Twilio::Application }.should be true
           end
 
           JSON.parse(canned_response('list_applications'))['applications'].each_with_index do |obj,i|
@@ -172,7 +171,7 @@ describe Twilio::Application do
             query = '.json?FriendlyName=example&Page=5'
             stub_request(:get, resource_uri('SUBACCOUNT_SID') + query).
               to_return :body => canned_response('list_applications'), :status => 200
-            Twilio::Application.all :page => 5, :friendly_name => 'example', :account => mock(:sid =>'SUBACCOUNT_SID')
+            Twilio::Application.all :page => 5, :friendly_name => 'example', :account => double(:sid =>'SUBACCOUNT_SID')
             a_request(:get, resource_uri('SUBACCOUNT_SID') + query).should have_been_made
           end
         end
@@ -256,7 +255,7 @@ describe Twilio::Application do
 
           let(:application) do
             Twilio::Application.find 'AP2a0747eba6abf96b7e3c3ff0b4530f6e',
-              :account => mock(:sid => 'SUBACCOUNT_SID')
+              :account => double(:sid => 'SUBACCOUNT_SID')
           end
 
           it 'returns an instance of Twilio::Application' do
@@ -273,7 +272,7 @@ describe Twilio::Application do
             stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/phony' + '.json').to_return :status => 404
           end
           it 'returns nil' do
-            application = Twilio::Application.find 'phony', :account => mock(:sid => 'SUBACCOUNT_SID')
+            application = Twilio::Application.find 'phony', :account => double(:sid => 'SUBACCOUNT_SID')
             application.should be_nil
           end
         end
@@ -376,7 +375,7 @@ describe Twilio::Application do
           stub_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).to_return :body => canned_response('application')
         end
 
-        let(:application) { Twilio::Application.create params.merge(:account => mock(:sid => 'SUBACCOUNT_SID')) }
+        let(:application) { Twilio::Application.create params.merge(:account => double(:sid => 'SUBACCOUNT_SID')) }
 
         it 'creates a new application on the account' do
           application
@@ -451,4 +450,3 @@ describe Twilio::Application do
     end
   end
 end
-

@@ -38,7 +38,7 @@ describe Twilio::Conference do
 
       it 'returns a collection containing instances of Twilio::Conference' do
         resp = Twilio::Conference.all
-        resp.all? { |r| r.is_a? Twilio::Conference }.should be_true
+        resp.all? { |r| r.is_a? Twilio::Conference }.should be true
       end
 
       it 'returns a collection containing objects with attributes corresponding to the response' do
@@ -73,7 +73,7 @@ describe Twilio::Conference do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Conference.all :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Conference.all :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -114,7 +114,7 @@ describe Twilio::Conference do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Conference.count :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Conference.count :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -146,7 +146,7 @@ describe Twilio::Conference do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::Conference.find 'CFbbe46ff1274e283f7e3ac1df0072ab39', :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::Conference.find 'CFbbe46ff1274e283f7e3ac1df0072ab39', :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '/CFbbe46ff1274e283f7e3ac1df0072ab39' + '.json').
           should have_been_made
         end
@@ -208,7 +208,7 @@ describe Twilio::Conference do
 
     it 'returns a collection of participants' do
       resp.should_not be_empty
-      resp.all? { |r| r.is_a? Twilio::Participant }.should be_true
+      resp.all? { |r| r.is_a? Twilio::Participant }.should be true
     end
 
     it 'returns a collection containing objects with attributes corresponding to the response' do

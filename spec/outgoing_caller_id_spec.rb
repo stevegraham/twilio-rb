@@ -33,7 +33,7 @@ describe Twilio::OutgoingCallerId do
 
     it 'returns a collection containing instances of Twilio::OutgoingCallerId' do
       resp = Twilio::OutgoingCallerId.all
-      resp.all? { |r| r.is_a? Twilio::OutgoingCallerId }.should be_true
+      resp.all? { |r| r.is_a? Twilio::OutgoingCallerId }.should be true
     end
 
     JSON.parse(canned_response('list_caller_ids'))['outgoing_caller_ids'].each_with_index do |obj,i|
@@ -62,7 +62,7 @@ describe Twilio::OutgoingCallerId do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::OutgoingCallerId.all :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::OutgoingCallerId.all :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -103,7 +103,7 @@ describe Twilio::OutgoingCallerId do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::OutgoingCallerId.count :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::OutgoingCallerId.count :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '.json').should have_been_made
         end
       end
@@ -161,7 +161,7 @@ describe Twilio::OutgoingCallerId do
 
       context 'found by passing in an instance of Twilio::Account' do
         it 'uses the subaccount sid in the request' do
-          Twilio::OutgoingCallerId.find 'PNe905d7e6b410746a0fb08c57e5a186f3', :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::OutgoingCallerId.find 'PNe905d7e6b410746a0fb08c57e5a186f3', :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + '/PNe905d7e6b410746a0fb08c57e5a186f3' + '.json').
             should have_been_made
         end
@@ -223,7 +223,7 @@ describe Twilio::OutgoingCallerId do
           stub_request(:post, resource_uri('SUBACCOUNT_SID') + '.json').with(:body => post_body).to_return :body => canned_response('caller_id')
         end
 
-        let(:caller_id) { Twilio::OutgoingCallerId.create params.merge(:account => mock(:sid => 'SUBACCOUNT_SID')) }
+        let(:caller_id) { Twilio::OutgoingCallerId.create params.merge(:account => double(:sid => 'SUBACCOUNT_SID')) }
 
         it 'creates a new incoming caller_id on the account' do
           caller_id

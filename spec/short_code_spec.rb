@@ -49,14 +49,14 @@ describe Twilio::ShortCode do
       context 'found by passing in an instance of Twilio::Account' do
         before { stub_api_call 'list_short_codes', 'SUBACCOUNT_SID' }
         it 'returns the short_code of resources' do
-          Twilio::ShortCode.count(:account => mock(:sid => 'SUBACCOUNT_SID')).should == 10
+          Twilio::ShortCode.count(:account => double(:sid => 'SUBACCOUNT_SID')).should == 10
         end
 
         it 'accepts options to refine the search' do
           query = '.json?FriendlyName=example'
           stub_request(:get, resource_uri('SUBACCOUNT_SID') + query).
             to_return :body => canned_response('list_short_codes'), :status => 200
-          Twilio::ShortCode.count :friendly_name => 'example', :account => mock(:sid => 'SUBACCOUNT_SID')
+          Twilio::ShortCode.count :friendly_name => 'example', :account => double(:sid => 'SUBACCOUNT_SID')
           a_request(:get, resource_uri('SUBACCOUNT_SID') + query).should have_been_made
         end
       end
@@ -72,7 +72,7 @@ describe Twilio::ShortCode do
       end
 
       it 'returns a collection containing instances of Twilio::ShortCode' do
-        resp.all? { |r| r.is_a? Twilio::ShortCode }.should be_true
+        resp.all? { |r| r.is_a? Twilio::ShortCode }.should be true
       end
 
       JSON.parse(canned_response('list_short_codes'))['short_codes'].each_with_index do |obj,i|
@@ -99,7 +99,7 @@ describe Twilio::ShortCode do
         end
 
         it 'returns a collection containing instances of Twilio::ShortCode' do
-          resp.all? { |r| r.is_a? Twilio::ShortCode }.should be_true
+          resp.all? { |r| r.is_a? Twilio::ShortCode }.should be true
         end
 
         JSON.parse(canned_response('list_short_codes'))['short_codes'].each_with_index do |obj,i|
@@ -120,13 +120,13 @@ describe Twilio::ShortCode do
       context 'found by passing in an instance of Twilio::Account' do
         context 'found by passing in an account sid' do
           before { stub_api_call 'list_short_codes', 'SUBACCOUNT_SID' }
-          let(:resp) { resp = Twilio::ShortCode.all :account => mock(:sid =>'SUBACCOUNT_SID') }
+          let(:resp) { resp = Twilio::ShortCode.all :account => double(:sid =>'SUBACCOUNT_SID') }
           it 'returns a collection of objects with a length corresponding to the response' do
             resp.length.should == 1
           end
 
           it 'returns a collection containing instances of Twilio::ShortCode' do
-            resp.all? { |r| r.is_a? Twilio::ShortCode }.should be_true
+            resp.all? { |r| r.is_a? Twilio::ShortCode }.should be true
           end
 
           JSON.parse(canned_response('list_short_codes'))['short_codes'].each_with_index do |obj,i|
@@ -139,7 +139,7 @@ describe Twilio::ShortCode do
             query = '.json?FriendlyName=example&Page=5'
             stub_request(:get, resource_uri('SUBACCOUNT_SID') + query).
               to_return :body => canned_response('list_short_codes'), :status => 200
-            Twilio::ShortCode.all :page => 5, :friendly_name => 'example', :account => mock(:sid =>'SUBACCOUNT_SID')
+            Twilio::ShortCode.all :page => 5, :friendly_name => 'example', :account => double(:sid =>'SUBACCOUNT_SID')
             a_request(:get, resource_uri('SUBACCOUNT_SID') + query).should have_been_made
           end
         end
@@ -216,7 +216,7 @@ describe Twilio::ShortCode do
 
           let(:short_code) do
             Twilio::ShortCode.find 'SC6b20cb705c1e8f00210049b20b70fce2',
-              :account => mock(:sid => 'SUBACCOUNT_SID')
+              :account => double(:sid => 'SUBACCOUNT_SID')
           end
 
           it 'returns an instance of Twilio::ShortCode' do
@@ -233,7 +233,7 @@ describe Twilio::ShortCode do
             stub_request(:get, resource_uri('SUBACCOUNT_SID') + '/phony' + '.json').to_return :status => 404
           end
           it 'returns nil' do
-            short_code = Twilio::ShortCode.find 'phony', :account => mock(:sid => 'SUBACCOUNT_SID')
+            short_code = Twilio::ShortCode.find 'phony', :account => double(:sid => 'SUBACCOUNT_SID')
             short_code.should be_nil
           end
         end
